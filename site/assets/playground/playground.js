@@ -2,6 +2,7 @@ import { normalizeConfig } from './config.js';
 import { toControlSpecs } from './uniforms.js';
 import { compare } from './pixeldiff.js';
 import { extractRegion, reassemble } from './editable.js';
+import { translateToHLSL } from './translate.js';
 import { createContext, buildProgram, setupQuad, renderFrame, readPixels } from './gl.js';
 
 class ShaderPlayground extends HTMLElement {
@@ -43,6 +44,11 @@ class ShaderPlayground extends HTMLElement {
           <button class="pg-reset">↺ Reset</button>
           ${this.cfg.reference ? '<button class="pg-check">✓ Conferir</button>' : ''}
           ${this.cfg.editableRegions.length ? '<button class="pg-solution">💡 Mostrar solução</button>' : ''}
+          <button class="pg-lang" title="Ver o equivalente em HLSL (Unity)">🔁 Ver em HLSL</button>
+        </div>
+        <div class="pg-hlsl" hidden>
+          <p class="pg-hlsl-nota">Como ficaria no <strong>Unity (HLSL)</strong> — ilustrativo, não roda aqui:</p>
+          <pre class="pg-hlsl-code"></pre>
         </div>
         <p class="pg-status" aria-live="polite"></p>
       </div>`;
@@ -80,6 +86,24 @@ class ShaderPlayground extends HTMLElement {
     this.querySelector('.pg-reset')?.addEventListener('click', () => this._reset());
     this.querySelector('.pg-check')?.addEventListener('click', () => this._check());
     this.querySelector('.pg-solution')?.addEventListener('click', () => this._showSolution());
+    this.querySelector('.pg-lang')?.addEventListener('click', () => this._toggleLang());
+  }
+
+  _toggleLang() {
+    const panel = this.querySelector('.pg-hlsl');
+    const btn = this.querySelector('.pg-lang');
+    if (!panel) return;
+    const showing = !panel.hidden;
+    if (showing) {
+      panel.hidden = true;
+      btn.textContent = '🔁 Ver em HLSL';
+    } else {
+      // HLSL curado (config.hlsl) ou tradução automática do shader que está rodando.
+      const hlsl = this.cfg.hlsl ?? translateToHLSL(this.fullSource);
+      this.querySelector('.pg-hlsl-code').textContent = hlsl;
+      panel.hidden = false;
+      btn.textContent = '🔁 Voltar pro GLSL';
+    }
   }
 
   _applyEditorAndCompile() {

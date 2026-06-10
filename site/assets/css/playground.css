@@ -11,3 +11,6 @@
 .pg-ok { color: #1a7f37; font-weight: bold; }
 .pg-quase { color: #b35900; }
 .pg-erro { color: #c0392b; font-family: ui-monospace, monospace; font-size: 13px; }
+.pg-hlsl { margin: 8px 0; border: 1px solid #7048e8; border-radius: 6px; background: #f3f0ff; }
+.pg-hlsl-nota { font: 13px system-ui; margin: 0; padding: 6px 10px; color: #5f3dc4; }
+.pg-hlsl-code { margin: 0; padding: 10px; font: 13px ui-monospace, monospace; white-space: pre-wrap; overflow-x: auto; border-top: 1px solid #d0bfff; }

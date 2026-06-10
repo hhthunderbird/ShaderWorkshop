@@ -67,10 +67,33 @@
     </div>
   </details>
 
+  <details class="sidebar">
+    <summary>🗣️ Dois sotaques, mesma língua: GLSL e HLSL</summary>
+    <div>
+      <p>Existem dois "dialetos" de shader bem parecidos. A gente usa <strong>GLSL</strong>
+      (na verdade <strong>GLSL ES</strong>, a versão que roda no navegador). O <strong>Unity</strong>
+      usa <strong>HLSL</strong>. As ideias são <em>idênticas</em> — muda quase só o nome de
+      algumas coisas:</p>
+      <table>
+        <tr><th>GLSL (aqui, no navegador)</th><th>HLSL (no Unity)</th></tr>
+        <tr><td><code>vec3</code> / <code>vec4</code></td><td><code>float3</code> / <code>float4</code></td></tr>
+        <tr><td><code>mix(a,b,t)</code></td><td><code>lerp(a,b,t)</code></td></tr>
+        <tr><td><code>fract(x)</code></td><td><code>frac(x)</code></td></tr>
+        <tr><td><code>gl_FragColor = cor;</code></td><td><code>return cor; // : SV_Target</code></td></tr>
+      </table>
+      <p>👉 Em <strong>qualquer</strong> playground deste curso, clique no botão
+      <strong>🔁 Ver em HLSL</strong> pra ver o mesmo shader escrito do jeito do Unity. Assim
+      você aprende aqui e já sai sabendo migrar.</p>
+      <p class="cuidado-inline">⚠️ Um detalhe: <code>mod</code> (GLSL) e <code>fmod</code> (HLSL)
+      dão resultados diferentes com números negativos — fora isso, a tradução é direta.</p>
+    </div>
+  </details>
+
   <div class="qa">
     <dl>
       <dt>Esse shader é uma linguagem nova?</dt>
-      <dd>É GLSL — parecida com C. Você vai pegar aos poucos; por enquanto só leu uma linha.</dd>
+      <dd>É GLSL — parecida com C. O Unity usa uma prima quase igual, a HLSL (veja a caixa
+      "Dois sotaques" acima). Você vai pegar aos poucos; por enquanto só leu uma linha.</dd>
       <dt>Por que a cor não tem o canal "alpha"?</dt>
       <dd>Tem! O <code>1.0</code> no fim (<code>vec4(cor, 1.0)</code>) é o alpha = opaco. Falaremos disso lá no módulo de transparência.</dd>
       <dt>Onde esse código roda mesmo?</dt>

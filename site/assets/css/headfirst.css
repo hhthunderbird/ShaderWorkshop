@@ -23,3 +23,7 @@ body.hf { max-width: 820px; margin: 0 auto; padding: 24px; font: 17px/1.6 Georgi
 .hf .recordacao h2 { margin-top: 8px; }
 .hf .recordacao::before { content: "🎯 Hora de fixar"; display: block; font-weight: bold; color: #7048e8; margin: 8px 0 0; }
 .hf .proximo-soon { color: #999; cursor: default; }
+.hf .sidebar table { border-collapse: collapse; margin: 8px 0; width: 100%; }
+.hf .sidebar th, .hf .sidebar td { border: 1px solid #bbb; padding: 5px 9px; text-align: left; font-size: 15px; }
+.hf .sidebar th { background: #e7e0ff; }
+.hf .cuidado-inline { color: #b35900; font-size: 14px; margin: 8px 0 0; }

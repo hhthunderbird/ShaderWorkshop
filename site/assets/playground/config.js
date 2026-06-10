@@ -21,6 +21,7 @@ export function normalizeConfig(raw) {
     editableRegions: Array.isArray(raw.editableRegions) ? raw.editableRegions : [],
     reference: raw.reference ?? null,
     solution: raw.solution ?? null,
+    hlsl: raw.hlsl ?? null, // versão HLSL curada (override do tradutor automático)
     tolerance: typeof raw.tolerance === 'number' ? clamp01(raw.tolerance) : 0.06,
   };
 }
