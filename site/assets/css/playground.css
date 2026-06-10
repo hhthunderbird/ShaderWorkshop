@@ -1,0 +1,13 @@
+.pg { border: 2px solid #2b2b2b; border-radius: 10px; padding: 12px; background: #fafafa; max-width: 360px; }
+.pg-canvas { width: 320px; height: 320px; display: block; border-radius: 6px; background: #000; image-rendering: pixelated; }
+.pg-controls { margin: 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.pg-control { display: flex; align-items: center; justify-content: space-between; font: 14px system-ui; gap: 8px; }
+.pg-control input[type="range"] { flex: 1; }
+.pg-editor { width: 100%; min-height: 90px; font: 13px ui-monospace, monospace; margin: 8px 0; border: 1px solid #bbb; border-radius: 6px; padding: 8px; box-sizing: border-box; }
+.pg-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+.pg-buttons button { font: 14px system-ui; padding: 6px 10px; border: 1px solid #2b2b2b; border-radius: 6px; background: #fff; cursor: pointer; }
+.pg-buttons button:hover { background: #efefef; }
+.pg-status { font: 14px system-ui; min-height: 1.2em; margin: 6px 0 0; }
+.pg-ok { color: #1a7f37; font-weight: bold; }
+.pg-quase { color: #b35900; }
+.pg-erro { color: #c0392b; font-family: ui-monospace, monospace; font-size: 13px; }
