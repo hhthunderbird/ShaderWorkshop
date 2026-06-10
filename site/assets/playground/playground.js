@@ -6,6 +6,7 @@ import { createContext, buildProgram, setupQuad, renderFrame, readPixels } from 
 
 class ShaderPlayground extends HTMLElement {
   connectedCallback() {
+    cancelAnimationFrame(this._raf); // evita loop duplicado se reinicializado
     let raw;
     try {
       raw = this._config || JSON.parse(this.getAttribute('data-config') || '{}');
@@ -24,7 +25,12 @@ class ShaderPlayground extends HTMLElement {
     this._loop();
   }
 
-  set config(obj) { this._config = obj; }
+  set config(obj) {
+    this._config = obj;
+    // Se o elemento já foi conectado (módulo ES roda após o upgrade do custom
+    // element), re-inicializa agora que a config existe.
+    if (this.isConnected) this.connectedCallback();
+  }
 
   _render() {
     this.innerHTML = `
@@ -112,10 +118,17 @@ class ShaderPlayground extends HTMLElement {
   }
 
   _reset() {
+    // NÃO reconstrói o DOM (isso detacharia o canvas do contexto WebGL ativo).
+    // Restaura valores no lugar e recompila no mesmo canvas/contexto.
     this.fullSource = this.cfg.fragment;
     if (this.editor) this.editor.value = extractRegion(this.cfg.fragment, this.cfg.editableRegions[0]);
     for (const s of this.controlSpecs) this.controlValues[s.name] = s.value;
-    this._render();
+    this.querySelectorAll('.pg-control').forEach((wrap, i) => {
+      const input = wrap.querySelector('input');
+      const s = this.controlSpecs[i];
+      if (!input || !s) return;
+      input.value = s.kind === 'slider' ? s.value : rgbToHex(s.value);
+    });
     this._compile();
   }
 
@@ -144,13 +157,17 @@ class ShaderPlayground extends HTMLElement {
 }
 
 function withHeader(src) {
-  // Cabeçalho GLSL ES padrão para todos os fragment shaders do curso.
-  const header = `precision mediump float;
-uniform float u_time;
-uniform vec2 u_resolution;
-varying vec2 v_uv;
-`;
-  return src.includes('precision ') ? src : header + src;
+  // Injeta cada declaração padrão só se ainda não estiver no shader do aluno.
+  // Evita tanto "undeclared identifier" quanto "duplicate declaration".
+  const hasPrecision = /^\s*precision\s/m.test(src);
+  const addIfMissing = (decl, token) => (src.includes(token) ? '' : decl + '\n');
+  return (
+    (hasPrecision ? '' : 'precision mediump float;\n') +
+    addIfMissing('uniform float u_time;', 'u_time') +
+    addIfMissing('uniform vec2 u_resolution;', 'u_resolution') +
+    addIfMissing('varying vec2 v_uv;', 'v_uv') +
+    src
+  );
 }
 
 function rgbToHex([r, g, b]) {
