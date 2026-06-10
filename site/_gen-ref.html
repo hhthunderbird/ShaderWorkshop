@@ -1,0 +1,13 @@
+<!doctype html><meta charset="utf-8">
+<canvas id="c" width="320" height="320"></canvas>
+<script>
+  const ctx = document.getElementById('c').getContext('2d');
+  ctx.fillStyle = '#ff0000'; ctx.fillRect(0, 0, 160, 320);
+  ctx.fillStyle = '#0000ff'; ctx.fillRect(160, 0, 160, 320);
+  // baixar
+  const a = document.createElement('a');
+  a.href = document.getElementById('c').toDataURL('image/png');
+  a.download = 'm1-meio-a-meio.png';
+  a.textContent = 'Baixar referência';
+  document.body.appendChild(a);
+</script>
