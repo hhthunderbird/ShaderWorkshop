@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { extractRegion, reassemble } from '../curso/assets/playground/editable.js';
+import { extractRegion, reassemble } from '../site/assets/playground/editable.js';
 
 const SRC = [
   'void main() {',

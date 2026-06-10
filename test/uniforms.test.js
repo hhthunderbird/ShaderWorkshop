@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { toControlSpecs, AUTO_UNIFORMS } from '../curso/assets/playground/uniforms.js';
+import { toControlSpecs, AUTO_UNIFORMS } from '../site/assets/playground/uniforms.js';
 
 test('float vira slider com min/max/value', () => {
   const specs = toControlSpecs([

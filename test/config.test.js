@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeConfig } from '../curso/assets/playground/config.js';
+import { normalizeConfig } from '../site/assets/playground/config.js';
 
 test('preenche defaults', () => {
   const c = normalizeConfig({ fragment: 'void main(){}' });

@@ -16,7 +16,7 @@
 
 ```
 /package.json                       # scripts de teste (node:test), sem deps de runtime
-/curso/
+/site/
   index.html                        # capa + mapa dos 3 marcos (Marco 1 ativo)
   /assets/
     /playground/
@@ -51,7 +51,7 @@
 **Files:**
 - Create: `package.json`
 - Create: `test/smoke.test.js`
-- Create: `curso/assets/playground/.gitkeep`
+- Create: `site/assets/playground/.gitkeep`
 
 - [ ] **Step 1: Criar `package.json`**
 
@@ -63,7 +63,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "serve": "python -m http.server 8000 --directory curso"
+    "serve": "python -m http.server 8000 --directory site"
   }
 }
 ```
@@ -74,7 +74,7 @@
 ```javascript
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ok } from '../curso/assets/playground/config.js';
+import { ok } from '../site/assets/playground/config.js';
 
 test('harness vivo', () => {
   assert.equal(ok(), true);
@@ -86,7 +86,7 @@ test('harness vivo', () => {
 Run: `npm test`
 Expected: FAIL — `Cannot find module .../config.js`
 
-- [ ] **Step 4: Criar stub mínimo `curso/assets/playground/config.js`**
+- [ ] **Step 4: Criar stub mínimo `site/assets/playground/config.js`**
 
 ```javascript
 export function ok() {
@@ -102,7 +102,7 @@ Expected: PASS — 1 test passed
 - [ ] **Step 6: Commit**
 
 ```bash
-git add package.json test/smoke.test.js curso/assets/playground/config.js
+git add package.json test/smoke.test.js site/assets/playground/config.js
 git commit -m "chore: esqueleto do curso + harness node:test"
 ```
 
@@ -111,7 +111,7 @@ git commit -m "chore: esqueleto do curso + harness node:test"
 ## Task 2: `config.js` — validação/normalização da config do playground
 
 **Files:**
-- Modify: `curso/assets/playground/config.js`
+- Modify: `site/assets/playground/config.js`
 - Create: `test/config.test.js`
 - Delete: `test/smoke.test.js` (substituído)
 
@@ -135,7 +135,7 @@ A config descreve uma instância de playground. Forma:
 ```javascript
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeConfig } from '../curso/assets/playground/config.js';
+import { normalizeConfig } from '../site/assets/playground/config.js';
 
 test('preenche defaults', () => {
   const c = normalizeConfig({ fragment: 'void main(){}' });
@@ -178,7 +178,7 @@ Expected: FAIL — `normalizeConfig is not a function`
 
 - [ ] **Step 3: Implementar `config.js`**
 
-Substituir todo o conteúdo de `curso/assets/playground/config.js`:
+Substituir todo o conteúdo de `site/assets/playground/config.js`:
 ```javascript
 const VALID_MODES = ['fragment', 'mesh'];
 
@@ -222,7 +222,7 @@ git rm test/smoke.test.js
 - [ ] **Step 6: Commit**
 
 ```bash
-git add curso/assets/playground/config.js test/config.test.js
+git add site/assets/playground/config.js test/config.test.js
 git commit -m "feat(playground): normalizeConfig com defaults e validacao"
 ```
 
@@ -231,7 +231,7 @@ git commit -m "feat(playground): normalizeConfig com defaults e validacao"
 ## Task 3: `uniforms.js` — decls de uniform → specs de controle
 
 **Files:**
-- Create: `curso/assets/playground/uniforms.js`
+- Create: `site/assets/playground/uniforms.js`
 - Create: `test/uniforms.test.js`
 
 Converte declarações de uniform em "specs de controle" (dados puros), que o orquestrador vira sliders/color-pickers. Tipos: `float` (slider), `color` (3 floats RGB). `u_time` e `u_resolution` são automáticos (não viram controle).
@@ -242,7 +242,7 @@ Converte declarações de uniform em "specs de controle" (dados puros), que o or
 ```javascript
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { toControlSpecs, AUTO_UNIFORMS } from '../curso/assets/playground/uniforms.js';
+import { toControlSpecs, AUTO_UNIFORMS } from '../site/assets/playground/uniforms.js';
 
 test('float vira slider com min/max/value', () => {
   const specs = toControlSpecs([
@@ -327,7 +327,7 @@ Expected: PASS — 5 tests passed
 - [ ] **Step 5: Commit**
 
 ```bash
-git add curso/assets/playground/uniforms.js test/uniforms.test.js
+git add site/assets/playground/uniforms.js test/uniforms.test.js
 git commit -m "feat(playground): toControlSpecs (uniform -> spec de controle)"
 ```
 
@@ -336,7 +336,7 @@ git commit -m "feat(playground): toControlSpecs (uniform -> spec de controle)"
 ## Task 4: `pixeldiff.js` — comparador de pixels para exercícios
 
 **Files:**
-- Create: `curso/assets/playground/pixeldiff.js`
+- Create: `site/assets/playground/pixeldiff.js`
 - Create: `test/pixeldiff.test.js`
 
 Compara dois `Uint8ClampedArray` RGBA (saída do aluno × referência). Retorna `{ score, pass }` onde score = 1 - (erro médio normalizado), pass = score >= (1 - tolerance).
@@ -347,7 +347,7 @@ Compara dois `Uint8ClampedArray` RGBA (saída do aluno × referência). Retorna 
 ```javascript
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { compare } from '../curso/assets/playground/pixeldiff.js';
+import { compare } from '../site/assets/playground/pixeldiff.js';
 
 const px = (r, g, b) => Uint8ClampedArray.from([r, g, b, 255]);
 
@@ -413,7 +413,7 @@ Expected: PASS — 4 tests passed
 - [ ] **Step 5: Commit**
 
 ```bash
-git add curso/assets/playground/pixeldiff.js test/pixeldiff.test.js
+git add site/assets/playground/pixeldiff.js test/pixeldiff.test.js
 git commit -m "feat(playground): pixeldiff.compare para exercicios autocorrigidos"
 ```
 
@@ -422,7 +422,7 @@ git commit -m "feat(playground): pixeldiff.compare para exercicios autocorrigido
 ## Task 5: `editable.js` — regiões GLSL travadas/editáveis
 
 **Files:**
-- Create: `curso/assets/playground/editable.js`
+- Create: `site/assets/playground/editable.js`
 - Create: `test/editable.test.js`
 
 Marca regiões editáveis no GLSL com comentários sentinela. Extrai o trecho editável (pro editor do aluno) e remonta o shader completo (travado + editado) antes de compilar.
@@ -440,7 +440,7 @@ Formato sentinela no GLSL:
 ```javascript
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { extractRegion, reassemble } from '../curso/assets/playground/editable.js';
+import { extractRegion, reassemble } from '../site/assets/playground/editable.js';
 
 const SRC = [
   'void main() {',
@@ -508,7 +508,7 @@ Expected: PASS — 3 tests passed
 - [ ] **Step 5: Commit**
 
 ```bash
-git add curso/assets/playground/editable.js test/editable.test.js
+git add site/assets/playground/editable.js test/editable.test.js
 git commit -m "feat(playground): editable regions (extract/reassemble GLSL)"
 ```
 
@@ -517,14 +517,14 @@ git commit -m "feat(playground): editable regions (extract/reassemble GLSL)"
 ## Task 6: `gl.js` — núcleo WebGL (compile + render fragment)
 
 **Files:**
-- Create: `curso/assets/playground/gl.js`
-- Create: `curso/assets/meshes/quad.json`
+- Create: `site/assets/playground/gl.js`
+- Create: `site/assets/meshes/quad.json`
 
 WebGL é verificado visualmente (não unit-testado headless). `gl.js` expõe funções puras de glue: criar contexto WebGL1, compilar programa, e renderizar um frame com uniforms.
 
 - [ ] **Step 1: Criar malha quad fullscreen**
 
-`curso/assets/meshes/quad.json`:
+`site/assets/meshes/quad.json`:
 ```json
 {
   "positions": [-1, -1, 1, -1, -1, 1, 1, 1],
@@ -641,7 +641,7 @@ export function readPixels(gl) {
 - [ ] **Step 3: Commit**
 
 ```bash
-git add curso/assets/playground/gl.js curso/assets/meshes/quad.json
+git add site/assets/playground/gl.js site/assets/meshes/quad.json
 git commit -m "feat(playground): nucleo WebGL1 (compile, quad, render, readPixels)"
 ```
 
@@ -652,7 +652,7 @@ git commit -m "feat(playground): nucleo WebGL1 (compile, quad, render, readPixel
 ## Task 7: `playground.js` — Web Component `<shader-playground>`
 
 **Files:**
-- Create: `curso/assets/playground/playground.js`
+- Create: `site/assets/playground/playground.js`
 
 Orquestra: lê config (atributo `data-config` JSON ou propriedade), monta DOM (canvas + editor + sliders + botões), roda o loop de render, e wira a checagem de exercício (pixel-diff contra `reference`).
 
@@ -847,7 +847,7 @@ export { ShaderPlayground };
 - [ ] **Step 2: Commit**
 
 ```bash
-git add curso/assets/playground/playground.js
+git add site/assets/playground/playground.js
 git commit -m "feat(playground): Web Component <shader-playground> com controles e check"
 ```
 
@@ -856,8 +856,8 @@ git commit -m "feat(playground): Web Component <shader-playground> com controles
 ## Task 8: CSS do playground + dispositivos Head First
 
 **Files:**
-- Create: `curso/assets/css/playground.css`
-- Create: `curso/assets/css/headfirst.css`
+- Create: `site/assets/css/playground.css`
+- Create: `site/assets/css/headfirst.css`
 
 - [ ] **Step 1: Criar `playground.css`**
 
@@ -906,7 +906,7 @@ body.hf { max-width: 820px; margin: 0 auto; padding: 24px; font: 17px/1.6 Georgi
 - [ ] **Step 3: Commit**
 
 ```bash
-git add curso/assets/css/playground.css curso/assets/css/headfirst.css
+git add site/assets/css/playground.css site/assets/css/headfirst.css
 git commit -m "feat(css): estilos do playground e dispositivos Head First"
 ```
 
@@ -915,11 +915,11 @@ git commit -m "feat(css): estilos do playground e dispositivos Head First"
 ## Task 9: Página de teste do playground (verificação visual)
 
 **Files:**
-- Create: `curso/_teste-playground.html`
+- Create: `site/_teste-playground.html`
 
 Página isolada para verificar o motor antes de montar o Módulo 1.
 
-- [ ] **Step 1: Criar `curso/_teste-playground.html`**
+- [ ] **Step 1: Criar `site/_teste-playground.html`**
 
 ```html
 <!doctype html>
@@ -978,7 +978,7 @@ REQUIRED SUB-SKILL: Use superpowers:verification-before-completion — confirmar
 - [ ] **Step 4: Commit**
 
 ```bash
-git add curso/_teste-playground.html
+git add site/_teste-playground.html
 git commit -m "test(playground): pagina de verificacao visual do motor"
 ```
 
@@ -987,7 +987,7 @@ git commit -m "test(playground): pagina de verificacao visual do motor"
 ## Task 10: Diagrama SVG CPU×GPU (asset do Módulo 1)
 
 **Files:**
-- Create: `curso/assets/img/cpu-vs-gpu.svg`
+- Create: `site/assets/img/cpu-vs-gpu.svg`
 
 - [ ] **Step 1: Criar `cpu-vs-gpu.svg`** (estilo desenhado, anotado)
 
@@ -1023,7 +1023,7 @@ git commit -m "test(playground): pagina de verificacao visual do motor"
 - [ ] **Step 2: Commit**
 
 ```bash
-git add curso/assets/img/cpu-vs-gpu.svg
+git add site/assets/img/cpu-vs-gpu.svg
 git commit -m "asset(m1): diagrama SVG CPU vs GPU"
 ```
 
@@ -1032,11 +1032,11 @@ git commit -m "asset(m1): diagrama SVG CPU vs GPU"
 ## Task 11: Módulo 1 — página do aluno
 
 **Files:**
-- Create: `curso/modulos/01-shaders-e-gpu.html`
+- Create: `site/modulos/01-shaders-e-gpu.html`
 
 Implementa a §5/Módulo 1 do spec com TODOS os dispositivos Head First obrigatórios (§3).
 
-- [ ] **Step 1: Criar `curso/modulos/01-shaders-e-gpu.html`**
+- [ ] **Step 1: Criar `site/modulos/01-shaders-e-gpu.html`**
 
 ```html
 <!doctype html>
@@ -1168,7 +1168,7 @@ Confirmar: playground pinta e responde ao seletor; todos os dispositivos HF apar
 - [ ] **Step 3: Commit**
 
 ```bash
-git add curso/modulos/01-shaders-e-gpu.html
+git add site/modulos/01-shaders-e-gpu.html
 git commit -m "feat(m1): pagina do aluno - Shaders e a GPU (Head First completo)"
 ```
 
@@ -1177,8 +1177,8 @@ git commit -m "feat(m1): pagina do aluno - Shaders e a GPU (Head First completo)
 ## Task 12: Módulo 1 — exercício com referência (pixel-diff)
 
 **Files:**
-- Create: `curso/assets/ref/m1-meio-a-meio.png` (gerado)
-- Modify: `curso/modulos/01-shaders-e-gpu.html` (adicionar 2º playground-exercício)
+- Create: `site/assets/ref/m1-meio-a-meio.png` (gerado)
+- Modify: `site/modulos/01-shaders-e-gpu.html` (adicionar 2º playground-exercício)
 
 - [ ] **Step 1: Gerar a imagem-referência** (320×320, metade esquerda vermelha, direita azul)
 
@@ -1190,7 +1190,7 @@ import { writeFileSync } from 'node:fs';
 console.log('Use o Step 2 (navegador) para gerar a referência.');
 ```
 
-Como evitamos dependências, gere a referência pelo navegador: abrir `curso/_gen-ref.html`:
+Como evitamos dependências, gere a referência pelo navegador: abrir `site/_gen-ref.html`:
 ```html
 <!doctype html><meta charset="utf-8">
 <canvas id="c" width="320" height="320"></canvas>
@@ -1206,7 +1206,7 @@ Como evitamos dependências, gere a referência pelo navegador: abrir `curso/_ge
   document.body.appendChild(a);
 </script>
 ```
-Run: `npm run serve` → abrir `http://localhost:8000/_gen-ref.html` → clicar "Baixar referência" → mover o arquivo para `curso/assets/ref/m1-meio-a-meio.png`.
+Run: `npm run serve` → abrir `http://localhost:8000/_gen-ref.html` → clicar "Baixar referência" → mover o arquivo para `site/assets/ref/m1-meio-a-meio.png`.
 
 - [ ] **Step 2: Adicionar o playground-exercício** ao final do conteúdo de `01-shaders-e-gpu.html`, antes de "Recordação":
 
@@ -1244,7 +1244,7 @@ REQUIRED SUB-SKILL: Use superpowers:verification-before-completion — evidênci
 - [ ] **Step 4: Commit**
 
 ```bash
-git add curso/assets/ref/m1-meio-a-meio.png curso/modulos/01-shaders-e-gpu.html curso/_gen-ref.html
+git add site/assets/ref/m1-meio-a-meio.png site/modulos/01-shaders-e-gpu.html site/_gen-ref.html
 git commit -m "feat(m1): exercicio pixel-diff meio-a-meio com referencia"
 ```
 
@@ -1253,9 +1253,9 @@ git commit -m "feat(m1): exercicio pixel-diff meio-a-meio com referencia"
 ## Task 13: Módulo 1 — guia do professor
 
 **Files:**
-- Create: `curso/professor/01-guia.md`
+- Create: `site/professor/01-guia.md`
 
-- [ ] **Step 1: Criar `curso/professor/01-guia.md`**
+- [ ] **Step 1: Criar `site/professor/01-guia.md`**
 
 ```markdown
 # Guia do Professor — Módulo 1: Shaders & a GPU
@@ -1292,7 +1292,7 @@ Rubrica: usou [0,1] corretamente (1pt), cor confere com os números (1pt), print
 - [ ] **Step 2: Commit**
 
 ```bash
-git add curso/professor/01-guia.md
+git add site/professor/01-guia.md
 git commit -m "docs(m1): guia do professor"
 ```
 
@@ -1301,9 +1301,9 @@ git commit -m "docs(m1): guia do professor"
 ## Task 14: Capa / mapa do curso
 
 **Files:**
-- Create: `curso/index.html`
+- Create: `site/index.html`
 
-- [ ] **Step 1: Criar `curso/index.html`**
+- [ ] **Step 1: Criar `site/index.html`**
 
 ```html
 <!doctype html>
@@ -1346,7 +1346,7 @@ Run: `npm run serve` → navegar index → Módulo 1 → exercício verde. Confi
 - [ ] **Step 3: Commit**
 
 ```bash
-git add curso/index.html
+git add site/index.html
 git commit -m "feat: capa e mapa do curso (Marco 1)"
 ```
 

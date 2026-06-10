@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { compare } from '../curso/assets/playground/pixeldiff.js';
+import { compare } from '../site/assets/playground/pixeldiff.js';
 
 const px = (r, g, b) => Uint8ClampedArray.from([r, g, b, 255]);
 
