@@ -1,0 +1,17 @@
+# Conteúdo do curso-fonte (pago, NÃO versionar / NÃO publicar)
+Curso/
+Transcricoes/
+*.mp4
+*.srt
+
+# Segredos / sessão de login
+cookies.txt
+
+# Ambiente Python (recriável)
+.venv-whisper/
+__pycache__/
+*.pyc
+
+# Cache de modelo / temporários
+.cache/
+*.log
