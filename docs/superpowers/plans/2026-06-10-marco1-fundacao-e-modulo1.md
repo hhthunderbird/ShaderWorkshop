@@ -1386,3 +1386,23 @@ Expected: branch atualizada no remoto, sem conteúdo de `Curso/`/`Transcricoes/`
 **Placeholder scan:** O único `[IMAGEM:]` é intencional (política do spec, com link de fonte). Nenhum TODO/TBD de código. ✔
 
 **Consistência de tipos:** `normalizeConfig` retorna mode, fragment, vertex, mesh, uniforms, editableRegions, reference, **solution**, tolerance — todos consumidos por `playground.js`. `solution` agora preservado (corrigido inline na Task 2/Step 3). `compare`/`toControlSpecs`/`extractRegion`/`reassemble` batem com os usos em `playground.js`. ✔
+
+---
+
+## Divergências aplicadas na execução (2026-06-10)
+
+Registradas para o plano-sequência (Módulos 2–6) reutilizar o motor correto:
+
+1. **Reorg de diretório:** web vive em `site/` (não `curso/`). Motivo: `Curso/` (mp4 fonte) colide com `curso/` no Windows (NTFS case-insensitive) e o site seria criado dentro da pasta dos mp4 — risco de exclusão acidental. `site/` ≠ `Curso/`, sem colisão. Todos os paths do plano já refletem `site/`.
+
+2. **Correções em `playground.js`** (bugs achados em review, sem os quais nada renderiza):
+   - `set config()` agora re-inicializa via `connectedCallback()` quando `isConnected` — senão o upgrade do custom element (script no `<head>`) dispara antes do `.config` inline e tudo vira "Config inválida".
+   - `connectedCallback()` chama `cancelAnimationFrame(this._raf)` no início (evita loop de render duplicado em re-init).
+   - `_reset()` NÃO reconstrói o DOM (isso detachava o canvas do contexto WebGL → tela preta). Restaura valores dos inputs no lugar e recompila no mesmo contexto.
+   - `withHeader()` injeta cada declaração padrão (`u_time`/`u_resolution`/`v_uv`/`precision`) só se ausente, por token — evita "undeclared identifier" e "duplicate declaration".
+
+3. **Imagem-referência via node** (Task 12): em vez do `_gen-ref.html` (browser), a referência é gerada por `scripts/gen-ref-m1.mjs` (encoder PNG com `zlib` nativo, sem deps nem navegador). `_gen-ref.html` fica como alternativa documentada.
+
+4. **Teste de integração headless** adicionado (`test/module1.integration.test.js`): valida as configs reais do Módulo 1 pelo pipeline puro + presença dos dispositivos Head First no HTML. Total: 21 testes.
+
+5. **Verificação visual PENDENTE:** sem extensão de browser no ambiente de build, a renderização WebGL das páginas não foi confirmada visualmente. Lógica pura (21 testes) e estrutura (HTML/configs) verificadas. **Falta o usuário abrir no navegador e confirmar** (ver checklist na entrega).
