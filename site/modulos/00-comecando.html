@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 0 — Comece aqui: o Playground</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · Comece aqui · Módulo 0</p>
+  <h1>Comece aqui: o Playground</h1>
+  <p>Antes de pintar pixels, 2 minutos pra conhecer a ferramenta. Você vai brincar com um
+  quadradinho de cor — sem medo de quebrar nada.</p>
+
+  <h2>Mexa sem medo</h2>
+  <p>Troque os números do <code>vec3</code> (são Vermelho, Verde, Azul, de 0 a 1) e clique
+  <strong>▶ Test Drive</strong>. Erre à vontade: <strong>↺ Reset</strong> volta tudo,
+  <strong>💡 Mostrar solução</strong> mostra uma resposta.</p>
+
+  <shader-playground id="pg-tour"></shader-playground>
+
+  <h2>Os botões</h2>
+  <div class="bullets">
+    <ul>
+      <li><strong>▶ Test Drive</strong> — roda o que você escreveu na hora.</li>
+      <li><strong>↺ Reset</strong> — volta o código ao original, como se nada tivesse acontecido.</li>
+      <li><strong>✓ Conferir</strong> — aparece quando o exercício tem um alvo: compara seu resultado com ele.</li>
+      <li><strong>💡 Mostrar solução</strong> — mostra uma resposta pronta pra você comparar.</li>
+      <li><strong>🔁 Ver em HLSL</strong> — mostra como ficaria no Unity — ilustrativo, sem precisar entender agora.</li>
+    </ul>
+  </div>
+
+  <div class="cuidado">
+    Tela preta/cinza ou ⚠ ERROR? Quase sempre é erro de digitação — faltou um <code>;</code>
+    no fim da linha ou um parêntese. <strong>↺ Reset</strong> restaura o código certo;
+    <strong>💡 Mostrar solução</strong> mostra a resposta. Não entre em pânico: errar é parte do jogo.
+  </div>
+
+  <h2>Onde eu escrevo?</h2>
+  <p>Você só mexe na parte clara, entre as marcas <code>// >>> EDIT</code> e <code>// &lt;&lt;&lt; EDIT</code>.
+  O resto (mais apagado) é o <strong>motor</strong> — ele cuida da parte chata pra você.</p>
+
+  <details class="sidebar">
+    <summary>🔤 Lendo uma linha de código pela 1ª vez (opcional)</summary>
+    <div>
+      <p>Não precisa decorar — é só pra reconhecer quando ler:</p>
+      <ul>
+        <li><code>void main() { ... }</code> — a receita que a GPU roda pra cada pixel.</li>
+        <li><code>;</code> — fim de uma instrução (como o ponto final de uma frase).</li>
+        <li><code>gl_FragColor</code> — a cor que sai (o resultado final do pixel).</li>
+        <li><code>vec3(r, g, b)</code> — um trio de números (uma cor: vermelho, verde, azul).</li>
+        <li><code>float</code> — um número (com vírgula, tipo 0.5).</li>
+        <li><code>step</code> e <code>mix</code> — duas funçõezinhas que você usa já no Módulo 1
+        (degrau e mistura) — a gente explica direitinho lá.</li>
+      </ul>
+    </div>
+  </details>
+
+  <div class="qa">
+    <dl>
+      <dt>Preciso saber programar?</dt>
+      <dd>Não! O curso ensina do zero. Aqui você só troca números e vê o que muda.</dd>
+      <dt>E se eu apagar algo importante?</dt>
+      <dd>↺ Reset traz tudo de volta. Nada quebra de verdade.</dd>
+    </dl>
+  </div>
+
+  <p style="margin-top:28px"><a href="01-shaders-e-gpu.html">Começar: Módulo 1 — Shaders &amp; a GPU →</a></p>
+
+  <script type="module">
+    document.getElementById('pg-tour').config = {
+      mode: 'fragment',
+      fragment: `void main() {
+// >>> EDIT: cor
+  vec3 cor = vec3(0.2, 0.6, 1.0);
+// <<< EDIT
+  gl_FragColor = vec4(cor, 1.0);
+}`,
+      editableRegions: ['cor'],
+      solution: '  vec3 cor = vec3(1.0, 0.4, 0.1);',
+    };
+  </script>
+</body>
+</html>
