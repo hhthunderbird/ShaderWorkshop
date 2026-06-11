@@ -52,7 +52,8 @@ test('a pagina HTML do Modulo 6 tem os dois demos, fecha o Marco 1 e nao tem pix
   assert.ok(html.includes('id="pg-cpu"'), 'falta pg-cpu');
   assert.ok(html.includes('id="pg-gpu"'), 'falta pg-gpu');
   assert.ok(html.includes('exercito.svg'), 'falta o SVG do exercito');
-  assert.ok(html.includes('[IMAGEM:'), 'falta placeholder do die-shot da GPU');
+  assert.ok(html.includes('gpu-die.svg'), 'M6 nao usa o gpu-die.svg');
+  assert.ok(!html.includes('[IMAGEM:'), 'M6 nao deve ter placeholder de imagem');
   assert.ok(html.includes('Marco 1'), 'falta a amarracao do Marco 1');
   assert.ok(!html.includes('reference:'), 'M6 e conceitual: nao deve ter pixel-diff');
   assert.ok(!html.includes('exportable'), 'M6 nao tem projeto exportavel');

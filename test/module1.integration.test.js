@@ -60,7 +60,8 @@ test('a pagina HTML do Modulo 1 contem os dois playgrounds e o exercicio', () =>
   assert.ok(html.includes('id="pg-ex"'), 'falta pg-ex');
   assert.ok(html.includes('>>> EDIT: cor'), 'falta sentinela editavel');
   assert.ok(html.includes('m1-meio-a-meio.png'), 'falta referencia do exercicio');
-  assert.ok(html.includes('[IMAGEM:'), 'falta placeholder de imagem');
+  assert.ok(html.includes('gpu-board.svg'), 'M1 nao usa o gpu-board.svg');
+  assert.ok(!html.includes('[IMAGEM:'), 'M1 nao deve ter placeholder de imagem');
   // dispositivos Head First obrigatorios (§3 do spec)
   for (const cls of ['afie', 'brain', 'qa', 'cuidado', 'bullets']) {
     assert.ok(html.includes(`class="${cls}"`), `falta dispositivo Head First: ${cls}`);

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 340" width="640" font-family="sans-serif">
+  <rect width="640" height="340" fill="#fbfbf7"/>
+  <text x="40" y="40" font-size="15" fill="#333">Dentro do chip: milhares de núcleos pequenos, lado a lado.</text>
+  <defs>
+    <pattern id="cores" width="26" height="24" patternUnits="userSpaceOnUse">
+      <rect x="3" y="3" width="20" height="18" fill="#1c7ed6"/>
+    </pattern>
+  </defs>
+  <rect x="120" y="60" width="400" height="240" rx="10" fill="#1b2630"/>
+  <rect x="160" y="90" width="320" height="180" fill="url(#cores)"/>
+  <rect x="160" y="90" width="320" height="180" fill="none" stroke="#4a5a6a" stroke-width="2"/>
+  <text x="170" y="320" font-size="13" fill="#666">cada quadradinho azul = um núcleo (roda uma cópia do shader)</text>
+</svg>
