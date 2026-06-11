@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 4 — Formas e Padrões</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · Marco 1 · Módulo 4 de 6</p>
+  <h1>Formas e Padrões</h1>
+  <p>Gradientes e ondas são lindos, mas e quando você quer desenhar uma <strong>coisa</strong> — um
+  círculo, um ponto, um símbolo? O truque é genial e simples: pra cada pixel, pergunte
+  <em>"quão longe eu estou de um lugar?"</em>. Essa distância vira a forma. Neste módulo você desenha
+  um círculo e depois combina formas como quem sobrepõe carimbos.</p>
+
+  <h2>A ideia: distância vira forma</h2>
+  <p>Você já sabe medir distância sem perceber. Da sua carteira até a porta da sala tem uma distância.
+  Num shader, cada pixel mede a distância até um <strong>centro</strong>. Se essa distância for
+  <em>menor</em> que um raio, o pixel está <strong>dentro</strong> do círculo (pinta de branco); se
+  for maior, está <strong>fora</strong> (preto). Só isso desenha um círculo perfeito.</p>
+
+  <figure>
+    <img src="../assets/img/formas.svg" alt="À esquerda, um círculo com centro, raio e a distância de um pixel até o centro; à direita, união (max) e interseção (min) de dois círculos" width="720">
+    <figcaption>Esquerda: círculo = pixels cuja distância ao centro é menor que o raio. Direita: juntar formas.</figcaption>
+  </figure>
+
+  <div class="brain">
+    A distância entre dois pontos é o velho <strong>teorema de Pitágoras</strong>: o cateto horizontal
+    ao quadrado mais o vertical ao quadrado, raiz de tudo. O shader tem uma função que faz isso de uma
+    vez: <code>length(a)</code>. Você não precisa escrever a raiz — mas é ela ali dentro.
+  </div>
+
+  <h2>Test Drive: seu círculo</h2>
+  <p>O playground abaixo desenha um círculo branco. Mexa nos sliders: <code>raio</code> muda o tamanho,
+  e <code>centro X</code>/<code>centro Y</code> movem ele pela tela. Repare na borda: é levemente
+  <em>macia</em> (lembra o <code>smoothstep</code> do módulo passado? está aqui de novo).</p>
+
+  <shader-playground id="pg-circ"></shader-playground>
+
+  <div class="afie">
+    <p>Sem mexer ainda — <strong>preveja</strong>: pra deixar o círculo no canto inferior esquerdo,
+    os valores de <code>centro X</code> e <code>centro Y</code> têm que ser <em>altos</em> ou
+    <em>baixos</em>?</p>
+    <p>centro X = ______  ·  centro Y = ______</p>
+    <p>Agora teste. Dica: lembra que Y = 0 é embaixo.</p>
+  </div>
+
+  <details class="sidebar">
+    <summary>🧮 Matemática de bolso: distância e <code>length</code></summary>
+    <div>
+      <p>A distância entre o pixel <code>(x, y)</code> e o centro <code>(cx, cy)</code> é
+      <code>√((x−cx)² + (y−cy)²)</code> — Pitágoras puro. Em GLSL: <code>length(v_uv − centro)</code>.
+      O <code>length</code> recebe um vetor (a diferença entre os dois pontos) e devolve o tamanho dele.</p>
+      <p>Por isso o círculo "sabe" ser redondo: todos os pontos à mesma distância do centro formam,
+      por definição, uma circunferência.</p>
+      <p>E o <code>smoothstep</code> aqui dá a borda macia: em vez de pular de "dentro" pra "fora"
+      num pixel só (que fica serrilhado), ele faz uma transição de uns poucos pixels.</p>
+    </div>
+  </details>
+
+  <h2>Juntando formas: carimbos</h2>
+  <p>Cada forma vira um número: <strong>1 dentro, 0 fora</strong> (uma "máscara"). Pra combinar duas
+  máscaras você usa duas funções:</p>
+  <div class="bullets">
+    <ul>
+      <li><strong>União</strong> = <code>max(a, b)</code> — fica branco onde <em>qualquer</em> uma das
+      formas está. Os dois carimbos juntos.</li>
+      <li><strong>Interseção</strong> = <code>min(a, b)</code> — fica branco só onde <em>as duas</em>
+      se sobrepõem. A "lente" do meio.</li>
+    </ul>
+  </div>
+
+  <details class="sidebar">
+    <summary>🗣️ Dois sotaques: <code>length</code>, <code>min</code>, <code>max</code> são iguais</summary>
+    <div>
+      <p>Boa notícia: <code>length</code>, <code>min</code>, <code>max</code> e <code>smoothstep</code>
+      se escrevem <strong>igualzinho</strong> em GLSL e HLSL. Nada muda na migração pro Unity aqui.
+      Confira no botão <strong>🔁 Ver em HLSL</strong>.</p>
+    </div>
+  </details>
+
+  <div class="qa">
+    <dl>
+      <dt>Por que <code>max</code> é união e <code>min</code> é interseção?</dt>
+      <dd>Pense nas máscaras (0 ou 1). Na união, basta UMA ser 1 → o maior dos dois (<code>max</code>)
+      é 1. Na interseção, as DUAS precisam ser 1 → o menor dos dois (<code>min</code>) só é 1 quando
+      ambas são.</dd>
+      <dt>Dá pra fazer um quadrado também?</dt>
+      <dd>Dá! Troca-se <code>length</code> por outra medida de distância (tipo o maior entre
+      <code>abs(x)</code> e <code>abs(y)</code>). É a mesma ideia de "distância vira forma" — só muda
+      a régua. Fica de desafio.</dd>
+      <dt>Isso tem nome?</dt>
+      <dd>Sim: <strong>campo de distância</strong> (SDF). É como jogos e fontes desenham formas nítidas
+      em qualquer tamanho. Você acabou de usar a versão simples.</dd>
+    </dl>
+  </div>
+
+  <div class="cuidado">
+    A máscara precisa ser <strong>1 dentro e 0 fora</strong> pra <code>min</code>/<code>max</code>
+    funcionarem como união/interseção. Se você inverter (1 fora, 0 dentro), o <code>max</code> vira
+    interseção e vice-versa. Confira sempre o sentido do seu <code>smoothstep</code>.
+  </div>
+
+  <h2>Ímãs de código: monte o círculo</h2>
+  <p>Estas linhas montam um shader de círculo, mas estão <strong>fora de ordem</strong>. No papel,
+  numere de 1 a 4 na ordem certa pra que ele compile e desenhe:</p>
+  <div class="magnets">
+    <pre>(  ) gl_FragColor = vec4(vec3(shape), 1.0);
+(  ) void main() {
+(  ) float shape = smoothstep(0.25, 0.24, d);
+(  ) float d = length(v_uv - vec2(0.5, 0.5));</pre>
+    <p>Dica: <code>d</code> precisa existir antes de ser usado; e o <code>main</code> abre a chave.</p>
+  </div>
+
+  <h2>Afie o lápis: dois círculos que se cruzam</h2>
+  <p>O shader abaixo já calcula DUAS máscaras de círculo: <code>c1</code> e <code>c2</code>. Mas só
+  está mostrando o primeiro. Sua missão: faça a <strong>união</strong> dos dois — os dois círculos
+  aparecendo juntos. Dica: você aprendeu que união é <code>max</code>. Edite, dê <em>Test Drive</em>
+  e clique <em>Conferir</em>.</p>
+  <shader-playground id="pg-ex"></shader-playground>
+
+  <div class="recordacao">
+    <h2>Recordação: caça ao par</h2>
+    <p>Ligue cada termo ao seu significado (escreva a letra):</p>
+    <ul>
+      <li>( ) <code>length</code> &nbsp;&nbsp; A. fica branco onde as DUAS formas se sobrepõem</li>
+      <li>( ) <code>max</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B. distância de um ponto a outro</li>
+      <li>( ) <code>min</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C. união: branco onde QUALQUER forma está</li>
+      <li>( ) raio &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D. limite de distância que separa dentro de fora</li>
+    </ul>
+  </div>
+
+  <p style="margin-top:28px"><a href="03-matematica-vira-imagem.html">← Anterior: Matemática que Vira Imagem</a>
+  &nbsp;·&nbsp;
+  <span class="proximo-soon">Próximo: Dando Vida — Animação →
+  <span style="color:#999">(em construção no próximo plano)</span></span></p>
+
+  <script type="module">
+    document.getElementById('pg-circ').config = {
+      mode: 'fragment',
+      fragment: `uniform float u_r;
+uniform float u_cx;
+uniform float u_cy;
+void main() {
+  float d = length(v_uv - vec2(u_cx, u_cy));
+  float shape = smoothstep(u_r, u_r - 0.015, d);
+  gl_FragColor = vec4(vec3(shape), 1.0);
+}`,
+      uniforms: [
+        { name: 'u_r', label: 'raio', min: 0.05, max: 0.45, value: 0.25 },
+        { name: 'u_cx', label: 'centro X', min: 0.0, max: 1.0, value: 0.5 },
+        { name: 'u_cy', label: 'centro Y', min: 0.0, max: 1.0, value: 0.5 },
+      ],
+    };
+    document.getElementById('pg-ex').config = {
+      mode: 'fragment',
+      fragment: `void main() {
+  float d1 = length(v_uv - vec2(0.35, 0.5));
+  float d2 = length(v_uv - vec2(0.65, 0.5));
+  float c1 = smoothstep(0.25, 0.24, d1);
+  float c2 = smoothstep(0.25, 0.24, d2);
+// >>> EDIT: combina
+  float shape = c1;
+// <<< EDIT
+  gl_FragColor = vec4(vec3(shape), 1.0);
+}`,
+      editableRegions: ['combina'],
+      solution: '  float shape = max(c1, c2);',
+      reference: '../assets/ref/m4-dois-circulos.png',
+      tolerance: 0.06,
+    };
+  </script>
+</body>
+</html>

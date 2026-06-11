@@ -16,6 +16,9 @@ body.hf { max-width: 820px; margin: 0 auto; padding: 24px; font: 17px/1.6 Georgi
 .hf .sidebar > div { padding: 0 16px 12px; }
 .hf .bullets { border-top: 3px double #888; padding-top: 12px; margin-top: 24px; }
 .hf .bullets::before { content: "Pontos-chave"; display: block; font-weight: bold; margin-bottom: 6px; }
+.hf .magnets { border: 2px dashed #495057; border-radius: 8px; padding: 8px 16px 12px; margin: 18px 0; background: #f1f3f5; }
+.hf .magnets::before { content: "🧲 Ímãs de código"; display: block; font-weight: bold; margin: 4px 0 6px; }
+.hf .magnets pre { background: #fff; border: 1px solid #ced4da; border-radius: 6px; padding: 10px 12px; font-family: ui-monospace, monospace; font-size: 14px; overflow-x: auto; }
 .hf figure { margin: 18px 0; text-align: center; }
 .hf .img-todo { border: 2px dotted #c0392b; padding: 14px; color: #c0392b; font-family: ui-monospace, monospace; font-size: 14px; background: #fff; }
 .hf .mascote { float: right; width: 90px; margin: 0 0 8px 12px; }
