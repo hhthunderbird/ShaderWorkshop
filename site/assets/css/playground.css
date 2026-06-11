@@ -16,5 +16,14 @@
 .pg-hlsl-code { margin: 0; padding: 10px; font: 13px ui-monospace, monospace; white-space: pre-wrap; overflow-x: auto; border-top: 1px solid #d0bfff; }
 
 .pg-erro-tec { margin-top: 6px; font-size: 0.85em; }
-.pg-erro-tec summary { cursor: pointer; color: #888; }
+.pg-erro-tec summary { cursor: pointer; color: #6c6c6c; }
 .pg-erro-tec pre { white-space: pre-wrap; background: #f3f0f0; padding: 6px; border-radius: 4px; overflow-x: auto; margin: 4px 0 0; }
+
+/* Acessibilidade: foco visível em todos os controles do playground */
+.pg button:focus-visible,
+.pg-editor:focus-visible,
+.pg input:focus-visible,
+.pg-erro-tec summary:focus-visible {
+  outline: 3px solid #1c7ed6;
+  outline-offset: 2px;
+}

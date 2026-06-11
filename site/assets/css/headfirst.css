@@ -27,7 +27,7 @@ body.hf { max-width: 820px; margin: 0 auto; padding: 24px; font: 17px/1.6 Georgi
 .hf .recordacao { border: 2px solid #7048e8; border-radius: 8px; padding: 8px 16px 14px; margin: 18px 0; background: #f3f0ff; }
 .hf .recordacao h2 { margin-top: 8px; }
 .hf .recordacao::before { content: "🎯 Hora de fixar"; display: block; font-weight: bold; color: #7048e8; margin: 8px 0 0; }
-.hf .proximo-soon { color: #999; cursor: default; }
+.hf .proximo-soon { color: #6c6c6c; cursor: default; }
 .hf .sidebar table { border-collapse: collapse; margin: 8px 0; width: 100%; }
 .hf .sidebar th, .hf .sidebar td { border: 1px solid #bbb; padding: 5px 9px; text-align: left; font-size: 15px; }
 .hf .sidebar th { background: #e7e0ff; }
@@ -38,3 +38,20 @@ body.hf { max-width: 820px; margin: 0 auto; padding: 24px; font: 17px/1.6 Georgi
 .hf .spec > summary { cursor: pointer; font-weight: bold; font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
 .hf .spec > div { margin-top: 8px; color: #333; }
 .hf .spec[open] { background: #f8f9fa; }
+
+/* Acessibilidade: foco visível em links e seções colapsáveis */
+.hf a:focus-visible,
+.hf details > summary:focus-visible {
+  outline: 3px solid #1c7ed6;
+  outline-offset: 2px;
+}
+
+/* Respeita prefers-reduced-motion: corta transições/animações de CSS.
+   (A animação do canvas é controlada no motor, via botão Animar/Pausar.) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
