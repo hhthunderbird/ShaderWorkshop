@@ -27,3 +27,12 @@ test('a pagina do Modulo 7 tem os dois playgrounds mesh e os dispositivos', () =
     assert.ok(html.includes(`class="${cls}"`), `falta dispositivo Head First: ${cls}`);
   }
 });
+
+test('M7 tem sub-blocos numerados e um afie de previsao antes do cubo', () => {
+  const html = readFileSync('site/modulos/07-vertices-e-pipeline.html', 'utf8');
+  assert.ok(/1\.\s*A malha/i.test(html), 'falta o sub-bloco "1. A malha"');
+  assert.ok(/2\.\s*Dois trabalhadores/i.test(html), 'falta o sub-bloco "2. Dois trabalhadores"');
+  assert.ok(/3\.\s*O pipeline/i.test(html), 'falta o sub-bloco "3. O pipeline"');
+  assert.ok(html.includes('class="afie"'), 'falta o afie de previsao no M7');
+  assert.ok(/vértices?/i.test(html) && /quantas vezes/i.test(html), 'o afie nao pergunta sobre quantas vezes roda');
+});

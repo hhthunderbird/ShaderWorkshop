@@ -15,10 +15,19 @@
   objeto 3D de verdade — um cubo — que gira na sua frente. E você vai ver que, por baixo, continua
   sendo o mesmo jogo de pintar pixels.</p>
 
-  <h2>1. Um objeto é feito de pontinhos</h2>
+  <h2>1. A malha: pontinhos ligados em triângulos</h2>
   <p>Todo objeto 3D é uma <strong>malha</strong>: um monte de pontos no espaço (os <strong>vértices</strong>)
   ligados em triângulos. Um cubo tem 8 cantos; a GPU liga esses cantos em triângulos e preenche as
   faces. Olhe o cubo abaixo girando — cada quina é um vértice.</p>
+
+  <div class="afie">
+    <p><strong>Preveja antes de ver:</strong> este cubo tem 8 cantos (vértices) e cada pixel da tela
+    que ele cobre é um fragmento.</p>
+    <p>Por quadro, o <strong>vertex shader</strong> (que posiciona) roda quantas vezes? ____
+    E o <strong>fragment shader</strong> (que pinta cada pixel) roda mais ou menos vezes que ele? ____</p>
+    <p>Resposta: o vertex roda ~1 vez por vértice (pouquíssimas); o fragment roda 1 vez por pixel
+    coberto (muitíssimas). É por isso que dividir o trabalho em dois faz sentido.</p>
+  </div>
 
   <shader-playground id="pg-cubo"></shader-playground>
 
@@ -52,7 +61,7 @@
     </div>
   </details>
 
-  <h2>3. A matriz MVP e a linha de montagem</h2>
+  <h2>3. O pipeline: do vértice ao pixel</h2>
   <p>Aquela matriz <code>u_mvp</code> faz três coisas de uma vez: <strong>move, gira e projeta</strong>
   o objeto na tela. É uma caixa-preta por agora (no próximo módulo a gente entende as ferramentas por
   dentro). O caminho completo, do ponto à imagem, é a <strong>linha de montagem</strong> (o pipeline):</p>
