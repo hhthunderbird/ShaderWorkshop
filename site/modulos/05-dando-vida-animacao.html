@@ -35,8 +35,9 @@
 
   <h2>Test Drive: um coração que pulsa</h2>
   <p>O círculo abaixo está <strong>vivo</strong>: o raio dele cresce e encolhe sozinho, porque depende
-  de <code>sin(u_time)</code>. O slider <code>velocidade</code> controla o ritmo. Não tem botão de
-  "rodar" pra animação — ela já está acontecendo.</p>
+  de <code>sin(u_time)</code>. O slider <code>velocidade</code> controla o ritmo. Você nem precisou
+  apertar "rodar" — a animação já acontece sozinha (o botão <strong>⏸ Pausar</strong> só congela o
+  tempo se você quiser observar um instante).</p>
 
   <shader-playground id="pg-pulso"></shader-playground>
 
@@ -80,9 +81,9 @@
   </div>
 
   <div class="cuidado">
-    Animação NÃO é um botão de "play": é a sua cor <strong>depender de <code>u_time</code></strong>.
-    Se você escrever um shader que ignora o tempo, a imagem fica parada — por mais que os quadros
-    passem. O movimento mora na fórmula.
+    Animação NÃO é apertar "play" (o ⏸ Pausar só <em>congela</em> o tempo): é a sua cor
+    <strong>depender de <code>u_time</code></strong>. Se você escrever um shader que ignora o tempo, a
+    imagem fica parada — por mais que os quadros passem. O movimento mora na fórmula.
   </div>
 
   <div class="bullets">

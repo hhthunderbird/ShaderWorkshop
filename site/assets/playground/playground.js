@@ -6,6 +6,7 @@ import { translateToHLSL } from './translate.js';
 import { createContext, buildProgram, setupQuad, setupMesh, MESH_VERTEX, renderFrame, readPixels, loadTexture } from './gl.js';
 import { withHeader, withHeaderMesh } from './header.js';
 import { friendlyError } from './glslerrors.js';
+import { advanceTime, defaultPlaying } from './anim.js';
 import { cube, sphere } from './geometry.js';
 import { multiply, perspective, translation, rotateX, rotateY, mat3FromMat4 } from './mat4.js';
 
@@ -24,7 +25,9 @@ class ShaderPlayground extends HTMLElement {
     this.controlValues = {};
     for (const s of this.controlSpecs) this.controlValues[s.name] = s.value;
     this.fullSource = this.cfg.fragment;
-    this.start = performance.now();
+    this._t = 0;
+    this._last = performance.now();
+    this.playing = defaultPlaying(this._prefersReduced());
     this._render();
     this._compile();
     this._loop();
@@ -37,15 +40,21 @@ class ShaderPlayground extends HTMLElement {
     if (this.isConnected) this.connectedCallback();
   }
 
+  _prefersReduced() {
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
   _render() {
+    const animated = this.cfg.mode === 'mesh' || this.fullSource.includes('u_time');
     this.innerHTML = `
       <div class="pg">
-        <canvas class="pg-canvas" width="320" height="320"></canvas>
+        <canvas class="pg-canvas" width="320" height="320" role="img" aria-label="resultado do shader (imagem)"></canvas>
         <div class="pg-controls"></div>
-        ${this.cfg.editableRegions.length ? '<textarea class="pg-editor" spellcheck="false"></textarea>' : ''}
+        ${this.cfg.editableRegions.length ? '<textarea class="pg-editor" spellcheck="false" aria-label="editor de código do shader"></textarea>' : ''}
         <div class="pg-buttons">
           <button class="pg-run">▶ Test Drive</button>
           <button class="pg-reset">↺ Reset</button>
+          ${animated ? `<button class="pg-anim">${this.playing ? '⏸ Pausar' : '▶ Animar'}</button>` : ''}
           ${this.cfg.reference ? '<button class="pg-check">✓ Conferir</button>' : ''}
           ${this.cfg.solution ? '<button class="pg-solution">💡 Mostrar solução</button>' : ''}
           <button class="pg-lang" title="Ver o equivalente em HLSL (Unity)">🔁 Ver em HLSL</button>
@@ -89,6 +98,10 @@ class ShaderPlayground extends HTMLElement {
 
     this.querySelector('.pg-run')?.addEventListener('click', () => this._applyEditorAndCompile());
     this.querySelector('.pg-reset')?.addEventListener('click', () => this._reset());
+    this.querySelector('.pg-anim')?.addEventListener('click', (e) => {
+      this.playing = !this.playing;
+      e.target.textContent = this.playing ? '⏸ Pausar' : '▶ Animar';
+    });
     this.querySelector('.pg-check')?.addEventListener('click', () => this._check());
     this.querySelector('.pg-solution')?.addEventListener('click', () => this._showSolution());
     this.querySelector('.pg-lang')?.addEventListener('click', () => this._toggleLang());
@@ -185,8 +198,11 @@ class ShaderPlayground extends HTMLElement {
 
   _loop() {
     const frame = () => {
+      const now = performance.now();
+      this._t = advanceTime(this._t, (now - this._last) / 1000, this.playing);
+      this._last = now;
       if (this.program && this.gl) {
-        const t = (performance.now() - this.start) / 1000;
+        const t = this._t;
         const base = {
           u_time: t,
           u_resolution: [this.canvas.width, this.canvas.height],
@@ -225,6 +241,10 @@ class ShaderPlayground extends HTMLElement {
       if (!input || !s) return;
       input.value = s.kind === 'slider' ? s.value : rgbToHex(s.value);
     });
+    this._t = 0;
+    this.playing = defaultPlaying(this._prefersReduced());
+    const animBtn = this.querySelector('.pg-anim');
+    if (animBtn) animBtn.textContent = this.playing ? '⏸ Pausar' : '▶ Animar';
     this._compile();
   }
 
