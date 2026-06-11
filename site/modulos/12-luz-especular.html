@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 12 — Luz Especular &amp; Brilho</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · Marco 3 · Módulo 12 de 14</p>
+  <h1>Luz Especular &amp; Brilho</h1>
+  <p>No M10 você acendeu a luz difusa: aquela que espalha igual, que deixa um lado da esfera claro e o
+  outro escuro, mas que <strong>não muda dependendo de onde você está olhando</strong>. A luz
+  especular é diferente. Ela cria um <strong>ponto de brilho</strong> — aquele reflexo branco-quente
+  que você vê numa bola de bilhar, numa maçaneta, num copo de água. E esse ponto <em>desliza</em>
+  quando você vira a cabeça. Por que? Porque o brilho especular depende de onde o olho está. Vamos
+  descobrir como calcular isso.</p>
+
+  <div class="brain">
+    Pense no M10: a luz difusa usava <code>dot(N, L)</code> — normal e direção da luz. Esse cálculo
+    dependia de <strong>onde você estava</strong> olhando? Segura a resposta. Agora pense num ponto
+    brilhante numa bola de bilhar: se você andar em volta da bola, o ponto brilhante acompanha você
+    ou fica parado? Por que será?
+  </div>
+
+  <h2>O vetor V: os olhos têm endereço</h2>
+  <p>Pra calcular o brilho especular, a GPU precisa saber <em>de onde</em> você está olhando. Isso é
+  o <strong>vetor V</strong> — a seta que aponta do ponto da superfície até a câmera. É o mesmo tipo
+  de vetor do M8: só uma direção, tamanho 1.</p>
+  <p>O motor já te entrega a posição da câmera em <code>u_cameraPos</code> (fixa em (0, 0, 3) no
+  mundo) e a posição do fragmento no mundo em <code>v_worldPos</code>. Então:</p>
+  <pre><code>vec3 V = normalize(u_cameraPos - v_worldPos);</code></pre>
+  <p>Subtrai: de onde estou menos onde está o ponto. Normaliza: vira direção pura. Simples — é o
+  mesmo raciocínio de qualquer vetor que você fez no M8.</p>
+
+  <h2>O vetor H: o meio do caminho entre a luz e o olho</h2>
+  <p>Aqui vem a sacada do Blinn-Phong (o modelo de iluminação que os jogos usaram por décadas): em
+  vez de calcular o reflexo exato da luz, a gente usa o <strong>vetor H</strong>, o
+  <em>half-vector</em> — a direção exatamente no meio entre L (pra luz) e V (pro olho).</p>
+  <pre><code>vec3 H = normalize(L + V);</code></pre>
+  <p>Soma as duas setas, normaliza. Pronto: H aponta entre elas. Quando a normal N aponta na mesma
+  direção que H, o brilho estoura — é exatamente o ponto em que a superfície "reflete" a luz pro
+  seu olho. Não precisa entender a derivação; o que importa é a intuição: <strong>N perto de H →
+  brilho; N longe de H → sem brilho</strong>.</p>
+
+  <h2>A receita do brilho</h2>
+  <div class="bullets">
+    <ul>
+      <li>O brilho especular é: <code>pow(max(dot(N, H), 0.0), dureza)</code>.</li>
+      <li>O <code>dot(N, H)</code> é o mesmo dot do M8 e M10 — mede o alinhamento entre N e H.</li>
+      <li>O <code>max(..., 0.0)</code> corta o negativo, igual ao M10.</li>
+      <li>O <code>pow(..., dureza)</code> é o que muda tudo: eleva o resultado a uma potência.<br>
+        — <strong>dureza alta</strong> (ex: 128): a potência "achata" o valor — só onde N ≈ H de
+        verdade o brilho sobrevive. Resultado: um ponto minúsculo e duro. Metal polido.<br>
+        — <strong>dureza baixa</strong> (ex: 2): o valor cai devagar — o brilho se espalha. Resultado:
+        uma mancha grande e suave. Plástico fosco.</li>
+      <li>Você combina o especular com a difusa: <code>cor_base * dif + vec3(1.0) * esp</code>.</li>
+    </ul>
+  </div>
+
+  <figure>
+    <img src="../assets/img/specular-vetores.svg" alt="Superfície curva com ponto P e quatro setas: N (normal, pra cima), L (pra luz, esquerda-cima), V (pro olho, direita-cima) e H (meio entre L e V, tracejado roxo). Legenda: o brilho estoura quando N aponta pra H." width="640">
+    <figcaption>N, L, V e H a partir de um ponto P. O brilho estoura quando N aponta na direção de H.</figcaption>
+  </figure>
+
+  <h2>Test Drive: acenda o brilho</h2>
+  <p>A esfera abaixo já tem difusa (do M10) <em>mais</em> o especular novo. O slider
+  <strong>dureza do brilho</strong> controla o tamanho do ponto branco. O slider
+  <strong>direção da luz</strong> move a fonte de luz em volta da esfera.</p>
+
+  <shader-playground id="pg-brilho"></shader-playground>
+
+  <div class="afie">
+    <p>Antes de mexer — <strong>preveja</strong>: com a dureza em 128, o ponto brilhante vai ser
+    grande ou pequeno? E se você baixar a dureza pra 4, o que acontece com o ponto?</p>
+    <p>Resposta (antes de testar): ____________________</p>
+    <p>Agora arraste o slider de dureza dos dois extremos e confira.</p>
+  </div>
+
+  <details class="sidebar">
+    <summary>🧮 Por que <code>pow</code> controla o tamanho do brilho?</summary>
+    <div>
+      <p>Imagine que <code>dot(N, H)</code> vale 0.9 quando você está perto do centro do brilho e 0.5
+      quando está na borda. Com <code>pow(0.9, 2) = 0.81</code> e <code>pow(0.5, 2) = 0.25</code> —
+      a diferença é pequena, o brilho se espalha. Mas com <code>pow(0.9, 64) ≈ 0.001</code> e
+      <code>pow(0.5, 64) ≈ 0</code> — a borda desaparece e só o centro sobrevive. Quanto maior o
+      expoente, mais a função "afunila" o brilho num pontinho. É como um holofote que fica mais
+      focado.</p>
+    </div>
+  </details>
+
+  <div class="qa">
+    <dl>
+      <dt>De onde vem <code>u_cameraPos</code>? Não declarei.</dt>
+      <dd>O motor injeta automaticamente no shader do modo mesh. A câmera fica fixa em (0, 0, 3) no
+      espaço do mundo. Você só usa — igual ao <code>v_normal</code> e ao <code>v_worldPos</code> que
+      o motor também fornece.</dd>
+      <dt>Por que H em vez do reflexo exato de L em torno de N?</dt>
+      <dd>Calcular o reflexo exato exige mais operações. O half-vector H dá praticamente o mesmo
+      resultado visual por um custo menor. É o Blinn-Phong: o truque esperto que os jogos usaram
+      dos anos 80 até hoje.</dd>
+      <dt>Isso é a iluminação "de verdade" dos jogos atuais?</dt>
+      <dd>É a base. Os jogos AAA modernos usam PBR (Physically Based Rendering), que é uma versão
+      muito mais elaborada — mas o <code>dot(N, H)</code> e o <code>pow</code> ainda estão lá dentro.
+      Você está aprendendo os blocos fundamentais.</dd>
+    </dl>
+  </div>
+
+  <div class="cuidado">
+    O ponto de brilho <strong>não está grudado na superfície</strong> — ele se move quando
+    <em>você</em> (a câmera) se move. É diferente da luz difusa, que depende só de N e L. O especular
+    depende de V também. Por isso, se você andar em volta de um objeto iluminado, o brilho escorrega.
+    Se parecer "colado", você provavelmente está esquecendo de usar V no cálculo.
+  </div>
+
+  <div class="bullets">
+    <ul>
+      <li><strong>Difusa</strong> (M10): <code>max(dot(N, L), 0.0)</code> — não muda com o ângulo do olho.</li>
+      <li><strong>Especular</strong>: <code>pow(max(dot(N, H), 0.0), dureza)</code> — depende de onde você está.</li>
+      <li><strong>H</strong>: <code>normalize(L + V)</code> — a direção no meio entre luz e olho.</li>
+      <li><strong>V</strong>: <code>normalize(u_cameraPos - v_worldPos)</code> — do ponto pra câmera.</li>
+      <li>Dureza alta = ponto pequeno e duro (metal). Dureza baixa = mancha grande (plástico).</li>
+      <li>Difusa + Especular juntas = Blinn-Phong, o modelo base de iluminação em tempo real.</li>
+    </ul>
+  </div>
+
+  <h2>🏆 Projeto-Vitória 3: Efeito Autoral</h2>
+  <p>Você chegou no terceiro projeto-vitória do curso. Desta vez, o desafio é criar um
+  <strong>efeito de material autoral</strong>: uma superfície com personalidade própria, usando tudo
+  que você sabe — textura, luz difusa e o brilho especular recém-aprendido. O bloco editável já traz
+  a estrutura; você muda a arte. Quando gostar do resultado, clique
+  <strong>📷 Baixar imagem</strong> e <strong>📋 Copiar shader</strong> pra guardar sua criação.</p>
+
+  <shader-playground id="pg-projeto"></shader-playground>
+
+  <div class="afie">
+    <p>Ideias pra experimentar dentro do bloco editável:</p>
+    <ul>
+      <li>Mude a <strong>cor base</strong>: substitua <code>texture2D(u_tex, v_uv).rgb</code> por
+      uma cor sólida como <code>vec3(0.8, 0.2, 0.9)</code> e veja o brilho especular brilhar em cima
+      dela.</li>
+      <li>Ajuste a <strong>intensidade do brilho</strong>: mude <code>vec3(esp)</code> por
+      <code>vec3(esp) * vec3(1.0, 0.8, 0.4)</code> — um brilho dourado.</li>
+      <li>Ladrilhe a textura (do M9): <code>texture2D(u_tex, fract(v_uv * 3.0)).rgb</code>.</li>
+      <li>Mude a potência do especular dentro do código: troque o <code>32.0</code> por <code>4.0</code>
+      ou <code>256.0</code> e compare.</li>
+    </ul>
+    <p><strong>Meta:</strong> usar pelo menos 3 ingredientes — textura (ou cor autoral), luz difusa
+    <em>e</em> o brilho especular. O especular é obrigatório desta vez!</p>
+  </div>
+
+  <div class="recordacao">
+    <h2>Recordação: caça ao par</h2>
+    <p>Ligue cada termo ao seu significado (escreva a letra):</p>
+    <ul>
+      <li>( ) V &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A. tamanho/dureza do ponto brilhante</li>
+      <li>( ) H &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B. seta do ponto da superfície pro olho</li>
+      <li>( ) <code>pow</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C. direção no meio entre L e V</li>
+      <li>( ) especular &nbsp;&nbsp;&nbsp; D. brilho que depende do ângulo de visão</li>
+    </ul>
+  </div>
+
+  <p style="margin-top:28px"><a href="11-hardware-fixo.html">← Anterior: Hardware Fixo</a>
+  &nbsp;·&nbsp;
+  <a href="13-alem-de-pixels.html">Próximo: Para Além de Pixels →</a></p>
+
+  <script type="module">
+    document.getElementById('pg-brilho').config = {
+      mode: 'mesh', mesh: 'sphere',
+      fragment: `precision highp float;
+void main() {
+  vec3 N = normalize(v_normal);
+  vec3 L = normalize(vec3(cos(u_lang), 0.4, sin(u_lang)));
+  vec3 V = normalize(u_cameraPos - v_worldPos);
+  vec3 H = normalize(L + V);
+  float dif = max(dot(N, L), 0.0);
+  float esp = pow(max(dot(N, H), 0.0), u_dureza);
+  vec3 base = vec3(0.40, 0.55, 0.90);
+  vec3 cor = base * (0.15 + 0.85 * dif) + vec3(1.0) * esp;
+  gl_FragColor = vec4(cor, 1.0);
+}`,
+      uniforms: [
+        { name: 'u_lang', label: 'direção da luz', min: 0.0, max: 6.2831, value: 0.8 },
+        { name: 'u_dureza', label: 'dureza do brilho', min: 2.0, max: 128.0, value: 32.0 },
+        { name: 'u_vel', label: 'rotação', min: 0.0, max: 1.5, value: 0.0 },
+      ],
+    };
+    document.getElementById('pg-projeto').config = {
+      mode: 'mesh', mesh: 'sphere',
+      texture: '../assets/tex/exemplo.png',
+      fragment: `precision highp float;
+void main() {
+  vec3 N = normalize(v_normal);
+  vec3 L = normalize(u_lightDir);
+  vec3 V = normalize(u_cameraPos - v_worldPos);
+  vec3 H = normalize(L + V);
+  float dif = max(dot(N, L), 0.0);
+  float esp = pow(max(dot(N, H), 0.0), 32.0);
+// >>> EDIT: arte
+  vec3 cor = texture2D(u_tex, v_uv).rgb;
+  vec3 final = cor * (0.2 + 0.8 * dif) + vec3(esp);
+// <<< EDIT
+  gl_FragColor = vec4(final, 1.0);
+}`,
+      uniforms: [{ name: 'u_vel', label: 'rotação', min: 0.0, max: 2.0, value: 0.5 }],
+      editableRegions: ['arte'],
+      exportable: true,
+    };
+  </script>
+</body>
+</html>
