@@ -55,3 +55,10 @@ test('o index linka o M12 e abre o Marco 3', () => {
   const idx = readFileSync('site/index.html', 'utf8');
   assert.ok(idx.includes('12-luz-especular.html'), 'index nao linka o M12');
 });
+
+test('M12 tem checkpoint de consolidacao (dot(N,H)) e nao data o Blinn-Phong como anos 80', () => {
+  const html = readFileSync('site/modulos/12-luz-especular.html', 'utf8');
+  assert.ok(/dot\(N, ?H\)/.test(html) && /(grande ou pequeno|tamanho do brilho)/i.test(html),
+    'falta o checkpoint sobre o que dot(N,H) alto causa no brilho');
+  assert.ok(!/anos 80/i.test(html), 'Blinn-Phong nao deve ser datado como "anos 80" (e de 1977)');
+});

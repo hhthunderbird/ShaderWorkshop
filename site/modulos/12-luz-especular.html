@@ -45,6 +45,14 @@
   seu olho. Não precisa entender a derivação; o que importa é a intuição: <strong>N perto de H →
   brilho; N longe de H → sem brilho</strong>.</p>
 
+  <div class="brain">
+    Pare e pense (você já sabe o <code>dot</code> desde o M8): se a normal <code>N</code> aponta
+    quase na direção de <code>H</code>, o <code>dot(N, H)</code> fica <strong>alto</strong> (perto de 1).
+    Isso vai deixar o brilho <strong>grande ou pequeno</strong> naquele ponto? E quando você eleva
+    esse número a uma potência grande (<code>pow(..., 64.0)</code>), o ponto de brilho cresce ou encolhe?
+    Segure seu palpite — a receita logo abaixo confirma.
+  </div>
+
   <h2>A receita do brilho</h2>
   <div class="bullets">
     <ul>
@@ -100,7 +108,7 @@
       <dt>Por que H em vez do reflexo exato de L em torno de N?</dt>
       <dd>Calcular o reflexo exato exige mais operações. O half-vector H dá praticamente o mesmo
       resultado visual por um custo menor. É o Blinn-Phong: o truque esperto que os jogos usaram
-      dos anos 80 até hoje.</dd>
+      desde os anos 1970 até hoje.</dd>
       <dt>Isso é a iluminação "de verdade" dos jogos atuais?</dt>
       <dd>É a base. Os jogos AAA modernos usam PBR (Physically Based Rendering), que é uma versão
       muito mais elaborada — mas o <code>dot(N, H)</code> e o <code>pow</code> ainda estão lá dentro.
