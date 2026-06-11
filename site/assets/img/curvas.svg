@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 260" width="760" height="260" font-family="system-ui, sans-serif">
+  <rect width="760" height="260" fill="#fff"/>
+  <!-- 3 mini-graficos lado a lado: step, smoothstep, sin. Cada um 200x180 -->
+  <!-- eixo comum: x 0..1 (largura), y 0..1 (altura, 0 embaixo) -->
+
+  <!-- ===== STEP ===== -->
+  <g transform="translate(30,30)">
+    <rect x="0" y="0" width="200" height="180" fill="#fafafa" stroke="#ddd"/>
+    <line x1="0" y1="90" x2="200" y2="90" stroke="#eee"/>
+    <!-- step(0.5): 0 ate x=0.5, salta pra 1 -->
+    <path d="M0,180 L100,180 L100,0 L200,0" fill="none" stroke="#e8590c" stroke-width="3"/>
+    <line x1="100" y1="0" x2="100" y2="180" stroke="#e8590c" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
+    <text x="100" y="205" text-anchor="middle" font-size="14" font-weight="bold" fill="#e8590c">step(0.5, x)</text>
+    <text x="100" y="224" text-anchor="middle" font-size="11" fill="#666">interruptor: 0 ou 1, salto seco</text>
+  </g>
+
+  <!-- ===== SMOOTHSTEP ===== -->
+  <g transform="translate(280,30)">
+    <rect x="0" y="0" width="200" height="180" fill="#fafafa" stroke="#ddd"/>
+    <line x1="0" y1="90" x2="200" y2="90" stroke="#eee"/>
+    <!-- smoothstep(0.3,0.7): curva S de 0 a 1 entre x=0.3 e 0.7 -->
+    <path d="M0,180 L60,180 C80,180 80,90 100,90 C120,90 120,0 140,0 L200,0"
+          fill="none" stroke="#1971c2" stroke-width="3"/>
+    <text x="100" y="205" text-anchor="middle" font-size="14" font-weight="bold" fill="#1971c2">smoothstep(0.3, 0.7, x)</text>
+    <text x="100" y="224" text-anchor="middle" font-size="11" fill="#666">dimmer: sobe suave, sem salto</text>
+  </g>
+
+  <!-- ===== SIN ===== -->
+  <g transform="translate(530,30)">
+    <rect x="0" y="0" width="200" height="180" fill="#fafafa" stroke="#ddd"/>
+    <line x1="0" y1="90" x2="200" y2="90" stroke="#eee"/>
+    <!-- sin: uma onda completa, mapeada pra [0,1] (0.5 no meio) -->
+    <path d="M0,90 C25,18 25,18 50,18 C75,18 75,162 100,162 C125,162 125,162 150,162 C175,162 175,90 200,90"
+          fill="none" stroke="#2f9e44" stroke-width="3"/>
+    <text x="100" y="205" text-anchor="middle" font-size="14" font-weight="bold" fill="#2f9e44">sin(x) → onda</text>
+    <text x="100" y="224" text-anchor="middle" font-size="11" fill="#666">sobe e desce, repete pra sempre</text>
+  </g>
+</svg>

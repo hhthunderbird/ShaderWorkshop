@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 3 — Matemática que Vira Imagem</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · Marco 1 · Módulo 3 de 6</p>
+  <h1>Matemática que Vira Imagem</h1>
+  <p>Até agora a cor de cada pixel veio <em>direto</em> da posição. Mas o pulo de qualidade vem
+  quando a gente passa essa posição por uma <strong>função</strong> antes de virar cor. Função é uma
+  máquina: entra um número, sai outro. Trocar a máquina muda a imagem inteira. Neste módulo você
+  conhece quatro máquinas que aparecem em <em>todo</em> shader: <code>step</code>, <code>smoothstep</code>,
+  <code>sin</code> e <code>fract</code>.</p>
+
+  <div class="brain">
+    Você já usou uma função sem perceber: <code>mix(a, b, t)</code> no módulo passado. Entrou um
+    <code>t</code> (de 0 a 1), saiu uma cor misturada. <strong>Toda</strong> função é assim — uma
+    entrada, uma saída. A pergunta deste módulo é: <em>e se a saída não subir reto?</em>
+  </div>
+
+  <h2>Interruptor × Dimmer: <code>step</code> e <code>smoothstep</code></h2>
+  <p>Imagine a luz de um quarto. O <strong>interruptor</strong> tem dois estados: apagado (0) ou aceso
+  (1), nada no meio — isso é <code>step</code>. Já o <strong>dimmer</strong> sobe a luz suavinho do 0
+  ao 1 — isso é <code>smoothstep</code>. Mesma ideia, "textura" diferente.</p>
+
+  <figure>
+    <img src="../assets/img/curvas.svg" alt="Três gráficos: step (salto seco em x=0.5), smoothstep (curva S suave entre 0.3 e 0.7) e sin (uma onda que sobe e desce)" width="760">
+    <figcaption>O formato da função é o formato da imagem. Salto seco, subida suave, ou onda.</figcaption>
+  </figure>
+
+  <h2>Test Drive: veja a função desenhada</h2>
+  <p>O playground abaixo faz duas coisas ao mesmo tempo: o <strong>fundo em cinza</strong> mostra o
+  <em>valor</em> da função (preto = 0, branco = 1), e a <strong>linha verde</strong> desenha o
+  <em>formato</em> dela. Troque a expressão de <code>y</code>, dê <em>Test Drive</em> e veja a curva
+  mudar. O slider <code>k</code> é um número que você pode usar na fórmula.</p>
+
+  <shader-playground id="pg-plot"></shader-playground>
+
+  <div class="afie">
+    <p>Copie cada fórmula no lugar do <code>y</code>, uma de cada vez, e observe a curva:</p>
+    <ul>
+      <li><code>float y = step(0.5, x);</code> &nbsp;→ o salto seco do interruptor</li>
+      <li><code>float y = fract(x * k);</code> &nbsp;→ serra que repete (mexa no <code>k</code>!)</li>
+      <li><code>float y = sin(x * k) * 0.5 + 0.5;</code> &nbsp;→ a onda</li>
+    </ul>
+    <p>Se ao usar <code>sin</code> sumir metade da imagem, é porque <code>sin</code> dá números de
+    <strong>−1 a 1</strong> e a tela só mostra de 0 a 1. O truque <code>* 0.5 + 0.5</code> conserta.</p>
+  </div>
+
+  <details class="sidebar">
+    <summary>🧮 Matemática de bolso: o que é uma função (e por que <code>sin</code> é uma onda)</summary>
+    <div>
+      <p>Uma <strong>função</strong> é uma regra que transforma um número em outro. Você dá o
+      <code>x</code>, ela devolve o <code>y</code>. <code>step(0.5, x)</code> devolve 0 se
+      <code>x &lt; 0.5</code> e 1 caso contrário. Simples assim.</p>
+      <p>O <strong>seno</strong> (<code>sin</code>) é especial: conforme <code>x</code> cresce, a saída
+      <em>sobe até 1, desce até −1 e volta</em>, repetindo pra sempre. É a forma natural de tudo que
+      <strong>oscila</strong>: ondas do mar, som, uma mola. Por isso usamos <code>sin</code> pra fazer
+      coisas ondularem.</p>
+      <p>Pra encaixar a onda do seno (de −1 a 1) no nosso intervalo de cor (de 0 a 1):
+      <code>sin(x) * 0.5 + 0.5</code>. Multiplicar por 0.5 "achata" pra −0.5..0.5; somar 0.5
+      "empurra" pra 0..1.</p>
+      <p>E o <code>fract(x)</code>? Ele guarda só a <strong>parte depois da vírgula</strong>:
+      <code>fract(2.7) = 0.7</code>. Como a parte decimal sempre reinicia do 0 ao chegar num número
+      inteiro, <code>fract</code> faz padrões <strong>se repetirem</strong> — quanto maior o
+      multiplicador, mais repetições.</p>
+    </div>
+  </details>
+
+  <details class="sidebar">
+    <summary>🗣️ Dois sotaques: <code>fract</code> no Unity é <code>frac</code></summary>
+    <div>
+      <p>As quatro funções existem nos dois dialetos com nomes quase iguais. A única que muda de nome
+      é <code>fract</code> (GLSL) → <code>frac</code> (HLSL/Unity). <code>step</code>,
+      <code>smoothstep</code> e <code>sin</code> se escrevem igual. Clique
+      <strong>🔁 Ver em HLSL</strong> pra conferir.</p>
+    </div>
+  </details>
+
+  <div class="qa">
+    <dl>
+      <dt>Qual a diferença real entre <code>step</code> e <code>smoothstep</code>?</dt>
+      <dd>Só a borda. <code>step</code> pula de 0 pra 1 de uma vez (borda "dura", serrilhada na tela).
+      <code>smoothstep</code> faz a mesma troca, mas com uma rampa suave no meio (borda "macia",
+      sem serrilhado). Pra desenhar formas bonitas a gente quase sempre prefere <code>smoothstep</code>.</dd>
+      <dt>O <code>sin</code> aqui usa graus ou radianos?</dt>
+      <dd>Radianos. Uma volta completa da onda são <code>6.2831</code> (isso é 2×π). Por isso
+      <code>sin(x * 6.2831)</code> dá exatamente uma onda quando <code>x</code> vai de 0 a 1.</dd>
+      <dt>Pra que serve a linha verde?</dt>
+      <dd>É só pra você <em>enxergar</em> o formato da função. Num shader de verdade você usa o
+      <em>valor</em> (o fundo cinza); a linha é um apoio de estudo.</dd>
+    </dl>
+  </div>
+
+  <div class="cuidado">
+    Ordem dos argumentos importa: é <code>step(limite, x)</code> — o limite vem <strong>primeiro</strong>.
+    <code>step(0.5, x)</code> e <code>step(x, 0.5)</code> dão resultados opostos. Mesma pegadinha em
+    <code>smoothstep(inicio, fim, x)</code>: os dois primeiros são as bordas, o <code>x</code> vem por último.
+  </div>
+
+  <div class="bullets">
+    <ul>
+      <li>Função = máquina: entra um número, sai outro. Trocar a função muda a imagem.</li>
+      <li><code>step</code> = borda dura (0 ou 1). <code>smoothstep</code> = borda suave (rampa).</li>
+      <li><code>sin</code> = onda (oscila de −1 a 1); use <code>* 0.5 + 0.5</code> pra virar cor.</li>
+      <li><code>fract</code> = parte decimal → faz padrões se repetirem.</li>
+    </ul>
+  </div>
+
+  <h2>Afie o lápis: faça uma onda</h2>
+  <p>Seu desafio: transforme o brilho da tela numa <strong>onda</strong> da esquerda pra direita —
+  começa no meio-cinza, fica branca, escurece até preto, e volta. Dica: é uma onda completa, então use
+  <code>sin</code> com <code>6.2831</code>, e não esqueça o truque <code>* 0.5 + 0.5</code> pra caber
+  em [0, 1]. Edite, dê <em>Test Drive</em> e clique <em>Conferir</em>.</p>
+  <shader-playground id="pg-ex"></shader-playground>
+
+  <div class="recordacao">
+    <h2>Recordação: caça ao par</h2>
+    <p>Ligue cada função ao seu efeito (escreva a letra):</p>
+    <ul>
+      <li>( ) <code>step</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A. borda suave, rampa no meio</li>
+      <li>( ) <code>smoothstep</code> &nbsp; B. oscila: sobe e desce em onda</li>
+      <li>( ) <code>sin</code> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C. borda dura: 0 ou 1, sem meio-termo</li>
+      <li>( ) <code>fract</code> &nbsp;&nbsp;&nbsp;&nbsp; D. parte decimal: faz repetir</li>
+    </ul>
+  </div>
+
+  <p style="margin-top:28px"><a href="02-pixel-e-cor.html">← Anterior: O Pixel e a Cor</a>
+  &nbsp;·&nbsp;
+  <span class="proximo-soon">Próximo: Formas e Padrões →
+  <span style="color:#999">(em construção no próximo plano)</span></span></p>
+
+  <script type="module">
+    document.getElementById('pg-plot').config = {
+      mode: 'fragment',
+      fragment: `uniform float u_k;
+float plot(float fx) {
+  return smoothstep(fx - 0.012, fx, v_uv.y) - smoothstep(fx, fx + 0.012, v_uv.y);
+}
+void main() {
+  float x = v_uv.x;
+// >>> EDIT: funcao
+  float y = smoothstep(0.3, 0.7, x);
+// <<< EDIT
+  vec3 bg = vec3(y);
+  vec3 col = mix(bg, vec3(0.2, 0.95, 0.4), plot(y));
+  gl_FragColor = vec4(col, 1.0);
+}`,
+      uniforms: [
+        { name: 'u_k', label: 'k', min: 1, max: 12, value: 4 },
+      ],
+      editableRegions: ['funcao'],
+    };
+    document.getElementById('pg-ex').config = {
+      mode: 'fragment',
+      fragment: `void main() {
+  float x = v_uv.x;
+// >>> EDIT: cor
+  vec3 c = vec3(x);
+// <<< EDIT
+  gl_FragColor = vec4(c, 1.0);
+}`,
+      editableRegions: ['cor'],
+      solution: '  vec3 c = vec3(sin(x * 6.2831) * 0.5 + 0.5);',
+      reference: '../assets/ref/m3-onda-sin.png',
+      tolerance: 0.06,
+    };
+  </script>
+</body>
+</html>
