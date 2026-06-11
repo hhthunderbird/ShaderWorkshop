@@ -9,6 +9,27 @@ void main() {
   gl_Position = vec4(a_position, 0.0, 1.0);
 }`;
 
+// Vertex shader padrão do modo mesh: aplica a MVP (caixa-preta) e repassa
+// uv, normal (em mundo) e posição em mundo. O aluno normalmente NÃO edita isto.
+const MESH_VERTEX = `
+attribute vec3 a_position;
+attribute vec3 a_normal;
+attribute vec2 a_uv;
+uniform mat4 u_mvp;
+uniform mat4 u_model;
+uniform mat3 u_normalMatrix;
+varying vec2 v_uv;
+varying vec3 v_normal;
+varying vec3 v_worldPos;
+void main() {
+  v_uv = a_uv;
+  v_normal = normalize(u_normalMatrix * a_normal);
+  v_worldPos = (u_model * vec4(a_position, 1.0)).xyz;
+  gl_Position = u_mvp * vec4(a_position, 1.0);
+}`;
+
+export { MESH_VERTEX };
+
 export function createContext(canvas) {
   const gl =
     canvas.getContext('webgl', { antialias: true, preserveDrawingBuffer: true }) ||
@@ -71,6 +92,28 @@ export function setupQuad(gl, program) {
   return 6; // index count
 }
 
+// Cria buffers de uma malha {positions, normals, uvs, indices} e liga os atributos.
+// Retorna a contagem de índices (p/ drawElements).
+export function setupMesh(gl, program, geo) {
+  const bind = (data, attr, size) => {
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(program, attr);
+    if (loc !== -1) {
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, size, gl.FLOAT, false, 0, 0);
+    }
+  };
+  bind(geo.positions, 'a_position', 3);
+  bind(geo.normals, 'a_normal', 3);
+  bind(geo.uvs, 'a_uv', 2);
+  const idxBuf = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, idxBuf);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, geo.indices, gl.STATIC_DRAW);
+  return geo.indices.length;
+}
+
 // Aplica uniforms automáticos + de controle e desenha.
 export function renderFrame(gl, program, indexCount, uniforms) {
   gl.useProgram(program);
@@ -81,13 +124,19 @@ export function renderFrame(gl, program, indexCount, uniforms) {
   if (uniforms.u_time !== undefined) set('u_time', (l) => gl.uniform1f(l, uniforms.u_time));
   if (uniforms.u_resolution) set('u_resolution', (l) => gl.uniform2f(l, uniforms.u_resolution[0], uniforms.u_resolution[1]));
   if (uniforms.u_mouse) set('u_mouse', (l) => gl.uniform2f(l, uniforms.u_mouse[0], uniforms.u_mouse[1]));
+  // Matrizes / luz do modo mesh (quando presentes).
+  if (uniforms.u_mvp) set('u_mvp', (l) => gl.uniformMatrix4fv(l, false, new Float32Array(uniforms.u_mvp)));
+  if (uniforms.u_model) set('u_model', (l) => gl.uniformMatrix4fv(l, false, new Float32Array(uniforms.u_model)));
+  if (uniforms.u_normalMatrix) set('u_normalMatrix', (l) => gl.uniformMatrix3fv(l, false, new Float32Array(uniforms.u_normalMatrix)));
+  if (uniforms.u_lightDir) set('u_lightDir', (l) => gl.uniform3f(l, uniforms.u_lightDir[0], uniforms.u_lightDir[1], uniforms.u_lightDir[2]));
   for (const [name, val] of Object.entries(uniforms.controls || {})) {
     if (Array.isArray(val)) set(name, (l) => gl.uniform3f(l, val[0], val[1], val[2]));
     else set(name, (l) => gl.uniform1f(l, val));
   }
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+  gl.enable(gl.DEPTH_TEST);
   gl.clearColor(0, 0, 0, 1);
-  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.drawElements(gl.TRIANGLES, indexCount, gl.UNSIGNED_SHORT, 0);
 }
 
