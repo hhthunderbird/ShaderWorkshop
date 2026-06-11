@@ -69,7 +69,7 @@
       <dt><code>mix</code>/<code>step</code> sempre substitui <code>if</code>?</dt>
       <dd>Com frequência sim, quando a lógica é "escolher entre dois valores com base numa condição contínua". <code>mix(b, a, step(limiar, x))</code> faz o que <code>if (x > limiar) a; else b;</code> faz — repare que a ordem inverte: o <strong>primeiro</strong> argumento do <code>mix</code> é o valor do <code>else</code> (quando x &lt; limiar), e o segundo é o do <code>if</code>.</dd>
       <dt>Preciso decorar o tamanho do warp?</dt>
-      <dd>Não. A ideia que importa é: <em>a turma anda junta</em>. O tamanho exato (32, 64...) varia por hardware. O que você carrega daqui é o princípio: branches que dividem vizinhos são caros; math que não diverge é grátis.</dd>
+      <dd>Não. A ideia que importa é: <em>a turma anda junta</em>. O tamanho exato (32, 64...) varia por hardware. O que você carrega daqui é o princípio: branches que dividem vizinhos são caros; conta que não diverge é de graça.</dd>
     </dl>
   </div>
 
@@ -78,7 +78,7 @@
   <ul>
     <li><strong>Marco 1 — Pinte o Pixel:</strong> do primeiro <code>vec3</code> de cor ao padrão animado com <code>u_time</code>, entendendo por que a GPU é tão rápida (M6).</li>
     <li><strong>Marco 2 — Superfícies de Verdade:</strong> do quad 2D ao objeto 3D com vértices, texturas, normais e luz difusa — e o pipeline de hardware fixo que faz tudo isso funcionar (M11).</li>
-    <li><strong>Marco 3 — O Poder da GPU:</strong> brilho especular e o modelo de Phong (M12), a GPU como calculadora paralela além dos pixels (M13), e agora warps, divergência e precisão (M14).</li>
+    <li><strong>Marco 3 — O Poder da GPU:</strong> brilho especular e o modelo de Blinn-Phong (M12), a GPU como calculadora paralela além dos pixels (M13), e agora warps, divergência e precisão (M14).</li>
   </ul>
   <p>Você escreveu código que roda em <strong>milhares de núcleos em paralelo, 60 vezes por segundo</strong>. Você entende o pipeline do vértice ao pixel. Você sabe o que é caro e o que é grátis. Isso é programar a GPU de verdade. 🎉</p>
 

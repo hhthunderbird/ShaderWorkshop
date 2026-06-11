@@ -76,8 +76,10 @@
   <div class="qa">
     <dl>
       <dt>A imagem precisa ter algum tamanho especial?</dt>
-      <dd>Aqui a gente usa imagens "comportadas" (lados potência de 2, tipo 128×128) e configura pra
-      funcionar em qualquer placa de escola. O motor cuida disso pra você.</dd>
+      <dd>No WebGL 1 (a versão que roda no navegador), imagens com lados potência de 2 (tipo 128×128)
+      funcionam com todas as configurações de repetição e mipmap. Tamanhos fora disso (NPOT) têm
+      restrições da API — não é o hardware, é o WebGL 1. O motor já usa imagens comportadas pra você
+      não precisar se preocupar.</dd>
       <dt>Por que minha textura aparece de cabeça pra baixo às vezes?</dt>
       <dd>Porque o "0,0" da imagem e o "0,0" da UV podem ficar em cantos diferentes. O motor já vira a
       imagem pra ela aparecer em pé — mas é o tropeço clássico de textura. Use a barra branca do topo
