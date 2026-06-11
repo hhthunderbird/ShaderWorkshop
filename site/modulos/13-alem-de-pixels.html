@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 13 — Para Além de Pixels: a GPU como Calculadora</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · Marco 3 · Módulo 13 de 14</p>
+  <h1>🧮 Para Além de Pixels: a GPU como Calculadora</h1>
+  <p>Até agora a GPU desenhou coisas pra você — pixels, triângulos, texturas. Mas a GPU é muito mais
+  do que uma pintora de tela: ela é uma <strong>calculadora paralela gigante</strong>. Física de fluidos,
+  partículas de jogos, treinamento de inteligência artificial — tudo isso roda na GPU. E não vira pixel
+  nenhum. Neste módulo, entendemos o salto de mentalidade que transforma o exército de pintores num
+  exército de calculadores.</p>
+
+  <div class="brain">
+    Lembra do M6? Milhares de cópias do <em>mesmo trabalho</em>, cada uma presa ao seu pixel de tela.
+    O fragment shader não pode olhar pro vizinho; cada fragmento é uma ilha independente. Isso é
+    incrível para pintar — mas e se o cálculo não precisasse virar pixel nenhum? E se o resultado fosse
+    só um número — a posição de uma partícula, a temperatura de uma célula de simulação, o peso de uma
+    rede neural? O exército continua o mesmo; o que muda é o <strong>destino do trabalho</strong>.
+  </div>
+
+  <h2>O salto de mentalidade</h2>
+  <p>No M6, o paralelismo era <strong>por pixel</strong>: a GPU disparava milhares de instâncias do seu
+  fragment shader, cada uma responsável por um ponto da tela. Funciona porque pintar pixels é uma tarefa
+  repetida, independente, previsível — exatamente o que a GPU ama.</p>
+
+  <p>O compute shader — disponível em APIs modernas como WebGPU, Metal e DirectX 12 — remove a amarração
+  com a tela. A GPU vira uma <strong>calculadora de propósito geral em paralelo</strong>: você dispara
+  grupos de threads (chamados esquadrões, ou <em>workgroups</em>) e cada thread faz qualquer conta que
+  você mandar. Física de fluidos? Cada thread simula uma célula de água. Partículas de explosão? Cada
+  thread atualiza a posição de uma partícula. Treinamento de rede neural? Cada thread multiplica um
+  pedaço da matriz. O resultado não precisa aparecer na tela — fica na memória da GPU pronto pro próximo
+  passo do cálculo.</p>
+
+  <div class="bullets">
+    <ul>
+      <li><strong>M6 — paralelismo por pixel:</strong> mesma regra rodando em todos os pixels da tela ao mesmo tempo; resultado vai pro framebuffer.</li>
+      <li><strong>M13 — compute / GPGPU:</strong> mesma ideia paralela, mas livre da tela; cada thread resolve qualquer conta; resultado fica na memória.</li>
+      <li>O <strong>hardware</strong> é o mesmo: os mesmos núcleos que pintam pixels também fazem física e IA.</li>
+      <li>O que muda é a <strong>API</strong> e a <strong>amarração</strong>: compute não está preso ao pipeline gráfico.</li>
+    </ul>
+  </div>
+
+  <figure>
+    <img src="../assets/img/m6-vs-m13.svg" alt="Dois painéis lado a lado: à esquerda (M6), cada núcleo pinta exatamente 1 pixel da tela — trabalho preso à tela; à direita (M13), cada núcleo resolve uma conta qualquer — física, IA, simulação — sem precisar virar pixel" width="720">
+    <figcaption>M6: o exército pinta pixels, um por soldado. M13: o mesmo exército resolve contas de qualquer tipo — a tela não é mais o destino obrigatório.</figcaption>
+  </figure>
+
+  <h2>Esquadrões</h2>
+  <p>No M6, o exército recebia uma única ordem: "pinta o teu pixel". Cada soldado trabalhava sozinho,
+  sem conversar com o vizinho. No compute, o exército se organiza em <strong>esquadrões</strong>
+  (o <em>workgroup</em> do GLSL, o <em>numthreads</em> do HLSL). Você não dispara um thread; dispara
+  um grupo deles de uma vez — por exemplo, um esquadrão de 64 ou 256 threads.</p>
+
+  <p>Por que grupos? Porque threads do mesmo esquadrão podem <em>compartilhar</em> uma memória rápida
+  (memória local do grupo) e <em>sincronizar</em> entre si. É a primeira vez que os soldados podem se
+  comunicar — mas só dentro do próprio esquadrão, não com todo o exército. Esse controle fino de
+  comunicação é o que permite algoritmos complexos: cada esquadrão resolve seu pedaço, e o resultado
+  combinado dos milhares de esquadrões é o cálculo inteiro.</p>
+
+  <p>A chamada pra disparar o trabalho se chama <strong>dispatch</strong>: você diz à GPU "rode X × Y × Z
+  esquadrões desse shader". Cada um encontra seu próprio identificador (o <em>global_id</em>) e sabe
+  exatamente que pedaço do problema lhe cabe — igual ao fragmento que sabe em qual pixel da tela está.</p>
+
+  <h2>Test Drive — Enxame de Pontos</h2>
+  <p>O demo abaixo mostra 40 pontos de luz se movendo ao mesmo tempo, cada um descrevendo sua própria
+  trajetória no tempo. É para dar a <em>sensação de escala</em> — a mesma ideia de "muitas coisas
+  acontecendo ao mesmo tempo" que está no coração do compute.</p>
+
+  <shader-playground id="pg-enxame"></shader-playground>
+
+  <div class="cuidado">
+    <strong>Atenção: isto é uma metáfora, não compute de verdade.</strong><br>
+    O que você vê acima é um fragment shader rodando um laço <code>for</code> dentro de um único
+    fragmento — a GPU ainda está presa ao pipeline gráfico, pintando pixels na tela. Isto <strong>não
+    é</strong> um compute shader.<br><br>
+    Um <strong>compute shader de verdade</strong> usa uma API diferente (WebGPU, Metal, CUDA, DirectX
+    Compute) que nosso playground <strong>não tem</strong>: ele é WebGL 1, que simplesmente não suporta
+    compute. O demo serve para ilustrar visualmente a ideia de "muitos cálculos ao mesmo tempo", mas
+    não execute os cálculos da forma que um compute shader executaria. Quando estudar compute de
+    verdade, você precisará de outra ferramenta.
+  </div>
+
+  <div class="qa">
+    <dl>
+      <dt>Então não dá pra fazer compute aqui no playground?</dt>
+      <dd>Não, de jeito nenhum. O playground usa WebGL 1, que não tem compute shaders. O que temos é
+      uma <em>metáfora visual</em> rodando em fragment shader — a ideia é certa, a ferramenta é outra.
+      WebGPU (o sucessor do WebGL) tem compute de verdade e já roda nos navegadores modernos.</dd>
+      <dt>Onde compute é usado na prática?</dt>
+      <dd>Em todo lugar que você imagina: física de jogos (partículas, destruição, colisão), simulações
+      científicas (dinâmica de fluidos, clima), machine learning (treinar e rodar redes neurais), ray
+      tracing acelerado, mineração de dados. A GPU virou a calculadora de escolha do mundo moderno
+      justamente por causa do compute.</dd>
+      <dt>É o mesmo hardware do M6?</dt>
+      <dd>Exatamente o mesmo. Os núcleos que pintavam seus pixels nos módulos anteriores são os mesmos
+      que treinam o ChatGPT e simulam fluidos. O que muda é a <strong>API</strong> e como o trabalho
+      chega neles — compute libera os núcleos da obrigação de pintar uma tela.</dd>
+    </dl>
+  </div>
+
+  <div class="bullets">
+    <ul>
+      <li>Compute shader = GPU como <strong>calculadora paralela de propósito geral</strong>, sem tela.</li>
+      <li>Esquadrão (<em>workgroup</em>) = grupo de threads que podem compartilhar memória rápida e sincronizar.</li>
+      <li><strong>Dispatch</strong> = a chamada que dispara X × Y × Z esquadrões de uma vez.</li>
+      <li>WebGL 1 <strong>não tem</strong> compute — precisa de WebGPU, Metal, CUDA ou DirectX Compute.</li>
+      <li>Hardware igual ao M6; liberdade muito maior: qualquer cálculo, não só pintar pixels.</li>
+    </ul>
+  </div>
+
+  <div class="recordacao">
+    <h2>Recordação: caça ao par</h2>
+    <p>Ligue cada termo ao seu significado (escreva a letra):</p>
+    <ul>
+      <li>( ) compute &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A. grupo de threads que compartilham memória rápida</li>
+      <li>( ) esquadrão &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B. paralelismo preso à tela, um fragmento por pixel</li>
+      <li>( ) M6 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C. conta de propósito geral na GPU, sem virar pixel</li>
+      <li>( ) WebGL 1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D. API de gráficos que não suporta compute shaders</li>
+    </ul>
+  </div>
+
+  <p style="margin-top:28px"><a href="12-luz-especular.html">← Anterior: Luz Especular &amp; Brilho</a>
+  &nbsp;·&nbsp;
+  <a href="14-otimizacao.html">Próximo: Otimização →</a></p>
+
+  <script type="module">
+    document.getElementById('pg-enxame').config = {
+      mode: 'fragment',
+      fragment: `precision highp float;
+void main() {
+  vec3 cor = vec3(0.02, 0.02, 0.05);
+  for (int i = 0; i < 40; i++) {
+    float fi = float(i);
+    vec2 p = vec2(
+      0.5 + 0.40 * sin(u_time * 0.70 + fi * 1.3),
+      0.5 + 0.40 * cos(u_time * 0.90 + fi * 2.1)
+    );
+    cor += vec3(0.15, 0.40, 0.90) * smoothstep(0.04, 0.0, distance(v_uv, p));
+  }
+  gl_FragColor = vec4(cor, 1.0);
+}`,
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" font-family="sans-serif">
+  <rect width="720" height="360" fill="#fbfbf7"/>
+  <text x="20" y="30" font-size="16" font-weight="bold" fill="#333">M6 — cada um pinta 1 pixel</text>
+  <g transform="translate(20,50)">
+    <g fill="#1c7ed6">
+      <rect x="10" y="10" width="46" height="46"/><rect x="66" y="10" width="46" height="46"/>
+      <rect x="122" y="10" width="46" height="46"/><rect x="178" y="10" width="46" height="46"/>
+      <rect x="10" y="66" width="46" height="46"/><rect x="66" y="66" width="46" height="46"/>
+      <rect x="122" y="66" width="46" height="46"/><rect x="178" y="66" width="46" height="46"/>
+    </g>
+    <rect x="0" y="0" width="234" height="170" fill="none" stroke="#aaa"/>
+    <text x="0" y="200" font-size="13" fill="#666">mesmo trabalho, preso à tela</text>
+  </g>
+  <text x="390" y="30" font-size="16" font-weight="bold" fill="#333">M13 — cada um resolve uma conta</text>
+  <g transform="translate(390,50)">
+    <g font-size="22">
+      <text x="14" y="34">🌊</text><text x="70" y="34">⚛️</text><text x="126" y="34">🤖</text><text x="182" y="34">💥</text>
+      <text x="14" y="90">🧮</text><text x="70" y="90">🌪️</text><text x="126" y="90">🔢</text><text x="182" y="90">✨</text>
+    </g>
+    <rect x="0" y="0" width="234" height="170" fill="none" stroke="#aaa"/>
+    <text x="0" y="200" font-size="13" fill="#666">qualquer cálculo, em esquadrões (física, IA…)</text>
+  </g>
+  <line x1="360" y1="40" x2="360" y2="300" stroke="#ddd"/>
+</svg>
