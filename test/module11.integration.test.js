@@ -17,7 +17,6 @@ test('a pagina do Modulo 11 e conceitual: demo, SVG, fecha o Marco 2, sem pixel-
   const html = readFileSync('site/modulos/11-hardware-fixo.html', 'utf8');
   assert.ok(html.includes('id="pg-raster"'), 'falta o demo de rasterizacao');
   assert.ok(html.includes('pipeline-fixo.svg'), 'falta o SVG do pipeline fixo');
-  assert.ok(html.includes('[IMAGEM:'), 'falta o placeholder do die da GPU');
   assert.ok(html.includes('Marco 2'), 'falta a amarracao do Marco 2');
   assert.ok(!html.includes('reference:'), 'M11 e conceitual: nao deve ter pixel-diff');
   assert.ok(!html.includes('exportable'), 'M11 nao tem projeto exportavel');
@@ -30,4 +29,10 @@ test('o index marca o Marco 2 como completo e linka o M11', () => {
   const idx = readFileSync('site/index.html', 'utf8');
   assert.ok(idx.includes('11-hardware-fixo.html'), 'index nao linka o M11');
   assert.ok(idx.includes('Marco 2 completo'), 'index nao marca Marco 2 completo');
+});
+
+test('M11 usa o zbuffer.svg no lugar do placeholder de imagem', () => {
+  const html = readFileSync('site/modulos/11-hardware-fixo.html', 'utf8');
+  assert.ok(html.includes('zbuffer.svg'), 'M11 nao referencia o zbuffer.svg');
+  assert.ok(!/\[IMAGEM:[^\]]*die/i.test(html), 'placeholder do die de GPU ainda presente');
 });

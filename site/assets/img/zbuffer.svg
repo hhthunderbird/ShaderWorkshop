@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" width="640" font-family="sans-serif">
+  <rect width="640" height="320" fill="#fbfbf7"/>
+  <text x="20" y="30" font-size="16" font-weight="bold" fill="#333">Z-buffer: quando dois caem no mesmo pixel, o mais perto ganha</text>
+  <text x="20" y="180" font-size="13" fill="#666">olho 👁</text>
+  <rect x="180" y="110" width="160" height="120" fill="#1c7ed6" opacity="0.9"/>
+  <text x="200" y="175" font-size="14" fill="#fff">z = 0.3 (perto)</text>
+  <rect x="300" y="80" width="160" height="120" fill="#e8590c" opacity="0.55"/>
+  <text x="360" y="120" font-size="14" fill="#333">z = 0.8 (longe)</text>
+  <rect x="300" y="110" width="40" height="40" fill="none" stroke="#111" stroke-width="2" stroke-dasharray="4 3"/>
+  <text x="250" y="270" font-size="15" fill="#2b8a3e">No pixel disputado, vence o de z menor (0.3): o azul aparece, o laranja fica escondido.</text>
+</svg>
