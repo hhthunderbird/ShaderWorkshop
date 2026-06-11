@@ -9,10 +9,10 @@ Traduzir o erro de compilação de shader numa **dica em PT-BR** acionável pro 
 
 ## 2. Arquitetura
 
-### 2.1 `site/assets/playground/glsl-errors.js` (novo, PURO, testável em node)
+### 2.1 `site/assets/playground/glslerrors.js` (novo, PURO, testável em node)
 - Exporta `friendlyError(rawLog)` → string PT-BR amigável (a **causa**, sem número de linha).
 - Puro string→string (igual config/header/pixeldiff): testável em node sem WebGL.
-- Parseia linhas do log no formato `ERROR: <a>:<linha>: '<token>' : <mensagem>` (extrai `token` e `mensagem`; ambos podem vir vazios). Usa só a **primeira** linha de ERROR (a raiz; o resto costuma ser cascata).
+- Parseia o log buscando a **primeira linha que contém `ERROR:`** (pula WARNINGs ou ruído antes), formato `ERROR: <a>:<linha>: '<token>' : <mensagem>` (extrai `token` e `mensagem`; ambos podem vir vazios). Usa só essa linha-raiz (o resto costuma ser cascata).
 - Mapeia por padrão da `<mensagem>` (case-insensitive), liderando por causa + token:
   - `undeclared identifier` → ``🔤 '<token>' não foi declarado ou está escrito errado — confira a digitação (maiúsculas e minúsculas contam).``
   - `syntax error` → ``✏️ Erro de digitação — provavelmente faltou um `;` no fim de uma linha, ou um parêntese/chave.``
@@ -21,6 +21,7 @@ Traduzir o erro de compilação de shader numa **dica em PT-BR** acionável pro 
   - `redefinition` → ``🔁 '<token>' foi declarado duas vezes. Remova a declaração repetida.``
   - **fallback** (qualquer outra) → ``⚠️ O shader não compilou — confira a digitação na parte que você editou.``
 - Se `<token>` vier vazio, usar a frase sem o token (ex.: undeclared sem token → fallback genérico).
+- Erros menos comuns (ex.: `l-value required`, `dimension mismatch`, atribuição inválida) caem no **fallback** de propósito — melhor uma dica genérica honesta que uma tradução errada. O `<details>` técnico sempre traz o log real pra esses casos.
 - Entrada vazia/sem `ERROR:` reconhecível → retorna o fallback.
 
 ### 2.2 `site/assets/playground/playground.js` (`_compile` catch)
