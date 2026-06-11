@@ -24,3 +24,6 @@ __pycache__/
 # Temporarios de download
 *.ytdl
 *.part
+
+# Dependencias node (recriaveis via npm install)
+node_modules/
