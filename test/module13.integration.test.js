@@ -12,7 +12,7 @@ void main(){
   for (int i = 0; i < 40; i++) {
     float fi = float(i);
     vec2 p = vec2(0.5 + 0.4*sin(u_time*0.7+fi*1.3), 0.5 + 0.4*cos(u_time*0.9+fi*2.1));
-    cor += vec3(0.15,0.4,0.9) * smoothstep(0.04, 0.0, distance(v_uv, p));
+    cor += vec3(0.15,0.4,0.9) * (1.0 - smoothstep(0.0, 0.04, distance(v_uv, p)));
   }
   gl_FragColor = vec4(cor, 1.0);
 }`,

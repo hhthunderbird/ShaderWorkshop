@@ -65,7 +65,7 @@
   combinado dos milhares de esquadrões é o cálculo inteiro.</p>
 
   <p>A chamada pra disparar o trabalho se chama <strong>dispatch</strong>: você diz à GPU "rode X × Y × Z
-  esquadrões desse shader". Cada um encontra seu próprio identificador (o <em>global_id</em>) e sabe
+  esquadrões desse shader". Cada <strong>thread</strong> (dentro dos esquadrões) encontra seu próprio identificador (o <em>global_id</em>) e sabe
   exatamente que pedaço do problema lhe cabe — igual ao fragmento que sabe em qual pixel da tela está.</p>
 
   <h2>Test Drive — Enxame de Pontos</h2>
@@ -77,13 +77,13 @@
 
   <div class="cuidado">
     <strong>Atenção: isto é uma metáfora, não compute de verdade.</strong><br>
-    O que você vê acima é um fragment shader rodando um laço <code>for</code> dentro de um único
-    fragmento — a GPU ainda está presa ao pipeline gráfico, pintando pixels na tela. Isto <strong>não
-    é</strong> um compute shader.<br><br>
+    O que você vê acima é um fragment shader rodando um laço <code>for</code> (em sequência, um cálculo
+    após o outro) dentro de um único fragmento — a GPU ainda está presa ao pipeline gráfico, pintando
+    pixels na tela. Isto <strong>não é</strong> um compute shader.<br><br>
     Um <strong>compute shader de verdade</strong> usa uma API diferente (WebGPU, Metal, CUDA, DirectX
     Compute) que nosso playground <strong>não tem</strong>: ele é WebGL 1, que simplesmente não suporta
     compute. O demo serve para ilustrar visualmente a ideia de "muitos cálculos ao mesmo tempo", mas
-    não execute os cálculos da forma que um compute shader executaria. Quando estudar compute de
+    não executa os cálculos da forma que um compute shader executaria. Quando estudar compute de
     verdade, você precisará de outra ferramenta.
   </div>
 
@@ -142,7 +142,7 @@ void main() {
       0.5 + 0.40 * sin(u_time * 0.70 + fi * 1.3),
       0.5 + 0.40 * cos(u_time * 0.90 + fi * 2.1)
     );
-    cor += vec3(0.15, 0.40, 0.90) * smoothstep(0.04, 0.0, distance(v_uv, p));
+    cor += vec3(0.15, 0.40, 0.90) * (1.0 - smoothstep(0.0, 0.04, distance(v_uv, p)));
   }
   gl_FragColor = vec4(cor, 1.0);
 }`,
