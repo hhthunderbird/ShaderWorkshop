@@ -123,7 +123,6 @@ export function renderFrame(gl, program, indexCount, uniforms) {
   };
   if (uniforms.u_time !== undefined) set('u_time', (l) => gl.uniform1f(l, uniforms.u_time));
   if (uniforms.u_resolution) set('u_resolution', (l) => gl.uniform2f(l, uniforms.u_resolution[0], uniforms.u_resolution[1]));
-  if (uniforms.u_mouse) set('u_mouse', (l) => gl.uniform2f(l, uniforms.u_mouse[0], uniforms.u_mouse[1]));
   // Matrizes / luz do modo mesh (quando presentes).
   if (uniforms.u_mvp) set('u_mvp', (l) => gl.uniformMatrix4fv(l, false, new Float32Array(uniforms.u_mvp)));
   if (uniforms.u_model) set('u_model', (l) => gl.uniformMatrix4fv(l, false, new Float32Array(uniforms.u_model)));
@@ -164,6 +163,7 @@ export function loadTexture(gl, url, onReady) {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
     if (onReady) onReady();
   };
+  img.onerror = () => { console.warn('Textura não carregada: ' + url); };
   img.src = url;
   return tex;
 }

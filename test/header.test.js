@@ -85,3 +85,11 @@ test('withHeaderMesh: precision do aluno vem antes dos uniforms (M12 specular)',
   assert.ok(out.indexOf('precision') < out.indexOf('uniform float u_time;'), 'precision antes dos uniforms');
   assert.equal((out.match(/precision\s+\w+\s+float/g) || []).length, 1, 'nao duplica precision');
 });
+
+test('splitPrecision tolera comentario de linha antes de precision (regressao FIX4)', () => {
+  const src = `// minha versão\nprecision highp float;\nvoid main(){ gl_FragColor = vec4(1.0); }`;
+  const out = withHeader(src);
+  assert.equal((out.match(/precision\s+\w+\s+float/g) || []).length, 1, 'exatamente uma precision');
+  assert.ok(/precision highp float/.test(out), 'deve ser highp');
+  assert.ok(out.indexOf('precision highp float') < out.indexOf('uniform float u_time;'), 'precision antes de u_time');
+});

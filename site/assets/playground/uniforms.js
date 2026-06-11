@@ -1,4 +1,4 @@
-export const AUTO_UNIFORMS = ['u_time', 'u_resolution', 'u_mouse'];
+export const AUTO_UNIFORMS = ['u_time', 'u_resolution'];
 
 export function toControlSpecs(decls) {
   const out = [];

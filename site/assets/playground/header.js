@@ -18,7 +18,7 @@ export function hasDeclaration(src, name) {
 // usado sem precisão -> "No precision specified for (float)". Por isso a precision
 // é re-emitida no TOPO, antes dos uniforms injetados.
 function splitPrecision(src) {
-  const m = src.match(/^\s*(precision\s+\w+\s+float\s*;)\s*/);
+  const m = src.match(/^(?:\s*\/\/[^\n]*\n)*\s*(precision\s+\w+\s+float\s*;)\s*/);
   if (m) return { precision: m[1], body: src.slice(m[0].length) };
   return { precision: 'precision mediump float;', body: src };
 }

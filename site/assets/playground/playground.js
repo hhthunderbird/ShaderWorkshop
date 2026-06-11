@@ -225,14 +225,19 @@ class ShaderPlayground extends HTMLElement {
 
   async _check() {
     if (!this.cfg.reference) return;
-    const actual = readPixels(this.gl);
-    const ref = await loadReferencePixels(this.cfg.reference, this.canvas.width, this.canvas.height);
-    const { score, pass } = compare(actual, ref, this.cfg.tolerance);
-    const pct = Math.round(score * 100);
-    this.statusEl.textContent = pass
-      ? `✓ Mandou bem! (${pct}% igual ao alvo)`
-      : `Quase! ${pct}% igual. Ajuste e tente de novo.`;
-    this.statusEl.className = 'pg-status ' + (pass ? 'pg-ok' : 'pg-quase');
+    try {
+      const actual = readPixels(this.gl);
+      const ref = await loadReferencePixels(this.cfg.reference, this.canvas.width, this.canvas.height);
+      const { score, pass } = compare(actual, ref, this.cfg.tolerance);
+      const pct = Math.round(score * 100);
+      this.statusEl.textContent = pass
+        ? `✓ Mandou bem! (${pct}% igual ao alvo)`
+        : `Quase! ${pct}% igual. Ajuste e tente de novo.`;
+      this.statusEl.className = 'pg-status ' + (pass ? 'pg-ok' : 'pg-quase');
+    } catch (e) {
+      this.statusEl.textContent = '⚠ Não consegui carregar a referência: ' + e.message;
+      this.statusEl.className = 'pg-status pg-erro';
+    }
   }
 
   _showSolution() {
