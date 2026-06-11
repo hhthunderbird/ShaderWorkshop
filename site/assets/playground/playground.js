@@ -3,8 +3,10 @@ import { toControlSpecs } from './uniforms.js';
 import { compare } from './pixeldiff.js';
 import { extractRegion, reassemble } from './editable.js';
 import { translateToHLSL } from './translate.js';
-import { createContext, buildProgram, setupQuad, renderFrame, readPixels } from './gl.js';
-import { withHeader } from './header.js';
+import { createContext, buildProgram, setupQuad, setupMesh, MESH_VERTEX, renderFrame, readPixels } from './gl.js';
+import { withHeader, withHeaderMesh } from './header.js';
+import { cube, sphere } from './geometry.js';
+import { multiply, perspective, translation, rotateX, rotateY, mat3FromMat4 } from './mat4.js';
 
 class ShaderPlayground extends HTMLElement {
   connectedCallback() {
@@ -155,8 +157,15 @@ class ShaderPlayground extends HTMLElement {
   _compile() {
     try {
       this.gl = this.gl || createContext(this.canvas);
-      this.program = buildProgram(this.gl, withHeader(this.fullSource));
-      this.indexCount = setupQuad(this.gl, this.program);
+      const gl = this.gl;
+      if (this.cfg.mode === 'mesh') {
+        this.geo = this.geo || (this.cfg.mesh === 'sphere' ? sphere(28) : cube());
+        this.program = buildProgram(gl, withHeaderMesh(this.fullSource), MESH_VERTEX);
+        this.indexCount = setupMesh(gl, this.program, this.geo);
+      } else {
+        this.program = buildProgram(gl, withHeader(this.fullSource));
+        this.indexCount = setupQuad(gl, this.program);
+      }
       this.statusEl.textContent = '';
       this.statusEl.className = 'pg-status';
     } catch (e) {
@@ -169,11 +178,23 @@ class ShaderPlayground extends HTMLElement {
   _loop() {
     const frame = () => {
       if (this.program && this.gl) {
-        renderFrame(this.gl, this.program, this.indexCount, {
-          u_time: (performance.now() - this.start) / 1000,
+        const t = (performance.now() - this.start) / 1000;
+        const base = {
+          u_time: t,
           u_resolution: [this.canvas.width, this.canvas.height],
           controls: this.controlValues,
-        });
+        };
+        if (this.cfg.mode === 'mesh') {
+          const vel = this.controlValues.u_vel ?? 0.6;
+          const model = multiply(rotateY(t * vel), rotateX(0.5));
+          const view = translation(0, 0, -3);
+          const proj = perspective(Math.PI / 4, 1, 0.1, 100);
+          base.u_mvp = multiply(proj, multiply(view, model));
+          base.u_model = model;
+          base.u_normalMatrix = mat3FromMat4(model);
+          base.u_lightDir = this.cfg.light;
+        }
+        renderFrame(this.gl, this.program, this.indexCount, base);
       }
       this._raf = requestAnimationFrame(frame);
     };
