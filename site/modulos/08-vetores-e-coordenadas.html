@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 8 — Vetores &amp; Coordenadas</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · Marco 2 · Módulo 8 de 11</p>
+  <h1>🧮 Vetores &amp; Coordenadas</h1>
+  <p>Este é um módulo-ferramenta. Antes de acender uma luz num objeto 3D (próximos módulos), você
+  precisa de duas ideias da matemática que aparecem em <em>todo</em> shader de luz: o
+  <strong>vetor</strong> e o <strong>produto escalar</strong>. A boa notícia: dá pra <em>ver</em> as
+  duas na tela. Nada de decoreba.</p>
+
+  <h2>Ponto e vetor: qual a diferença?</h2>
+  <p>Um <strong>ponto</strong> é um lugar (onde você está). Um <strong>vetor</strong> é uma
+  <em>seta</em>: tem direção e tamanho (pra onde ir, e quanto). No M7 a posição de cada vértice era um
+  ponto. Agora vamos pensar em <em>direções</em> — setas.</p>
+  <div class="brain">
+    Volte lá no M4: o que <code>length(v_uv - vec2(0.5))</code> media? E aquela subtração
+    <code>v_uv - vec2(0.5)</code> — que "coisa" geométrica ela era?
+    <br><br>
+    Pensou? Pois é: a subtração era uma <strong>seta</strong> do centro da tela até o pixel, e o
+    <code>length</code> media o <em>tamanho</em> dela. Você usava vetores sem saber o nome.
+  </div>
+
+  <h2>Normalizar: encolher a seta pra tamanho 1</h2>
+  <p>Muitas vezes só importa a <strong>direção</strong> da seta, não o tamanho. <code>normalize(v)</code>
+  pega qualquer seta e devolve uma de tamanho 1 apontando pro mesmo lado. É como dizer "pra lá",
+  esquecendo "quão longe".</p>
+
+  <h2>O produto escalar (<code>dot</code>): o medidor de alinhamento</h2>
+  <p>Pense em <strong>duas lanternas</strong>: quanto mais elas apontam pro mesmo lado, mais a luz se
+  junta. Agora a estrela do módulo faz exatamente essa medida. <code>dot(a, b)</code> pega dois
+  vetores e devolve <strong>um número</strong> que diz o quanto eles apontam pro mesmo lado:</p>
+  <figure>
+    <img src="../assets/img/vetores-dot.svg" alt="Três casos: dois vetores quase juntos (dot perto de 1), perpendiculares (dot igual a 0) e opostos (dot perto de -1)" width="720">
+    <figcaption>Com vetores de tamanho 1: <code>dot</code> = 1 (mesma direção), 0 (perpendiculares), −1 (opostos).</figcaption>
+  </figure>
+
+  <div class="brain">
+    Pense em <strong>duas lanternas</strong>. Quanto mais elas apontam pro mesmo lugar, mais a luz se
+    soma — o <code>dot</code> chega perto de 1. Apontando em ângulo reto, nada em comum (0). Apontando
+    uma contra a outra, opostas (−1). É exatamente assim que a luz vai "saber" se uma superfície está
+    virada pra ela — no Módulo 10.
+  </div>
+
+  <h2>Test Drive: o dot virou imagem</h2>
+  <p>Cada pixel calcula a <strong>direção</strong> dele a partir do centro (uma seta normalizada) e
+  faz o <code>dot</code> com uma direção que <em>você</em> controla pelo slider. O número do
+  <code>dot</code> vira o brilho do pixel:</p>
+  <div class="bullets">
+    <ul>
+      <li><strong>Branco</strong> = apontam pro mesmo lado (dot perto de 1).</li>
+      <li><strong>Cinza-médio</strong> = perpendiculares (dot = 0).</li>
+      <li><strong>Preto</strong> = opostos (dot perto de −1).</li>
+    </ul>
+  </div>
+  <p>Gire o slider e veja o "holofote" girar.</p>
+
+  <shader-playground id="pg-dot"></shader-playground>
+
+  <div class="afie">
+    <p>Sem mexer ainda — <strong>preveja</strong>: quando o slider aponta pra direita, qual metade da
+    tela fica branca: a <em>direita</em> ou a <em>esquerda</em>? E o que tem bem no meio do lobo claro?</p>
+    <p>Resposta: ____________________</p>
+    <p>Agora gire o slider e confira.</p>
+  </div>
+
+  <details class="sidebar">
+    <summary>🧮 Matemática de bolso: vetor, normalizar e dot (sem susto)</summary>
+    <div>
+      <p><strong>Vetor</strong> = uma seta: <code>vec2(dx, dy)</code> guarda "ande dx pra direita e dy
+      pra cima". O <strong>tamanho</strong> dela é <code>length(v)</code> (Pitágoras, do M4).</p>
+      <p><strong>normalize(v)</strong> = a mesma seta, mas com tamanho 1. Serve pra comparar só
+      <em>direções</em>, sem o tamanho atrapalhar.</p>
+      <p><strong>dot(a, b)</strong> = multiplica e soma: <code>a.x*b.x + a.y*b.y</code>. Com setas de
+      tamanho 1, esse número é exatamente o "alinhamento": 1, 0 ou −1 (e tudo no meio). Você não
+      precisa decorar a fórmula — precisa lembrar o que o número <em>significa</em>.</p>
+    </div>
+  </details>
+
+  <details class="sidebar">
+    <summary>🧭 Coordenadas: local, mundo, tela (visão rápida)</summary>
+    <div>
+      <p>O mesmo ponto pode ser descrito em "réguas" diferentes: na régua do <strong>objeto</strong>
+      (local), na régua da <strong>cena</strong> (mundo) ou na régua da <strong>tela</strong>. A
+      matriz MVP do M7 era justamente a tradutora entre essas réguas. Você não precisa fazer a conta —
+      só saber que "mudar de coordenada" é trocar de régua, não mudar o ponto.</p>
+    </div>
+  </details>
+
+  <div class="qa">
+    <dl>
+      <dt>Por que normalizar antes do <code>dot</code>?</dt>
+      <dd>Porque aí o resultado vira só "alinhamento" (de −1 a 1). Uma seta o dobro do tamanho
+      dobraria o número do <code>dot</code> — e aí ele mediria tamanho junto com direção, não só o
+      alinhamento que a gente quer.</dd>
+      <dt>O <code>dot</code> dá ângulo?</dt>
+      <dd>Dá a <em>pista</em> do ângulo: 1 = 0°, 0 = 90°, −1 = 180°. (É o cosseno do ângulo, pros
+      curiosos — mas o número já basta pra gente.)</dd>
+      <dt>Onde isso vai ser usado?</dt>
+      <dd>Na luz! No Módulo 10 a luz vai usar o <code>dot</code>. Antes de chegar lá, arrisque: você
+      acha que a face fica clara quando o <code>dot</code> (entre a direção dela e a luz) é
+      <em>alto</em> ou <em>baixo</em>? Guarde sua aposta.</dd>
+    </dl>
+  </div>
+
+  <div class="cuidado">
+    <code>dot</code> devolve um <strong>número</strong>, não um vetor. E pode ser <strong>negativo</strong>
+    (até −1). Quando isso virar brilho de luz, a gente corta o negativo com <code>max(..., 0.0)</code> —
+    mas isso é assunto do M10. Por aqui, deixe o negativo aparecer (ele vira preto).
+  </div>
+
+  <div class="bullets">
+    <ul>
+      <li>Vetor = seta (direção + tamanho). Ponto = lugar.</li>
+      <li><code>normalize</code> deixa a seta com tamanho 1 (só a direção importa).</li>
+      <li><code>dot(a,b)</code> mede alinhamento: 1 (juntos), 0 (perpendiculares), −1 (opostos).</li>
+      <li>Esse mesmo <code>dot</code> vai decidir a luz no M10.</li>
+    </ul>
+  </div>
+
+  <h2>Afie o lápis: aponte o holofote pra direita</h2>
+  <p>O shader abaixo já calcula a <strong>direção de cada pixel</strong> (a seta normalizada
+  <code>dir</code>). Sua missão: faça o brilho ser o <code>dot</code> dessa direção com a direção
+  <strong>horizontal pra direita</strong>, <code>vec2(1.0, 0.0)</code>. Detalhe: o <code>dot</code>
+  vai de −1 a 1, mas a cor do pixel vai de 0 a 1; o <code>* 0.5 + 0.5</code> reencaixa um no outro.
+  O resultado é um holofote apontando pra direita. Edite, dê <em>Test Drive</em> e clique
+  <em>Conferir</em>.</p>
+  <shader-playground id="pg-ex"></shader-playground>
+
+  <div class="recordacao">
+    <h2>Recordação: caça ao par</h2>
+    <p>Ligue cada termo ao seu significado (escreva a letra):</p>
+    <ul>
+      <li>( ) vetor &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A. número de −1 a 1 que mede alinhamento</li>
+      <li>( ) normalize &nbsp; B. uma seta: direção e tamanho</li>
+      <li>( ) dot &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C. deixa a seta com tamanho 1</li>
+      <li>( ) coordenada &nbsp; D. a "régua" em que se descreve um ponto</li>
+    </ul>
+  </div>
+
+  <p style="margin-top:28px"><a href="07-vertices-e-pipeline.html">← Anterior: Vértices &amp; Pipeline</a>
+  &nbsp;·&nbsp;
+  <span class="proximo-soon">Próximo: Texturas &amp; UV →
+  <span style="color:#999">(em construção no próximo plano)</span></span></p>
+
+  <script type="module">
+    document.getElementById('pg-dot').config = {
+      mode: 'fragment',
+      fragment: `uniform float u_ang;
+void main() {
+  vec2 p = v_uv - vec2(0.5);
+  vec2 dir = p / (length(p) + 0.001);
+  vec2 ref = vec2(cos(u_ang), sin(u_ang));
+  float g = dot(dir, ref) * 0.5 + 0.5;
+  gl_FragColor = vec4(vec3(g), 1.0);
+}`,
+      uniforms: [{ name: 'u_ang', label: 'direção (gira o holofote)', min: 0.0, max: 6.2831, value: 0.0 }],
+    };
+    document.getElementById('pg-ex').config = {
+      mode: 'fragment',
+      fragment: `void main() {
+  vec2 p = v_uv - vec2(0.5);
+  vec2 dir = p / (length(p) + 0.001);
+// >>> EDIT: brilho
+  float g = 0.5;
+// <<< EDIT
+  gl_FragColor = vec4(vec3(g), 1.0);
+}`,
+      editableRegions: ['brilho'],
+      solution: '  float g = dot(dir, vec2(1.0, 0.0)) * 0.5 + 0.5;',
+      reference: '../assets/ref/m8-dot-horizontal.png',
+      tolerance: 0.06,
+    };
+  </script>
+</body>
+</html>

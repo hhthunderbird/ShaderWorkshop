@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240" width="720" height="240" font-family="system-ui, sans-serif">
+  <rect width="720" height="240" fill="#fff"/>
+  <text x="360" y="24" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">O produto escalar (dot) mede o "quanto apontam pro mesmo lado"</text>
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#333"/></marker>
+  </defs>
+
+  <!-- 3 casos: alinhados (dot≈1), perpendiculares (dot=0), opostos (dot≈-1) -->
+  <!-- ALINHADOS -->
+  <g transform="translate(40,60)">
+    <circle cx="80" cy="70" r="3" fill="#333"/>
+    <line x1="80" y1="70" x2="150" y2="50" stroke="#1971c2" stroke-width="3" marker-end="url(#ar)"/>
+    <line x1="80" y1="70" x2="145" y2="58" stroke="#2f9e44" stroke-width="3" marker-end="url(#ar)"/>
+    <text x="80" y="120" text-anchor="middle" font-size="13" fill="#444">quase juntos</text>
+    <text x="80" y="140" text-anchor="middle" font-size="15" font-weight="bold" fill="#2b8a3e">dot ≈ 1</text>
+  </g>
+  <!-- PERPENDICULARES -->
+  <g transform="translate(280,60)">
+    <circle cx="80" cy="70" r="3" fill="#333"/>
+    <line x1="80" y1="70" x2="150" y2="70" stroke="#1971c2" stroke-width="3" marker-end="url(#ar)"/>
+    <line x1="80" y1="70" x2="80" y2="10" stroke="#2f9e44" stroke-width="3" marker-end="url(#ar)"/>
+    <text x="80" y="120" text-anchor="middle" font-size="13" fill="#444">em ângulo reto</text>
+    <text x="80" y="140" text-anchor="middle" font-size="15" font-weight="bold" fill="#1971c2">dot = 0</text>
+  </g>
+  <!-- OPOSTOS -->
+  <g transform="translate(520,60)">
+    <circle cx="80" cy="70" r="3" fill="#333"/>
+    <line x1="80" y1="70" x2="150" y2="70" stroke="#1971c2" stroke-width="3" marker-end="url(#ar)"/>
+    <line x1="80" y1="70" x2="14" y2="74" stroke="#2f9e44" stroke-width="3" marker-end="url(#ar)"/>
+    <text x="80" y="120" text-anchor="middle" font-size="13" fill="#444">contrários</text>
+    <text x="80" y="140" text-anchor="middle" font-size="15" font-weight="bold" fill="#e03131">dot ≈ −1</text>
+  </g>
+
+  <text x="360" y="210" text-anchor="middle" font-size="12" fill="#888">Vetores normalizados (tamanho 1): dot vai de −1 (opostos) a 1 (mesma direção). 0 = perpendiculares.</text>
+</svg>
