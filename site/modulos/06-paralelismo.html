@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 6 — Por Baixo do Capô I: Paralelismo</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · Marco 1 · Módulo 6 de 6</p>
+  <h1>🏗️ Por Baixo do Capô I: Paralelismo</h1>
+  <p>Você já escreveu shaders que pintam, desenham e animam. Falta responder a pergunta que abriu o
+  curso: <em>como isso é tão RÁPIDO?</em> Uma tela cheia tem <strong>milhões</strong> de pixels, e seu
+  shaderzinho roda pra cada um, 60 vezes por segundo. Se fosse um por vez, travava. O truque é a forma
+  como a GPU trabalha — e você já estava usando o tempo todo, sem saber.</p>
+
+  <h2>Um pintor × um exército</h2>
+  <p>Imagine pintar um mural de 10 000 quadradinhos. Sozinho, você pinta um, depois o próximo, depois o
+  próximo... leva horas. Agora imagine <strong>10 000 pintores</strong>, cada um responsável por
+  <em>um</em> quadradinho, todos pintando <strong>ao mesmo tempo</strong>. O mural fica pronto num
+  piscar. A CPU é o pintor solo; a GPU é o exército.</p>
+
+  <figure>
+    <img src="../assets/img/exercito.svg" alt="À esquerda, um pintor pintando um quadradinho de cada vez (lento); à direita, um exército pintando todos os quadradinhos ao mesmo tempo (instantâneo)" width="720">
+    <figcaption>CPU: um quadradinho de cada vez. GPU: todos ao mesmo tempo, cada núcleo no seu.</figcaption>
+  </figure>
+
+  <h2>Veja a diferença rodando</h2>
+  <p>Os dois quadros abaixo "pintam" uma grade de células. O da <strong>esquerda</strong> faz como a
+  CPU: enche <em>uma de cada vez</em>, em fila. O da <strong>direita</strong> faz como a GPU:
+  <em>todas mudam juntas</em>, todo quadro. Olhe os dois lado a lado — qual termina o trabalho antes?</p>
+
+  <div class="duo">
+    <div>
+      <p style="text-align:center;font-weight:bold;color:#c92a2a">🖌️ 1 pintor (CPU) — em fila</p>
+      <shader-playground id="pg-cpu"></shader-playground>
+    </div>
+    <div>
+      <p style="text-align:center;font-weight:bold;color:#2b8a3e">👥 exército (GPU) — todos juntos</p>
+      <shader-playground id="pg-gpu"></shader-playground>
+    </div>
+  </div>
+
+  <div class="brain">
+    Repare numa coisa esquisita do exército: nenhum pintor <strong>conversa</strong> com o vizinho.
+    Cada um olha só pro seu quadradinho e pinta. É justamente por não precisarem se coordenar que
+    podem trabalhar todos ao mesmo tempo. Se cada um tivesse que perguntar "e aí, que cor você usou?",
+    a mágica acabava.
+  </div>
+
+  <h2>Cada pixel é uma ilha</h2>
+  <p>Aqui está o segredo do shader, agora explícito: quando você escreve <code>gl_FragColor = ...</code>,
+  está escrevendo a regra <strong>de UM pixel</strong>. A GPU pega essa mesma regra e roda em
+  <strong>milhares de núcleos</strong> ao mesmo tempo, um por pixel. Por isso seu shader nunca falou
+  "o pixel do lado" — ele <em>não pode</em>. Cada fragmento é independente, e essa limitação é
+  exatamente o que deixa tudo voar.</p>
+
+  <details class="sidebar">
+    <summary>🔎 Curiosidade: por que "independente" é tão importante</summary>
+    <div>
+      <p>Tarefas que <strong>não dependem uma da outra</strong> podem ser feitas em paralelo — ao
+      mesmo tempo. Pintar pixels é o exemplo perfeito: a cor do pixel lá do canto não muda em nada a
+      cor do pixel do meio. Como são independentes, a GPU joga cada um num núcleo e manda ver.</p>
+      <p>Existe um nome chique pra "a mesma instrução rodando em montões de dados ao mesmo tempo", mas
+      o nome importa menos que a ideia: <strong>uma regra, multiplicada por milhares de núcleos</strong>.
+      A gente volta nos detalhes (e nos nomes) no próximo marco.</p>
+    </div>
+  </details>
+
+  <div class="qa">
+    <dl>
+      <dt>A GPU tem mesmo "milhares" de núcleos?</dt>
+      <dd>Sim — placas modernas têm de centenas a milhares de núcleos pequenos. A CPU tem poucos (tipo
+      4 a 16), mas cada um é mais "esperto". Para pintar pixels, ganhar no número vence.</dd>
+      <dt>Então a GPU é melhor que a CPU?</dt>
+      <dd>Não — é diferente. A GPU arrasa em "muitas tarefas iguais e independentes" (pixels!). A CPU
+      arrasa em "tarefas complicadas que dependem umas das outras". Cada uma no seu quadradinho. 😉</dd>
+      <dt>Por que eu nunca acessei "o pixel vizinho"?</dt>
+      <dd>Porque o modelo de execução não deixa, de propósito. Essa independência é o que permite rodar
+      tudo em paralelo. (Dá pra ler vizinhos com texturas — assunto de marcos futuros.)</dd>
+    </dl>
+  </div>
+
+  <figure>
+    <div class="img-todo">[IMAGEM: foto de um "die" de GPU ou diagrama dos núcleos CUDA/stream processors]
+    Fonte sugerida: https://commons.wikimedia.org/ (busque "GPU die" ou "CUDA cores") — baixe e salve em assets/img/gpu-die.jpg e troque este bloco por &lt;img&gt;.</div>
+  </figure>
+
+  <div class="cuidado">
+    "Paralelo" não é "rápido por mágica". É rápido porque o trabalho foi <strong>dividido</strong> em
+    milhares de pedaços independentes que rodam juntos. Se um shader força os pixels a dependerem uns
+    dos outros, ele perde justamente o que torna a GPU veloz.
+  </div>
+
+  <div class="bullets">
+    <ul>
+      <li>O MESMO shader roda pra todos os pixels — milhares <em>ao mesmo tempo</em>.</li>
+      <li>Cada fragmento é independente: não lê nem conversa com o vizinho.</li>
+      <li>É essa independência que permite usar milhares de núcleos em paralelo.</li>
+      <li>CPU = poucos núcleos espertos (tarefas dependentes); GPU = muitos núcleos simples (tarefas iguais e independentes).</li>
+    </ul>
+  </div>
+
+  <div class="afie">
+    <p>No quadro da CPU, conte mais ou menos quantas células acendem por segundo. Agora imagine uma
+    tela real com <strong>2 milhões</strong> de pixels nesse ritmo de "um por vez". <strong>Quanto
+    tempo</strong> levaria pra desenhar UM quadro? E o jogo precisa de 60 por segundo...</p>
+    <p>Escreva sua estimativa: ____________. (Spoiler: é por isso que a GPU existe.)</p>
+  </div>
+
+  <div class="recordacao">
+    <h2>Recordação: caça ao par</h2>
+    <p>Ligue cada termo ao seu significado (escreva a letra):</p>
+    <ul>
+      <li>( ) CPU &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A. roda a mesma regra em milhares de núcleos ao mesmo tempo</li>
+      <li>( ) GPU &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B. cada pixel decide sua cor sem olhar o vizinho</li>
+      <li>( ) paralelo &nbsp;&nbsp; C. poucos núcleos espertos, tarefas em fila</li>
+      <li>( ) independente &nbsp; D. dividir o trabalho em pedaços que rodam juntos</li>
+    </ul>
+  </div>
+
+  <div class="recordacao" style="border-color:#37b24d;background:#ebfbee">
+    <h2 style="color:#2b8a3e">🏆 Você terminou o Marco 1!</h2>
+    <p>Recapitulando o "curso curto": você aprendeu o que é um shader e por que a GPU existe (M1),
+    pintou pixels pela posição (M2), usou funções pra criar transições e ondas (M3), desenhou e
+    combinou formas (M4), deu vida a tudo com o tempo (M5) — e agora entende <em>por que</em> roda tão
+    rápido (M6). Você escreveu código que roda em <strong>milhares de núcleos</strong>, ao mesmo tempo,
+    60 vezes por segundo. Isso é programar a GPU. 🎉</p>
+    <p>Os próximos marcos vão fundo: superfícies 3D de verdade, e o poder bruto da GPU por dentro.</p>
+  </div>
+
+  <p style="margin-top:28px"><a href="05-dando-vida-animacao.html">← Anterior: Dando Vida — Animação</a>
+  &nbsp;·&nbsp;
+  <span class="proximo-soon">Marco 2 — Superfícies de Verdade
+  <span style="color:#999">(em breve)</span></span></p>
+
+  <script type="module">
+    document.getElementById('pg-cpu').config = {
+      mode: 'fragment',
+      fragment: `uniform float u_vel;
+void main() {
+  vec2 cell = floor(v_uv * 12.0);
+  float idx = cell.y * 12.0 + cell.x;      // ordem da fila: 0 a 143
+  float ponteiro = fract(u_time * u_vel * 0.07) * 144.0;
+  float on = step(idx, ponteiro);          // so acende ate onde o pintor chegou
+  vec3 c = on * vec3(fract(idx * 0.13), 0.55, 0.95);
+  gl_FragColor = vec4(c, 1.0);
+}`,
+      uniforms: [
+        { name: 'u_vel', label: 'velocidade', min: 0.2, max: 3.0, value: 1.0 },
+      ],
+    };
+    document.getElementById('pg-gpu').config = {
+      mode: 'fragment',
+      fragment: `uniform float u_vel;
+void main() {
+  vec2 cell = floor(v_uv * 12.0);
+  float idx = cell.y * 12.0 + cell.x;
+  // TODAS as celulas mudam de brilho JUNTAS (mesma fase) -> de uma vez
+  float on = 0.5 + 0.5 * sin(u_time * u_vel * 3.0);
+  vec3 c = on * vec3(fract(idx * 0.13), 0.55, 0.95);
+  gl_FragColor = vec4(c, 1.0);
+}`,
+      uniforms: [
+        { name: 'u_vel', label: 'velocidade', min: 0.2, max: 3.0, value: 1.0 },
+      ],
+    };
+  </script>
+</body>
+</html>
