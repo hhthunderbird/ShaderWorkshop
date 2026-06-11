@@ -21,7 +21,7 @@
   são automáticas (cinzas):</p>
 
   <figure>
-    <img src="../assets/img/pipeline-fixo.svg" alt="Pipeline em fila: Vertex (programável), Rasterizador (fixo), Fragment (programável), TMU (fixo), Z-buffer (fixo), com verdes para programável e cinzas para fixo" width="760">
+    <img src="../assets/img/pipeline-fixo.svg" alt="Pipeline em fila: Vertex (programável), Rasterizador (fixo), Fragment (programável, com TMU acoplada por dentro para buscar texels), Z-buffer/ROP (fixo), com verdes para programável e cinzas para fixo" width="760">
     <figcaption>Você escreve só as caixas verdes. As cinzas viraram circuito dedicado — por isso voam.</figcaption>
   </figure>
 
@@ -43,13 +43,16 @@
   <h2>TMU: buscar a cor da textura também é hardware</h2>
   <p>Quando você escreveu <code>texture2D(u_tex, v_uv)</code> no M9, parecia uma função sua. Mas
   "buscar o pedacinho certo da imagem" é tão comum que existe um circuito só pra isso: a
-  <strong>TMU</strong> (Texture Mapping Unit). Você pede o texel; o hardware entrega voando.</p>
+  <strong>TMU</strong> (Texture Mapping Unit). Essa chamada acontece <em>de dentro do fragment shader</em>
+  — enquanto ele está rodando, ele pede o texel à TMU e o hardware entrega voando. A TMU não é uma etapa
+  depois do fragment; é um serviço que o fragment aciona por dentro quando executa o <code>texture2D</code>.</p>
 
   <h2>Z-buffer: quem está na frente ganha</h2>
   <p>Quando dois objetos se sobrepõem na tela, quem aparece? O mais <strong>perto</strong> da câmera.
-  Quem decide isso é o <strong>Z-buffer</strong> (também fixo): pra cada pixel, ele guarda a distância
-  do que já foi desenhado ali e só deixa passar quem estiver mais na frente. Você já usou isso sem
-  saber — era o que fazia as faces de trás do seu cubo (M7) não aparecerem na frente.</p>
+  Quem decide isso é o <strong>Z-buffer</strong> (também fixo): quando dois pedaços de coisas caem no
+  mesmo pixel, o Z-buffer guarda a profundidade e deixa passar só o mais perto (o da frente) — é assim
+  que um objeto na frente esconde o que está atrás dele. Sem o Z-buffer, o que fosse desenhado por último
+  apareceria no topo, mesmo estando atrás.</p>
 
   <figure>
     <div class="img-todo">[IMAGEM: diagrama/foto de um "die" de GPU destacando blocos de TMU/ROP, ou um esquema do pipeline de hardware]
@@ -91,7 +94,7 @@
       <li>O pipeline tem partes <strong>programáveis</strong> (vertex, fragment) e <strong>fixas</strong>.</li>
       <li><strong>Rasterização</strong>: transforma triângulos em fragmentos (pixels). Hardware fixo.</li>
       <li><strong>TMU</strong>: circuito que busca a cor da textura (o <code>texture2D</code> do M9).</li>
-      <li><strong>Z-buffer</strong>: decide quem está na frente (o que fez seu cubo do M7 ter profundidade).</li>
+      <li><strong>Z-buffer</strong>: decide quem está na frente — quando dois objetos se sobrepõem, só o mais próximo aparece no pixel.</li>
     </ul>
   </div>
 

@@ -13,7 +13,7 @@
 2. (10 min) Rasterização com o playground (pg-raster): o triângulo passeia e a GPU descobre, por
    pixel, quem está dentro. Cada quadradinho = um fragmento.
 3. (8 min) TMU: ligue ao `texture2D` do M9 (buscar texel é circuito dedicado).
-4. (8 min) Z-buffer: ligue ao cubo do M7 (faces de trás não aparecem na frente).
+4. (8 min) Z-buffer: explique com dois objetos sobrepostos — quando dois fragmentos caem no mesmo pixel, o mais próximo ganha; o mais distante é descartado. A TMU é um serviço acionado de dentro do fragment shader (não uma etapa depois dele).
 5. (5 min) Caça ao par + Pontos-chave.
 6. (5 min) **Fechamento do Marco 2** — recapitule M7→M11 e celebre o Projeto-Vitória 2.
 
