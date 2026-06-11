@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 14 — Por Baixo do Capô III: Otimização</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · Marco 3 · Módulo 14 de 14</p>
+  <h1>🏗️ Por Baixo do Capô III: Otimização</h1>
+  <p>Você já sabe fazer a GPU desenhar coisas bonitas. Falta o último passo: <strong>pensar como ela pensa</strong> — o que é rápido e o que é caro. Dois shaders que produzem o mesmo visual podem ter custos muito diferentes por dentro. Vamos abrir o capô uma última vez.</p>
+
+  <div class="brain">
+    Se mil threads são uma "turma que anda junta", o que acontece quando metade vai por um caminho e metade vai pelo outro?
+  </div>
+
+  <h2>Warps: a turma anda junta</h2>
+  <p>Lembra do exército do M6? Cada pixel era um soldado, todos pintando ao mesmo tempo. Agora vamos um nível mais fundo: a GPU não controla cada soldado individualmente — ela agrupa os soldados em <strong>pelotões</strong> (chamados <em>warps</em> na NVIDIA ou <em>wavefronts</em> na AMD). Um pelotão tem geralmente 32 ou 64 threads, e todos executam <strong>a mesma instrução ao mesmo tempo</strong>. Não tem como um thread do pelotão adiantar ou atrasar — a turma anda junta, no mesmo passo, na mesma linha de código.</p>
+  <p>É esse sincronismo que torna a GPU tão poderosa: um único controlador comanda dezenas de threads de uma vez. Mas esse sincronismo tem uma consequência importante quando aparece um <code>if</code>...</p>
+
+  <h2>Divergência de branch</h2>
+  <p>Imagine que o pelotão chega num cruzamento: metade dos threads precisa executar o bloco <code>if</code> e a outra metade o bloco <code>else</code>. O que acontece? A turma <strong>não pode se separar</strong> — tem que andar junta. Então ela faz os dois caminhos: primeiro executa o <code>if</code> (a metade que foi para o <code>else</code> fica parada, mascarada), depois executa o <code>else</code> (a metade do <code>if</code> fica parada). O resultado: o trabalho que poderia ser feito em 1 passo leva 2 passos — custa o dobro.</p>
+  <p>Isso se chama <strong>divergência de branch</strong>. Um <code>if</code> cujos vizinhos de pelotão tomam caminhos diferentes é caro. Um <code>if</code> onde todos tomam o mesmo caminho (por exemplo, uma guarda que todos passam ou todos não passam) é de graça.</p>
+
+  <figure>
+    <img src="../assets/img/warp-divergencia.svg" alt="Diagrama mostrando um warp (grupo de threads) marchando junto; ao encontrar um if/else, metade vai para um caminho e metade para outro, mas o warp executa os dois caminhos e descarta um, custando o dobro." width="720">
+    <figcaption>A turma chega no cruzamento e faz OS DOIS caminhos — jogando metade do trabalho fora. É por isso que divergência de branch custa caro.</figcaption>
+  </figure>
+
+  <h2>Test Drive: o mesmo desenho, dois custos</h2>
+  <p>Os dois quadros abaixo produzem <strong>exatamente o mesmo visual</strong>: listras verticais alternando vermelho-alaranjado e azul. A diferença está por dentro. O da <strong>esquerda</strong> usa um <code>if/else</code> clássico — para cada pixel, a GPU escolhe um dos dois blocos. O da <strong>direita</strong> usa <code>mix</code> — nenhum branch, a conta é feita diretamente com matemática. Seus olhos não veem diferença; o pelotão da GPU sente: <code>mix</code> não divide a turma.</p>
+
+  <div class="duo">
+    <div>
+      <p style="text-align:center;font-weight:bold;color:#c92a2a">🔀 Com <code>if/else</code> — branch divergente</p>
+      <shader-playground id="pg-if"></shader-playground>
+    </div>
+    <div>
+      <p style="text-align:center;font-weight:bold;color:#2b8a3e">✅ Com <code>mix</code> — sem branch</p>
+      <shader-playground id="pg-mix"></shader-playground>
+    </div>
+  </div>
+
+  <p>O visual é idêntico. Mas no caso do <code>if</code>, os pixels das bordas entre as listras provavelmente caem em pelotões mistos (alguns pixels numa listra, outros na outra) — e a turma executa os dois blocos. Com <code>mix</code>, não há escolha: a conta acontece para todo mundo ao mesmo tempo, sem ninguém ficar esperando.</p>
+
+  <div class="cuidado">
+    <strong>Honestidade importante:</strong> você <em>não consegue ver</em> os warps dentro do shader — o WebGL não expõe isso (a introspação de warps existe só em Vulkan/GLSL 4.x com extensões de subgrupo). O diagrama da turma que anda junta é uma <strong>metáfora</strong> do que o hardware faz. O que você <em>pode</em> tomar como prática real: um <code>if</code> que divide pixels vizinhos em caminhos diferentes <strong>pode ser caro</strong>, e <code>mix</code>/<code>step</code> frequentemente faz o mesmo trabalho sem criar um branch.
+  </div>
+
+  <h2>half × float: precisão tem preço</h2>
+  <p>Outro botão de otimização é a <strong>precisão numérica</strong>. Calcular com números de 32 bits (<code>highp</code>/<code>float</code>) é mais caro do que calcular com 16 bits (<code>mediump</code>/<code>half</code>). Para muitas contas de cor e UV, 16 bits são mais do que suficientes — e rodam mais rápido em GPUs móveis.</p>
+
+  <div class="bullets">
+    <ul>
+      <li>Use <code>highp</code> apenas onde a precisão importa: posições, cálculos de profundidade, distâncias grandes.</li>
+      <li>Para cores, UVs e fatores de mistura, <code>mediump</code> costuma ser suficiente — e mais barato.</li>
+      <li>Em WebGL1 você já conhece isso: a diretiva <code>precision mediump float;</code> que o motor injeta desde o M1 é exatamente esse trade-off.</li>
+      <li>Em GLSL ES 3.0 e HLSL existem tipos explícitos <code>half</code> para forçar 16 bits.</li>
+    </ul>
+  </div>
+
+  <div class="qa">
+    <dl>
+      <dt>Todo <code>if</code> é ruim?</dt>
+      <dd>Não — só o <code>if</code> que divide pixels vizinhos do mesmo pelotão. Se todos os pixels de um pelotão tomam o mesmo caminho (condição uniforme, como um parâmetro global), o custo é zero. O problema é quando a condição depende da posição do pixel e divide a turma ao meio.</dd>
+      <dt><code>mix</code>/<code>step</code> sempre substitui <code>if</code>?</dt>
+      <dd>Com frequência sim, quando a lógica é "escolher entre dois valores com base numa condição contínua". <code>mix(a, b, step(limiar, x))</code> faz o que <code>if (x > limiar) a; else b;</code> faz — sem branch.</dd>
+      <dt>Preciso decorar o tamanho do warp?</dt>
+      <dd>Não. A ideia que importa é: <em>a turma anda junta</em>. O tamanho exato (32, 64...) varia por hardware. O que você carrega daqui é o princípio: branches que dividem vizinhos são caros; math que não diverge é grátis.</dd>
+    </dl>
+  </div>
+
+  <h2>🏆 Fim do curso: você chegou ao fim</h2>
+  <p>Você começou pintando um único pixel com <code>gl_FragColor</code> — e chegou aqui. Olha o caminho:</p>
+  <ul>
+    <li><strong>Marco 1 — Pinte o Pixel:</strong> do primeiro <code>vec3</code> de cor ao padrão animado com <code>u_time</code>, entendendo por que a GPU é tão rápida (M6).</li>
+    <li><strong>Marco 2 — Superfícies de Verdade:</strong> do quad 2D ao objeto 3D com vértices, texturas, normais e luz difusa — e o pipeline de hardware fixo que faz tudo isso funcionar (M11).</li>
+    <li><strong>Marco 3 — O Poder da GPU:</strong> brilho especular e o modelo de Phong (M12), a GPU como calculadora paralela além dos pixels (M13), e agora warps, divergência e precisão (M14).</li>
+  </ul>
+  <p>Você escreveu código que roda em <strong>milhares de núcleos em paralelo, 60 vezes por segundo</strong>. Você entende o pipeline do vértice ao pixel. Você sabe o que é caro e o que é grátis. Isso é programar a GPU de verdade. 🎉</p>
+
+  <p><strong>Missão final:</strong> abra seu <strong>Efeito Autoral</strong> (M12) — aquele shader que você criou do zero como Projeto-Vitória 3. Procure: tem algum <code>if</code> que divide pixels vizinhos? Daria pra trocar por um <code>mix</code> ou <code>step</code>? Justifique sua resposta em 2–3 frases. Essa é a avaliação mais honesta do curso: aplicar o que você aprendeu no código que você criou.</p>
+
+  <div class="bullets">
+    <ul>
+      <li>Threads rodam em <strong>warps/wavefronts</strong> — pelotões que executam a mesma instrução juntos.</li>
+      <li><strong>Divergência de branch</strong>: <code>if</code> que divide o pelotão faz a GPU executar os dois caminhos — custa o dobro.</li>
+      <li><code>mix</code>/<code>step</code> frequentemente substitui <code>if</code> sem criar branch.</li>
+      <li><strong>Precisão</strong>: <code>mediump</code>/<code>half</code> é mais barato que <code>highp</code>/<code>float</code> onde a precisão não é crítica.</li>
+      <li>Otimização é sobre entender o hardware — e você agora entende.</li>
+    </ul>
+  </div>
+
+  <div class="recordacao">
+    <h2>Recordação: caça ao par</h2>
+    <p>Ligue cada termo ao seu significado (escreva a letra):</p>
+    <ul>
+      <li>( ) warp &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A. evita o branch com matemática direta</li>
+      <li>( ) divergência &nbsp;&nbsp;&nbsp; B. turma de threads que anda junta</li>
+      <li>( ) mix &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C. turma faz os dois caminhos do if/else</li>
+      <li>( ) half/mediump &nbsp;&nbsp; D. conta mais barata, menos bits de precisão</li>
+    </ul>
+  </div>
+
+  <div class="recordacao" style="border-color:#37b24d;background:#ebfbee">
+    <h2 style="color:#2b8a3e">🏆 Curso completo — 14/14 módulos!</h2>
+    <p>Do primeiro pixel ao poder da GPU: você percorreu os três marcos, escreveu shaders 2D e 3D,
+    iluminou objetos, entendeu o pipeline completo — e agora sabe o que acontece por dentro quando
+    o shader roda. Parabéns. 🎉</p>
+  </div>
+
+  <p style="margin-top:28px"><a href="13-alem-de-pixels.html">← Anterior: Para Além de Pixels</a>
+  &nbsp;·&nbsp;
+  <a href="../index.html">🗺️ Mapa do curso</a></p>
+
+  <script type="module">
+    document.getElementById('pg-if').config = {
+      mode: 'fragment',
+      fragment: `void main() {
+  float faixa = step(0.5, fract(v_uv.x * 8.0));
+  vec3 cor;
+  if (faixa > 0.5) {
+    cor = vec3(0.90, 0.30, 0.20);
+  } else {
+    cor = vec3(0.20, 0.40, 0.90);
+  }
+  gl_FragColor = vec4(cor, 1.0);
+}`,
+    };
+    document.getElementById('pg-mix').config = {
+      mode: 'fragment',
+      fragment: `void main() {
+  float faixa = step(0.5, fract(v_uv.x * 8.0));
+  vec3 cor = mix(vec3(0.20, 0.40, 0.90), vec3(0.90, 0.30, 0.20), faixa);
+  gl_FragColor = vec4(cor, 1.0);
+}`,
+    };
+  </script>
+</body>
+</html>
