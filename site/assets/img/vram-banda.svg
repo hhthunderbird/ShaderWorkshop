@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 300" width="660" font-family="sans-serif">
+  <rect width="660" height="300" fill="#fbfbf7"/>
+  <text x="20" y="28" font-size="16" font-weight="bold" fill="#333">VRAM é o armazém; a banda é a velocidade da esteira</text>
+  <rect x="40" y="80" width="180" height="150" rx="8" fill="#fff4e6" stroke="#e8590c"/>
+  <text x="130" y="105" font-size="14" text-anchor="middle" fill="#e8590c">VRAM (armazém)</text>
+  <text x="130" y="130" font-size="11" text-anchor="middle" fill="#666">texturas (M9)</text>
+  <text x="130" y="148" font-size="11" text-anchor="middle" fill="#666">+ framebuffer</text>
+  <text x="130" y="172" font-size="12" text-anchor="middle" fill="#333">ex.: 8 GB</text>
+  <text x="130" y="210" font-size="11" text-anchor="middle" fill="#888">+ resolução/textura = + GB</text>
+  <line x1="220" y1="155" x2="430" y2="155" stroke="#1c7ed6" stroke-width="10"/>
+  <text x="325" y="145" font-size="13" text-anchor="middle" fill="#1c7ed6">banda: ex. 272 GB/s</text>
+  <text x="325" y="180" font-size="11" text-anchor="middle" fill="#888">se a esteira é lenta, os núcleos esperam (gargalo)</text>
+  <g fill="#2b8a3e"><circle cx="470" cy="120" r="10"/><circle cx="500" cy="120" r="10"/><circle cx="530" cy="120" r="10"/><circle cx="470" cy="155" r="10"/><circle cx="500" cy="155" r="10"/><circle cx="530" cy="155" r="10"/><circle cx="470" cy="190" r="10"/><circle cx="500" cy="190" r="10"/><circle cx="530" cy="190" r="10"/></g>
+  <text x="500" y="225" font-size="12" text-anchor="middle" fill="#2b8a3e">núcleos (M6)</text>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="context-stroke"/></marker></defs>
+</svg>
