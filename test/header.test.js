@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { withHeader, hasDeclaration } from '../site/assets/playground/header.js';
+import { withHeader, hasDeclaration, withHeaderMesh } from '../site/assets/playground/header.js';
 
 test('injeta varying v_uv quando o shader USA mas nao declara (regressao do M1/M2)', () => {
   const src = `void main() {\n  vec3 c = vec3(v_uv.x, v_uv.y, 0.0);\n  gl_FragColor = vec4(c, 1.0);\n}`;
@@ -40,4 +40,20 @@ test('hasDeclaration detecta declaracao com qualificador de precisao (nao duplic
   // e withHeader nao re-injeta nesse caso
   const src = 'uniform mediump vec2 u_resolution;\nvoid main(){ gl_FragColor = vec4(u_resolution, 0.0, 1.0); }';
   assert.equal((withHeader(src).match(/u_resolution;/g) || []).length, 1);
+});
+
+test('withHeaderMesh injeta varyings 3D e uniforms quando ausentes', () => {
+  const src = `void main(){ gl_FragColor = vec4(v_normal * 0.5 + 0.5, 1.0); }`;
+  const out = withHeaderMesh(src);
+  assert.match(out, /varying vec3 v_normal;/);
+  assert.match(out, /varying vec2 v_uv;/);
+  assert.match(out, /varying vec3 v_worldPos;/);
+  assert.match(out, /uniform vec3 u_lightDir;/);
+  assert.ok(out.indexOf('varying vec3 v_normal;') < out.indexOf('void main'));
+});
+
+test('withHeaderMesh nao duplica o que o aluno ja declarou', () => {
+  const src = `varying vec3 v_normal;\nvoid main(){ gl_FragColor = vec4(v_normal,1.0); }`;
+  const out = withHeaderMesh(src);
+  assert.equal((out.match(/varying vec3 v_normal;/g) || []).length, 1);
 });
