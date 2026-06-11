@@ -252,3 +252,14 @@ Formato por módulo: **Objetivo · Conceitos · Analogia · Fonte · Demos (play
 
 ## 10. Git
 `C:\Projetos\ShaderWorkshop` não é repositório git. Spec salvo como arquivo. Inicializar git é opcional (recomendado antes do build, pra versionar o curso).
+
+---
+
+## Adendo (2026-06-10): Toggle GLSL ES ⇄ HLSL
+
+Decisão aprovada pelo usuário: o curso usa **GLSL ES** (exigência do navegador), mas a diferença pra **HLSL (Unity)** deve ficar **clara no material**, e cada playground ganha um **toggle "🔁 Ver em HLSL"**.
+
+- **Motor:** módulo puro `site/assets/playground/translate.js` (`translateToHLSL`) — mapa de tokens do subconjunto: `vecN→floatN`, `matN→floatNxN`, `mix→lerp`, `fract→frac`, `mod→fmod`, `texture2D→tex2D`, `gl_FragColor = X;→return X;`, remove `precision`/`uniform`. Função pura, unit-testada.
+- **É um GUIA ILUSTRATIVO, não compilador.** Read-only ("não roda aqui"). Funciona bem nos snippets simples (Marco 1). Para shaders com I/O estrutural (vertex, semantics, samplers — Marco 2+), fornecer HLSL **curado** via `config.hlsl` (override do tradutor automático).
+- **Conteúdo:** sidebar "Dois sotaques, mesma língua" no Módulo 1 com tabela de equivalência + nota sobre `mod`≠`fmod` em negativos. Replicar o explicador nos marcos seguintes.
+- **Pegadinha conhecida:** `varying` não tem equivalente direto em HLSL (vira membro de struct com semantic); o tradutor não trata — só aparece se o aluno declarar `varying` no próprio fragmento, o que não ocorre nos módulos iniciais (o motor injeta `v_uv` por fora).

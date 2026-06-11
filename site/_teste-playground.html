@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Teste do Playground</title>
+  <link rel="stylesheet" href="assets/css/playground.css">
+  <script type="module" src="assets/playground/playground.js"></script>
+</head>
+<body>
+  <h1>Teste 1 — cor por sliders</h1>
+  <shader-playground id="t1"></shader-playground>
+
+  <h1>Teste 2 — gradiente por UV + exercício editável</h1>
+  <shader-playground id="t2"></shader-playground>
+
+  <script type="module">
+    document.getElementById('t1').config = {
+      mode: 'fragment',
+      fragment: `uniform vec3 u_cor;
+void main() { gl_FragColor = vec4(u_cor, 1.0); }`,
+      uniforms: [
+        { name: 'u_cor', label: 'Cor', type: 'color', value: [0.2, 0.6, 1.0] },
+      ],
+    };
+    document.getElementById('t2').config = {
+      mode: 'fragment',
+      fragment: `void main() {
+// >>> EDIT: cor
+  vec3 c = vec3(v_uv.x, v_uv.y, 0.0);
+// <<< EDIT
+  gl_FragColor = vec4(c, 1.0);
+}`,
+      editableRegions: ['cor'],
+      solution: '  vec3 c = vec3(v_uv.x, 0.0, 1.0 - v_uv.x);',
+    };
+  </script>
+</body>
+</html>

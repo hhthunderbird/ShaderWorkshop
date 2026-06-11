@@ -1,6 +1,11 @@
 # Conteúdo do curso-fonte (pago, NÃO versionar / NÃO publicar)
-Curso/
+# Nota Windows: Curso/ e curso/ são o mesmo dir (NTFS case-insensitive).
+# Não ignorar o dir inteiro; ignorar apenas os tipos de arquivo que são conteúdo pago.
 Transcricoes/
+# mp4/srt em qualquer subdir (incluindo Curso/)
+Curso/*.mp4
+Curso/*.srt
+Curso/_cookies.txt
 *.mp4
 *.srt
 
