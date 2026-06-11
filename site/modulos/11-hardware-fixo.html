@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 11 — Por Baixo do Capô II: Hardware Fixo</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · Marco 2 · Módulo 11 de 11</p>
+  <h1>🏗️ Por Baixo do Capô II: Hardware Fixo</h1>
+  <p>Você programou o vertex (M7) e o fragment (M1–M10). Mas entre eles, e depois deles, acontece um
+  monte de coisa que você <strong>nunca</strong> escreveu — e nem precisou. Essa parte não é shader:
+  é <strong>hardware fixo</strong>, circuitos dedicados que fazem sempre a mesma tarefa, rápido pra
+  caramba. Vamos conhecer a "fábrica fixa" da GPU.</p>
+
+  <h2>A linha de montagem tem estações programáveis e fixas</h2>
+  <p>Lembra a linha de montagem do M7? Agora dá pra ver quais estações você controla (verdes) e quais
+  são automáticas (cinzas):</p>
+
+  <figure>
+    <img src="../assets/img/pipeline-fixo.svg" alt="Pipeline em fila: Vertex (programável), Rasterizador (fixo), Fragment (programável), TMU (fixo), Z-buffer (fixo), com verdes para programável e cinzas para fixo" width="760">
+    <figcaption>Você escreve só as caixas verdes. As cinzas viraram circuito dedicado — por isso voam.</figcaption>
+  </figure>
+
+  <h2>Rasterização: o triângulo vira pixels</h2>
+  <p>Entre o vertex e o fragment, alguém precisa transformar um <strong>triângulo</strong> (3 pontos)
+  numa <strong>multidão de fragmentos</strong> (os pixels que ele cobre). Isso é a
+  <strong>rasterização</strong> — e é hardware fixo. O playground abaixo mostra a ideia: o triângulo
+  se move, e a GPU descobre, pixel a pixel, quais estão dentro dele. Cada quadradinho da grade é um
+  fragmento candidato.</p>
+
+  <shader-playground id="pg-raster"></shader-playground>
+
+  <div class="brain">
+    Por que isso virou hardware fixo? Porque <em>todo</em> objeto de <em>todo</em> jogo passa por aqui,
+    milhões de vezes por segundo. Uma tarefa tão repetida e tão igual compensa ser gravada em circuito
+    — igual ao raciocínio do paralelismo (M6): tarefa repetida e previsível → hardware especializado.
+  </div>
+
+  <h2>TMU: buscar a cor da textura também é hardware</h2>
+  <p>Quando você escreveu <code>texture2D(u_tex, v_uv)</code> no M9, parecia uma função sua. Mas
+  "buscar o pedacinho certo da imagem" é tão comum que existe um circuito só pra isso: a
+  <strong>TMU</strong> (Texture Mapping Unit). Você pede o texel; o hardware entrega voando.</p>
+
+  <h2>Z-buffer: quem está na frente ganha</h2>
+  <p>Quando dois objetos se sobrepõem na tela, quem aparece? O mais <strong>perto</strong> da câmera.
+  Quem decide isso é o <strong>Z-buffer</strong> (também fixo): pra cada pixel, ele guarda a distância
+  do que já foi desenhado ali e só deixa passar quem estiver mais na frente. Você já usou isso sem
+  saber — era o que fazia as faces de trás do seu cubo (M7) não aparecerem na frente.</p>
+
+  <figure>
+    <div class="img-todo">[IMAGEM: diagrama/foto de um "die" de GPU destacando blocos de TMU/ROP, ou um esquema do pipeline de hardware]
+    Fonte sugerida: https://commons.wikimedia.org/ (busque "GPU die" ou "texture mapping unit") — baixe pra assets/img/ e troque este bloco por &lt;img&gt;.</div>
+  </figure>
+
+  <details class="sidebar">
+    <summary>🔎 Curiosidade: por que separar programável de fixo?</summary>
+    <div>
+      <p>É um equilíbrio. As partes <strong>programáveis</strong> (shaders) te dão liberdade criativa
+      — você inventa a cor, a forma, a luz. As partes <strong>fixas</strong> fazem o trabalho pesado e
+      repetitivo (recortar triângulos, buscar texels, decidir profundidade) com velocidade máxima,
+      porque não precisam ser flexíveis. Juntando os dois: criatividade onde importa, velocidade onde
+      é sempre igual.</p>
+    </div>
+  </details>
+
+  <div class="qa">
+    <dl>
+      <dt>Eu poderia programar a rasterização?</dt>
+      <dd>Em GPUs comuns, não — é fixa de propósito (pra ser rápida). Existem caminhos avançados
+      (compute shaders) que fazem coisas "à mão", e a gente toca nisso no próximo marco.</dd>
+      <dt>O Z-buffer é o que conserta objetos "atravessando"?</dt>
+      <dd>Isso mesmo. Sem ele, o último triângulo desenhado apareceria por cima, mesmo estando atrás.
+      O Z-buffer compara a profundidade e mantém só o mais perto.</dd>
+      <dt>Preciso decorar TMU/ROP?</dt>
+      <dd>Não. Guarde a ideia: <strong>shaders = você programa; o resto = fábrica fixa e veloz</strong>.
+      Os nomes ajudam a reconhecer quando lê sobre GPUs.</dd>
+    </dl>
+  </div>
+
+  <div class="cuidado">
+    "Fixo" não quer dizer "sem importância" — quer dizer "não dá pra reprogramar". Rasterizador, TMU e
+    Z-buffer fazem boa parte do trabalho; eles só não são escritos por você.
+  </div>
+
+  <div class="bullets">
+    <ul>
+      <li>O pipeline tem partes <strong>programáveis</strong> (vertex, fragment) e <strong>fixas</strong>.</li>
+      <li><strong>Rasterização</strong>: transforma triângulos em fragmentos (pixels). Hardware fixo.</li>
+      <li><strong>TMU</strong>: circuito que busca a cor da textura (o <code>texture2D</code> do M9).</li>
+      <li><strong>Z-buffer</strong>: decide quem está na frente (o que fez seu cubo do M7 ter profundidade).</li>
+    </ul>
+  </div>
+
+  <div class="recordacao">
+    <h2>Recordação: caça ao par</h2>
+    <p>Ligue cada termo ao seu significado (escreva a letra):</p>
+    <ul>
+      <li>( ) rasterização &nbsp; A. circuito que busca o texel da textura</li>
+      <li>( ) TMU &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B. decide o que está na frente</li>
+      <li>( ) Z-buffer &nbsp;&nbsp;&nbsp; C. transforma triângulos em fragmentos</li>
+      <li>( ) shader &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D. a parte que VOCÊ programa</li>
+    </ul>
+  </div>
+
+  <div class="recordacao" style="border-color:#37b24d;background:#ebfbee">
+    <h2 style="color:#2b8a3e">🏆 Você terminou o Marco 2!</h2>
+    <p>No "curso médio" você saiu do plano 2D pro 3D de verdade: desenhou uma malha e entendeu o
+    pipeline (M7), ganhou as ferramentas de vetor e <code>dot</code> (M8), vestiu objetos com texturas
+    (M9), acendeu luz neles (M10) — e agora sabe que metade do trabalho é feita por hardware fixo
+    velocíssimo (M11). Você construiu um <strong>objeto 3D texturizado e iluminado</strong>, do zero,
+    rodando na GPU. 🎉</p>
+    <p>O Marco 3 (curso longo) vai além: brilho especular, a GPU como calculadora paralela gigante
+    (compute), e os truques de otimização por dentro.</p>
+  </div>
+
+  <p style="margin-top:28px"><a href="10-normais-e-luz.html">← Anterior: Normais &amp; Luz Difusa</a>
+  &nbsp;·&nbsp;
+  <span class="proximo-soon">Marco 3 — O Poder da GPU
+  <span style="color:#999">(em breve)</span></span></p>
+
+  <script type="module">
+    document.getElementById('pg-raster').config = {
+      mode: 'fragment',
+      fragment: `void main() {
+  vec2 uv = v_uv;
+  // 3 vertices de um triangulo (o de cima passeia com o tempo)
+  vec2 A = vec2(0.18, 0.2);
+  vec2 B = vec2(0.85, 0.32);
+  vec2 C = vec2(0.5 + 0.18 * sin(u_time * 0.8), 0.85);
+  // dentro do triangulo? (mesma regra de "lado" pras 3 arestas)
+  float e0 = (B.x - A.x) * (uv.y - A.y) - (B.y - A.y) * (uv.x - A.x);
+  float e1 = (C.x - B.x) * (uv.y - B.y) - (C.y - B.y) * (uv.x - B.x);
+  float e2 = (A.x - C.x) * (uv.y - C.y) - (A.y - C.y) * (uv.x - C.x);
+  float inside = (e0 >= 0.0 && e1 >= 0.0 && e2 >= 0.0) ? 1.0 : 0.0;
+  // grade de "fragmentos" (cada quadradinho = um pixel candidato)
+  vec2 g = fract(uv * 16.0);
+  float grid = (g.x < 0.08 || g.y < 0.08) ? 1.0 : 0.0;
+  vec3 col = mix(vec3(0.12), vec3(0.30, 0.70, 1.0), inside);
+  col = mix(col, vec3(0.0), grid * 0.45);
+  gl_FragColor = vec4(col, 1.0);
+}`,
+    };
+  </script>
+</body>
+</html>

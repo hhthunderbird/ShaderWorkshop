@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 260" width="760" height="260" font-family="system-ui, sans-serif">
+  <rect width="760" height="260" fill="#fff"/>
+  <text x="380" y="26" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">O pipeline: estações que VOCÊ programa × estações FIXAS (hardware)</text>
+
+  <!-- legenda -->
+  <g transform="translate(230,40)">
+    <rect x="0" y="0" width="16" height="16" fill="#d3f9d8" stroke="#2f9e44"/>
+    <text x="22" y="13" font-size="12" fill="#2b8a3e">programável (shader)</text>
+    <rect x="200" y="0" width="16" height="16" fill="#e9ecef" stroke="#868e96"/>
+    <text x="222" y="13" font-size="12" fill="#495057">fixo (circuito dedicado)</text>
+  </g>
+
+  <!-- 5 caixas em fila -->
+  <g transform="translate(20,80)" font-size="12">
+    <!-- vertex (prog) -->
+    <rect x="0" y="20" width="120" height="70" rx="8" fill="#d3f9d8" stroke="#2f9e44" stroke-width="2"/>
+    <text x="60" y="48" text-anchor="middle" font-weight="bold" fill="#2b8a3e">Vertex</text>
+    <text x="60" y="66" text-anchor="middle" fill="#444">posiciona (M7)</text>
+    <text x="142" y="60" font-size="18" fill="#888">→</text>
+    <!-- rasterizador (fixo) -->
+    <rect x="160" y="20" width="120" height="70" rx="8" fill="#e9ecef" stroke="#868e96" stroke-width="2"/>
+    <text x="220" y="44" text-anchor="middle" font-weight="bold" fill="#495057">Rasterizador</text>
+    <text x="220" y="62" text-anchor="middle" fill="#444">triângulo→</text>
+    <text x="220" y="77" text-anchor="middle" fill="#444">fragmentos</text>
+    <text x="302" y="60" font-size="18" fill="#888">→</text>
+    <!-- fragment (prog) -->
+    <rect x="320" y="20" width="120" height="70" rx="8" fill="#d3f9d8" stroke="#2f9e44" stroke-width="2"/>
+    <text x="380" y="48" text-anchor="middle" font-weight="bold" fill="#2b8a3e">Fragment</text>
+    <text x="380" y="66" text-anchor="middle" fill="#444">pinta (M1-M10)</text>
+    <text x="462" y="60" font-size="18" fill="#888">→</text>
+    <!-- TMU (fixo) -->
+    <rect x="480" y="20" width="120" height="70" rx="8" fill="#e9ecef" stroke="#868e96" stroke-width="2"/>
+    <text x="540" y="44" text-anchor="middle" font-weight="bold" fill="#495057">TMU</text>
+    <text x="540" y="62" text-anchor="middle" fill="#444">busca o texel</text>
+    <text x="540" y="77" text-anchor="middle" fill="#444">(texture2D, M9)</text>
+    <text x="622" y="60" font-size="18" fill="#888">→</text>
+    <!-- ROP / Z-buffer (fixo) -->
+    <rect x="640" y="20" width="110" height="70" rx="8" fill="#e9ecef" stroke="#868e96" stroke-width="2"/>
+    <text x="695" y="44" text-anchor="middle" font-weight="bold" fill="#495057">Z-buffer</text>
+    <text x="695" y="62" text-anchor="middle" fill="#444">quem está</text>
+    <text x="695" y="77" text-anchor="middle" fill="#444">na frente ganha</text>
+  </g>
+
+  <text x="380" y="210" text-anchor="middle" font-size="13" fill="#444">Você escreve só as caixas verdes. As cinzas são tão usadas que viraram circuito dedicado — e por isso voam.</text>
+  <text x="380" y="234" text-anchor="middle" font-size="12" fill="#888">(TMU = Texture Mapping Unit · ROP/Z-buffer decide o que aparece na frente)</text>
+</svg>
