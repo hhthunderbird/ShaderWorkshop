@@ -100,6 +100,19 @@
     </ul>
   </div>
 
+  <h2>Sua vez: acenda a luz com as próprias mãos</h2>
+  <p>Agora você escreve a conta. A esfera abaixo começa <strong>chapada</strong> (claridade fixa em
+  1.0 — sem volume). Sua missão: troque o <code>1.0</code> pela receita da luz difusa, usando o
+  <code>dot</code> entre a normal <code>N</code> e a direção da luz <code>L</code>.</p>
+  <div class="afie">
+    <p><strong>Preveja:</strong> quando você usar <code>max(dot(N, L), 0.0)</code>, qual parte da
+    esfera vai ficar clara? E a parte virada pro lado contrário da luz?</p>
+    <p>Escreva, clique ▶ Test Drive e confira: <strong>se a esfera ganhar um lado claro (virado pra
+    luz) e um lado escuro, você acertou.</strong> Travou? 💡 Mostrar solução.</p>
+  </div>
+
+  <shader-playground id="pg-exercicio"></shader-playground>
+
   <h2>🏆 Projeto-Vitória: Objeto Texturizado e Iluminado</h2>
   <p>Hora de juntar o Marco 2 inteiro: forma (M7) + vetores/dot (M8) + textura (M9) + luz (M10). O
   cubo abaixo já vem texturizado <strong>e</strong> iluminado. Ele é <strong>seu</strong>: mexa na
@@ -148,6 +161,21 @@ void main() {
         { name: 'u_lang', label: 'direção da luz', min: 0.0, max: 6.2831, value: 0.8 },
         { name: 'u_vel', label: 'rotação', min: 0.0, max: 1.5, value: 0.0 },
       ],
+    };
+    document.getElementById('pg-exercicio').config = {
+      mode: 'mesh', mesh: 'sphere',
+      fragment: `void main() {
+  vec3 N = normalize(v_normal);
+  vec3 L = normalize(u_lightDir);
+// >>> EDIT: luz
+  float dif = 1.0;
+// <<< EDIT
+  vec3 cor = vec3(0.55, 0.7, 1.0) * dif;
+  gl_FragColor = vec4(cor, 1.0);
+}`,
+      solution: '  float dif = max(dot(N, L), 0.0);',
+      editableRegions: ['luz'],
+      uniforms: [{ name: 'u_vel', label: 'rotação', min: 0.0, max: 1.5, value: 0.0 }],
     };
     document.getElementById('pg-projeto').config = {
       mode: 'mesh', mesh: 'cube',

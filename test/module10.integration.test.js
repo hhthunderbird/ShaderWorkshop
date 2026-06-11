@@ -47,3 +47,11 @@ test('a pagina do Modulo 10 tem os 2 playgrounds, o SVG, projeto exportavel e di
     assert.ok(html.includes(`class="${cls}"`), `falta dispositivo Head First: ${cls}`);
   }
 });
+
+test('M10 tem exercicio predict-observe da difusa: editavel + solution, SEM pixel-diff', () => {
+  const html = readFileSync('site/modulos/10-normais-e-luz.html', 'utf8');
+  assert.ok(html.includes('id="pg-exercicio"'), 'falta o exercicio predict-observe');
+  assert.ok(html.includes("editableRegions: ['luz']"), 'falta a regiao editavel luz');
+  assert.ok(html.includes('max(dot(N, L), 0.0)'), 'falta a solucao da difusa');
+  assert.ok(!html.includes('reference:'), 'M10 e cena 3D: nenhum playground pode ter reference');
+});
