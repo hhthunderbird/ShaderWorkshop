@@ -23,5 +23,6 @@ export function normalizeConfig(raw) {
     solution: raw.solution ?? null,
     hlsl: raw.hlsl ?? null, // versão HLSL curada (override do tradutor automático)
     tolerance: typeof raw.tolerance === 'number' ? clamp01(raw.tolerance) : 0.06,
+    exportable: raw.exportable === true, // botões Baixar PNG / Copiar shader (Projeto-Vitória)
   };
 }

@@ -44,8 +44,9 @@ class ShaderPlayground extends HTMLElement {
           <button class="pg-run">▶ Test Drive</button>
           <button class="pg-reset">↺ Reset</button>
           ${this.cfg.reference ? '<button class="pg-check">✓ Conferir</button>' : ''}
-          ${this.cfg.editableRegions.length ? '<button class="pg-solution">💡 Mostrar solução</button>' : ''}
+          ${this.cfg.solution ? '<button class="pg-solution">💡 Mostrar solução</button>' : ''}
           <button class="pg-lang" title="Ver o equivalente em HLSL (Unity)">🔁 Ver em HLSL</button>
+          ${this.cfg.exportable ? '<button class="pg-export">📷 Baixar imagem</button><button class="pg-copy">📋 Copiar shader</button>' : ''}
         </div>
         <div class="pg-hlsl" hidden>
           <p class="pg-hlsl-nota">Como ficaria no <strong>Unity (HLSL)</strong> — ilustrativo, não roda aqui:</p>
@@ -88,6 +89,43 @@ class ShaderPlayground extends HTMLElement {
     this.querySelector('.pg-check')?.addEventListener('click', () => this._check());
     this.querySelector('.pg-solution')?.addEventListener('click', () => this._showSolution());
     this.querySelector('.pg-lang')?.addEventListener('click', () => this._toggleLang());
+    this.querySelector('.pg-export')?.addEventListener('click', () => this._exportPng());
+    this.querySelector('.pg-copy')?.addEventListener('click', () => this._copyShader());
+  }
+
+  _exportPng() {
+    // canvas usa preserveDrawingBuffer -> toDataURL pega o frame atual.
+    try {
+      const url = this.canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'meu-shader.png';
+      a.click();
+      this.statusEl.textContent = '✓ Imagem baixada (meu-shader.png).';
+      this.statusEl.className = 'pg-status pg-ok';
+    } catch (e) {
+      this.statusEl.textContent = '⚠ Não consegui exportar: ' + e.message;
+      this.statusEl.className = 'pg-status pg-erro';
+    }
+  }
+
+  async _copyShader() {
+    const code = this.fullSource;
+    try {
+      await navigator.clipboard.writeText(code);
+      this.statusEl.textContent = '✓ Shader copiado! Cole pra compartilhar.';
+      this.statusEl.className = 'pg-status pg-ok';
+    } catch (e) {
+      // Fallback (file:// ou sem permissão de clipboard): seleciona o texto do editor.
+      if (this.editor) {
+        this.editor.focus();
+        this.editor.select();
+        this.statusEl.textContent = 'Copie com Ctrl+C (texto já selecionado).';
+      } else {
+        this.statusEl.textContent = '⚠ Copie o shader manualmente do editor.';
+      }
+      this.statusEl.className = 'pg-status pg-quase';
+    }
   }
 
   _toggleLang() {

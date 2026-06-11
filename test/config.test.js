@@ -10,6 +10,13 @@ test('preenche defaults', () => {
   assert.deepEqual(c.editableRegions, []);
   assert.equal(c.reference, null);
   assert.equal(c.tolerance, 0.06);
+  assert.equal(c.exportable, false);
+});
+
+test('exportable: so true quando explicitamente true', () => {
+  assert.equal(normalizeConfig({ fragment: 'x', exportable: true }).exportable, true);
+  assert.equal(normalizeConfig({ fragment: 'x', exportable: 'sim' }).exportable, false);
+  assert.equal(normalizeConfig({ fragment: 'x' }).exportable, false);
 });
 
 test('exige fragment', () => {

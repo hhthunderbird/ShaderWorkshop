@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 5 — Dando Vida: Animação</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · Marco 1 · Módulo 5 de 6</p>
+  <h1>Dando Vida: Animação</h1>
+  <p>Tudo que você fez até agora era uma <em>foto</em>: parada. Agora vem o movimento. E o segredo é
+  ridiculamente simples: a CPU manda pra GPU, <strong>a cada quadro</strong>, um número que cresce — o
+  <strong>tempo</strong>. Se a sua cor depende do tempo, ela muda sozinha, 60 vezes por segundo. Isso
+  é animação.</p>
+
+  <h2>O relógio que todos os pixels veem</h2>
+  <p>Esse número do tempo chega numa variável que o motor já te dá pronta: <code>u_time</code> (em
+  segundos, desde que a página abriu). Ele é um <strong>uniform</strong> — uma palavra nova que vale a
+  pena guardar: um valor que a CPU manda <em>igual pra todos os pixels</em>, a cada quadro. Os sliders
+  que você mexeu nos módulos anteriores? Também eram uniforms.</p>
+
+  <figure>
+    <img src="../assets/img/relogio.svg" alt="A CPU contém um relógio e envia u_time pela seta até a GPU; na GPU, milhares de pixels leem a mesma hora e se movem juntos" width="640">
+    <figcaption>Um <strong>uniform</strong> é um valor que a CPU envia igual pra todos os pixels, a cada quadro. <code>u_time</code> é o relógio.</figcaption>
+  </figure>
+
+  <div class="brain">
+    Imagine uma sala com mil pintores, cada um no seu quadradinho (você já conhece essa turma). Como
+    eles se mexem <em>juntos</em>, no ritmo, sem combinar nada? Todos olham pro <strong>mesmo relógio
+    na parede</strong>. O <code>u_time</code> é esse relógio. Ninguém conversa; todos veem a mesma hora.
+  </div>
+
+  <h2>Test Drive: um coração que pulsa</h2>
+  <p>O círculo abaixo está <strong>vivo</strong>: o raio dele cresce e encolhe sozinho, porque depende
+  de <code>sin(u_time)</code>. O slider <code>velocidade</code> controla o ritmo. Não tem botão de
+  "rodar" pra animação — ela já está acontecendo.</p>
+
+  <shader-playground id="pg-pulso"></shader-playground>
+
+  <div class="afie">
+    <p>Sem mexer ainda — <strong>preveja</strong>:</p>
+    <ul>
+      <li>Se você aumentar a <code>velocidade</code>, o pulso fica mais <em>rápido</em> ou mais
+      <em>lento</em>?</li>
+      <li>O <code>sin</code> vai de −1 a 1. Então o raio oscila entre dois valores. Quais seriam, se a
+      fórmula fosse <code>0.25 + 0.1 * sin(...)</code>?  De ______ até ______.</li>
+    </ul>
+    <p>Agora mexa no slider e confira.</p>
+  </div>
+
+  <details class="sidebar">
+    <summary>🧮 Matemática de bolso: <code>sin(tempo)</code> pra oscilar</summary>
+    <div>
+      <p>Você já viu o <code>sin</code> como onda no espaço (do módulo passado). Aqui é a mesma onda,
+      mas no <strong>tempo</strong>: conforme <code>u_time</code> cresce, <code>sin(u_time)</code>
+      sobe e desce entre −1 e 1, pra sempre. É um vai-e-vem automático.</p>
+      <p>O padrão pra fazer algo oscilar entre <code>A</code> e <code>B</code> é:
+      <code>meio + amplitude * sin(u_time)</code>, onde <code>meio = (A+B)/2</code>. Multiplicar
+      <code>u_time</code> por um número antes (<code>sin(u_time * 3.0)</code>) deixa <strong>mais
+      rápido</strong>; somar um valor (<code>sin(u_time + 1.5)</code>) muda a <em>fase</em> (adianta
+      ou atrasa).</p>
+    </div>
+  </details>
+
+  <div class="qa">
+    <dl>
+      <dt>De onde vem o <code>u_time</code>? Não declarei.</dt>
+      <dd>O motor injeta e atualiza pra você todo quadro (assim como o <code>v_uv</code>). É de graça,
+      use à vontade. Por baixo, a CPU calcula "quantos segundos se passaram" e manda pra GPU.</dd>
+      <dt>O que é "uniform", afinal?</dt>
+      <dd>Um valor que vem da CPU e é o <strong>mesmo</strong> pra todos os pixels naquele quadro
+      (diferente do <code>v_uv</code>, que muda de pixel pra pixel). Sliders, cor, tempo: tudo uniform.</dd>
+      <dt>A animação vai travar em computador fraco?</dt>
+      <dd>Como cada pixel é independente e a GPU é paralela, costuma rodar liso. Se travar, é sinal de
+      shader pesado demais — assunto pros próximos marcos.</dd>
+    </dl>
+  </div>
+
+  <div class="cuidado">
+    Animação NÃO é um botão de "play": é a sua cor <strong>depender de <code>u_time</code></strong>.
+    Se você escrever um shader que ignora o tempo, a imagem fica parada — por mais que os quadros
+    passem. O movimento mora na fórmula.
+  </div>
+
+  <div class="bullets">
+    <ul>
+      <li><code>u_time</code> = segundos desde que a página abriu; cresce sozinho a cada quadro.</li>
+      <li><strong>uniform</strong> = valor que a CPU manda igual pra todos os pixels (tempo, sliders, cor).</li>
+      <li>Pra mover/pulsar: faça a cor, posição ou tamanho <em>depender</em> de <code>u_time</code>.</li>
+      <li><code>meio + amplitude * sin(u_time)</code> oscila suavemente entre dois valores.</li>
+    </ul>
+  </div>
+
+  <h2>🏆 Projeto-Vitória: Meu Padrão Animado</h2>
+  <p>Você chegou ao fim do Marco 1. Hora de juntar <strong>tudo</strong>: cor (M2), funções (M3),
+  formas (M4) e agora tempo (M5). O playground abaixo é <strong>seu</strong>. Já vem um exemplo
+  rodando — mexa, quebre, recrie. Quando gostar, clique <strong>📷 Baixar imagem</strong> pra salvar
+  e <strong>📋 Copiar shader</strong> pra mandar pra um colega (é só ele colar).</p>
+
+  <shader-playground id="pg-projeto"></shader-playground>
+
+  <div class="afie">
+    <p>Ideias pra começar (troque dentro do bloco editável):</p>
+    <ul>
+      <li>Faça a cor <strong>mudar</strong> com o tempo: <code>vec3 cor = forma * vec3(sin(t)*0.5+0.5, 0.4, 1.0);</code></li>
+      <li>Faça a forma <strong>andar</strong>: troque o centro por <code>vec2(0.5 + 0.3*sin(t), 0.5)</code>.</li>
+      <li>Combine DUAS formas com <code>max</code> (união), cada uma pulsando em ritmo diferente.</li>
+    </ul>
+    <p><strong>Meta:</strong> usar pelo menos 3 dos 4 ingredientes do marco (cor, função, forma, tempo).</p>
+  </div>
+
+  <div class="recordacao">
+    <h2>Recordação: caça ao par</h2>
+    <p>Ligue cada termo ao seu significado (escreva a letra):</p>
+    <ul>
+      <li>( ) <code>u_time</code> &nbsp;&nbsp; A. valor que a CPU manda igual pra todos os pixels</li>
+      <li>( ) uniform &nbsp;&nbsp;&nbsp;&nbsp; B. relógio: segundos desde que abriu</li>
+      <li>( ) <code>sin(u_time)</code> &nbsp; C. vai-e-vem automático entre −1 e 1</li>
+      <li>( ) animação &nbsp;&nbsp; D. a cor depender do tempo</li>
+    </ul>
+  </div>
+
+  <p style="margin-top:28px"><a href="04-formas-e-padroes.html">← Anterior: Formas e Padrões</a>
+  &nbsp;·&nbsp;
+  <span class="proximo-soon">Próximo: Por Baixo do Capô I — Paralelismo →
+  <span style="color:#999">(em construção no próximo plano)</span></span></p>
+
+  <script type="module">
+    document.getElementById('pg-pulso').config = {
+      mode: 'fragment',
+      fragment: `uniform float u_vel;
+void main() {
+  float d = length(v_uv - vec2(0.5));
+  float r = 0.25 + 0.12 * sin(u_time * u_vel);
+  float shape = smoothstep(r, r - 0.02, d);
+  vec3 cor = vec3(shape) * vec3(1.0, 0.35, 0.45);
+  gl_FragColor = vec4(cor, 1.0);
+}`,
+      uniforms: [
+        { name: 'u_vel', label: 'velocidade', min: 0.2, max: 5.0, value: 2.0 },
+      ],
+    };
+    document.getElementById('pg-projeto').config = {
+      mode: 'fragment',
+      fragment: `uniform float u_vel;
+void main() {
+  float t = u_time * u_vel;
+  vec2 p = v_uv;
+// >>> EDIT: arte
+  float d = length(p - vec2(0.5, 0.5));
+  float pulso = 0.3 + 0.1 * sin(t);
+  float forma = smoothstep(pulso, pulso - 0.02, d);
+  vec3 cor = forma * vec3(0.6 + 0.4 * sin(t), 0.5, 1.0);
+// <<< EDIT
+  gl_FragColor = vec4(cor, 1.0);
+}`,
+      uniforms: [
+        { name: 'u_vel', label: 'velocidade', min: 0.2, max: 5.0, value: 1.5 },
+      ],
+      editableRegions: ['arte'],
+      exportable: true,
+    };
+  </script>
+</body>
+</html>
