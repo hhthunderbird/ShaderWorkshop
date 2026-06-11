@@ -4,6 +4,7 @@ import { compare } from './pixeldiff.js';
 import { extractRegion, reassemble } from './editable.js';
 import { translateToHLSL } from './translate.js';
 import { createContext, buildProgram, setupQuad, renderFrame, readPixels } from './gl.js';
+import { withHeader } from './header.js';
 
 class ShaderPlayground extends HTMLElement {
   connectedCallback() {
@@ -178,20 +179,6 @@ class ShaderPlayground extends HTMLElement {
   disconnectedCallback() {
     cancelAnimationFrame(this._raf);
   }
-}
-
-function withHeader(src) {
-  // Injeta cada declaração padrão só se ainda não estiver no shader do aluno.
-  // Evita tanto "undeclared identifier" quanto "duplicate declaration".
-  const hasPrecision = /^\s*precision\s/m.test(src);
-  const addIfMissing = (decl, token) => (src.includes(token) ? '' : decl + '\n');
-  return (
-    (hasPrecision ? '' : 'precision mediump float;\n') +
-    addIfMissing('uniform float u_time;', 'u_time') +
-    addIfMissing('uniform vec2 u_resolution;', 'u_resolution') +
-    addIfMissing('varying vec2 v_uv;', 'v_uv') +
-    src
-  );
 }
 
 function rgbToHex([r, g, b]) {

@@ -1,0 +1,43 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { withHeader, hasDeclaration } from '../site/assets/playground/header.js';
+
+test('injeta varying v_uv quando o shader USA mas nao declara (regressao do M1/M2)', () => {
+  const src = `void main() {\n  vec3 c = vec3(v_uv.x, v_uv.y, 0.0);\n  gl_FragColor = vec4(c, 1.0);\n}`;
+  const out = withHeader(src);
+  assert.match(out, /varying vec2 v_uv;/);
+  // a declaracao deve vir ANTES do main
+  assert.ok(out.indexOf('varying vec2 v_uv;') < out.indexOf('void main'));
+});
+
+test('NAO duplica v_uv quando o aluno ja declarou', () => {
+  const src = `varying vec2 v_uv;\nvoid main() { gl_FragColor = vec4(v_uv, 0.0, 1.0); }`;
+  const out = withHeader(src);
+  assert.equal(out.match(/varying vec2 v_uv;/g).length, 1);
+});
+
+test('injeta precision quando ausente, preserva quando presente', () => {
+  assert.match(withHeader('void main(){}'), /^precision mediump float;/);
+  const comPrec = 'precision highp float;\nvoid main(){}';
+  assert.ok(!withHeader(comPrec).startsWith('precision mediump'));
+});
+
+test('NAO duplica uniform u_cor declarado pelo aluno (so usa, sem auto-uniforms)', () => {
+  const src = `uniform vec3 u_cor;\nvoid main() { gl_FragColor = vec4(u_cor, 1.0); }`;
+  const out = withHeader(src);
+  assert.equal(out.match(/uniform vec3 u_cor;/g).length, 1); // nao mexe no do aluno
+});
+
+test('hasDeclaration distingue declaracao de mero uso', () => {
+  assert.equal(hasDeclaration('varying vec2 v_uv;', 'v_uv'), true);
+  assert.equal(hasDeclaration('vec3 c = vec3(v_uv.x, 0.0, 0.0);', 'v_uv'), false);
+  assert.equal(hasDeclaration('uniform float u_time;', 'u_time'), true);
+});
+
+test('hasDeclaration detecta declaracao com qualificador de precisao (nao duplica)', () => {
+  assert.equal(hasDeclaration('uniform mediump vec2 u_resolution;', 'u_resolution'), true);
+  assert.equal(hasDeclaration('varying highp vec2 v_uv;', 'v_uv'), true);
+  // e withHeader nao re-injeta nesse caso
+  const src = 'uniform mediump vec2 u_resolution;\nvoid main(){ gl_FragColor = vec4(u_resolution, 0.0, 1.0); }';
+  assert.equal((withHeader(src).match(/u_resolution;/g) || []).length, 1);
+});
