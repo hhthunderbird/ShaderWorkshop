@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 9 — Texturas &amp; UV</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · Marco 2 · Módulo 9 de 11</p>
+  <h1>Texturas &amp; UV</h1>
+  <p>Seu cubo do M7 era colorido por contas. Mas e quando você quer <strong>vestir</strong> o objeto
+  com uma imagem de verdade — madeira, tijolo, o rosto de um personagem? Isso é uma
+  <strong>textura</strong>. E o truque que cola a imagem na superfície tem nome que você já conhece
+  de outro lugar: <strong>UV</strong>.</p>
+
+  <h2>Textura = uma imagem que o shader consulta</h2>
+  <p>Uma textura é só uma imagem. O shader, pra cada pixel da superfície, pergunta: <em>"qual cor
+  da imagem eu uso aqui?"</em>. A função que responde é <code>texture2D(imagem, uv)</code>: você dá um
+  endereço <code>uv</code> (de 0 a 1) e ela devolve a cor daquele ponto da imagem.</p>
+
+  <div class="brain">
+    Você já viu "UV" antes, lá no M2 — mas <strong>cuidado</strong>: o sentido mudou. No M2,
+    <code>v_uv</code> era a posição do pixel na <em>tela</em>. Aqui, UV é o endereço na
+    <em>imagem/superfície</em>: que pedacinho da figura cola em cada ponto do objeto. Mesma faixa
+    0 a 1, significado novo.
+  </div>
+
+  <figure>
+    <img src="../assets/img/uv-molde.svg" alt="Uma imagem 2D com cantos rotulados (0,0) a (1,1) e uma seta mostrando como a UV cola a imagem numa superfície 3D" width="640">
+    <figcaption>Cada ponto da superfície tem um endereço UV (0 a 1) que diz qual pedaço da imagem usar.</figcaption>
+  </figure>
+
+  <h2>Test Drive: amostrando a imagem</h2>
+  <p>O playground abaixo mostra uma textura de exemplo (4 quadrantes coloridos, barra branca no topo,
+  pontinho preto no canto de baixo — pra você notar a orientação). Ele usa
+  <code>texture2D(u_tex, v_uv)</code>. Agora a brincadeira: troque <code>v_uv</code> por
+  <code>fract(v_uv * 3.0)</code> e veja a imagem <strong>repetir</strong> em ladrilhos. (Lembra o
+  <code>fract</code> do M3? Ele reinicia de 0 a cada número inteiro — por isso repete.)</p>
+
+  <shader-playground id="pg-tex"></shader-playground>
+
+  <div class="afie">
+    <p>Sem rodar — <strong>preveja</strong>: com <code>fract(v_uv * 3.0)</code>, quantas cópias da
+    imagem vão aparecer na horizontal? E na vertical? Total de ladrilhos: ______</p>
+    <p>Agora teste. (Dica: 3 na horizontal × 3 na vertical.)</p>
+  </div>
+
+  <h2>Vestindo o objeto 3D</h2>
+  <p>O mesmo <code>texture2D(u_tex, v_uv)</code>, agora num cubo girando. Cada face do cubo tem suas
+  coordenadas UV, então a imagem cola direitinho em cada lado. Repare na barra branca e no pontinho
+  preto pra conferir que a imagem não está de cabeça pra baixo.</p>
+  <shader-playground id="pg-cubo-tex"></shader-playground>
+
+  <details class="sidebar">
+    <summary>🧮 Matemática de bolso: por que <code>fract</code> repete (recordando o M3)</summary>
+    <div>
+      <p><code>fract(x)</code> guarda só a parte depois da vírgula: <code>fract(2.3) = 0.3</code>.
+      Então, conforme <code>v_uv</code> vai de 0 a 1, <code>v_uv * 3.0</code> vai de 0 a 3, e o
+      <code>fract</code> faz isso "dar a volta" três vezes: 0→1, 0→1, 0→1. Cada volta é um ladrilho.
+      Trocar o <code>3.0</code> muda quantos ladrilhos.</p>
+    </div>
+  </details>
+
+  <details class="sidebar">
+    <summary>🗣️ Dois sotaques: <code>texture2D</code> no Unity</summary>
+    <div>
+      <p>A ideia é a mesma; no Unity moderno (HLSL) a amostragem se escreve diferente
+      (<code>tex.Sample(sampler, uv)</code>), mas o conceito — endereço UV de 0 a 1 → cor da imagem —
+      é idêntico. Clique <strong>🔁 Ver em HLSL</strong> pra uma ideia (é ilustrativo).</p>
+    </div>
+  </details>
+
+  <div class="qa">
+    <dl>
+      <dt>A imagem precisa ter algum tamanho especial?</dt>
+      <dd>Aqui a gente usa imagens "comportadas" (lados potência de 2, tipo 128×128) e configura pra
+      funcionar em qualquer placa de escola. O motor cuida disso pra você.</dd>
+      <dt>Por que minha textura aparece de cabeça pra baixo às vezes?</dt>
+      <dd>Porque o "0,0" da imagem e o "0,0" da UV podem ficar em cantos diferentes. O motor já vira a
+      imagem pra ela aparecer em pé — mas é o tropeço clássico de textura. Use a barra branca do topo
+      pra checar.</dd>
+      <dt>Dá pra usar várias imagens?</dt>
+      <dd>Dá (cada uma num "sampler"), mas aqui a gente fica com uma só. Múltiplas texturas é assunto
+      de cursos mais longos.</dd>
+    </dl>
+  </div>
+
+  <div class="cuidado">
+    <strong>UV mudou de sentido.</strong> No M2 a UV era a posição na tela; aqui é o endereço na
+    imagem/superfície. Se você pensar "tela" no lugar de "superfície", vai colar a imagem errado.
+    Mesma faixa 0..1, ideia diferente.
+  </div>
+
+  <div class="bullets">
+    <ul>
+      <li>Textura = imagem que o shader consulta com <code>texture2D(u_tex, uv)</code>.</li>
+      <li>UV = endereço de 0 a 1 na imagem/superfície (não é a tela, como era no M2).</li>
+      <li><code>fract(uv * N)</code> faz a imagem repetir em N ladrilhos (recupera o M3).</li>
+      <li>Cada face/ponto do objeto tem sua UV — por isso a imagem cola certo.</li>
+    </ul>
+  </div>
+
+  <h2>Afie o lápis: faça o padrão repetir 3 vezes</h2>
+  <p>O shader abaixo pinta um gradiente horizontal simples (<code>v_uv.x</code>). Sua missão: faça
+  esse gradiente <strong>repetir 3 vezes</strong> na horizontal, usando <code>fract</code> — é o mesmo
+  truque que ladrilha uma textura. Edite, dê <em>Test Drive</em> e clique <em>Conferir</em>.</p>
+  <shader-playground id="pg-ex"></shader-playground>
+
+  <div class="recordacao">
+    <h2>Recordação: caça ao par</h2>
+    <p>Ligue cada termo ao seu significado (escreva a letra):</p>
+    <ul>
+      <li>( ) textura &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A. endereço 0..1 que diz qual pedaço da imagem usar</li>
+      <li>( ) UV &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; B. imagem que o shader consulta</li>
+      <li>( ) <code>texture2D</code> &nbsp; C. faz o padrão repetir em ladrilhos</li>
+      <li>( ) <code>fract(uv*N)</code> &nbsp; D. lê a cor da imagem num endereço UV</li>
+    </ul>
+  </div>
+
+  <p style="margin-top:28px"><a href="08-vetores-e-coordenadas.html">← Anterior: Vetores &amp; Coordenadas</a>
+  &nbsp;·&nbsp;
+  <span class="proximo-soon">Próximo: Normais &amp; Luz Difusa →
+  <span style="color:#999">(em construção no próximo plano)</span></span></p>
+
+  <script type="module">
+    document.getElementById('pg-tex').config = {
+      mode: 'fragment',
+      texture: '../assets/tex/exemplo.png',
+      fragment: `uniform sampler2D u_tex;
+void main() {
+// >>> EDIT: uv
+  vec3 c = texture2D(u_tex, v_uv).rgb;
+// <<< EDIT
+  gl_FragColor = vec4(c, 1.0);
+}`,
+      editableRegions: ['uv'],
+      solution: '  vec3 c = texture2D(u_tex, fract(v_uv * 3.0)).rgb;',
+    };
+    document.getElementById('pg-cubo-tex').config = {
+      mode: 'mesh', mesh: 'cube',
+      texture: '../assets/tex/exemplo.png',
+      fragment: `void main() {
+  gl_FragColor = texture2D(u_tex, v_uv);
+}`,
+      uniforms: [{ name: 'u_vel', label: 'velocidade', min: 0.0, max: 2.0, value: 0.5 }],
+    };
+    document.getElementById('pg-ex').config = {
+      mode: 'fragment',
+      fragment: `void main() {
+// >>> EDIT: repete
+  vec3 c = vec3(v_uv.x);
+// <<< EDIT
+  gl_FragColor = vec4(c, 1.0);
+}`,
+      editableRegions: ['repete'],
+      solution: '  vec3 c = vec3(fract(v_uv.x * 3.0));',
+      reference: '../assets/ref/m9-fract-uv.png',
+      tolerance: 0.06,
+    };
+  </script>
+</body>
+</html>

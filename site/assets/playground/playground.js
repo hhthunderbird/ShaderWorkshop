@@ -3,7 +3,7 @@ import { toControlSpecs } from './uniforms.js';
 import { compare } from './pixeldiff.js';
 import { extractRegion, reassemble } from './editable.js';
 import { translateToHLSL } from './translate.js';
-import { createContext, buildProgram, setupQuad, setupMesh, MESH_VERTEX, renderFrame, readPixels } from './gl.js';
+import { createContext, buildProgram, setupQuad, setupMesh, MESH_VERTEX, renderFrame, readPixels, loadTexture } from './gl.js';
 import { withHeader, withHeaderMesh } from './header.js';
 import { cube, sphere } from './geometry.js';
 import { multiply, perspective, translation, rotateX, rotateY, mat3FromMat4 } from './mat4.js';
@@ -158,6 +158,9 @@ class ShaderPlayground extends HTMLElement {
     try {
       this.gl = this.gl || createContext(this.canvas);
       const gl = this.gl;
+      if (this.cfg.texture && !this.texObj) {
+        this.texObj = loadTexture(gl, this.cfg.texture);
+      }
       if (this.cfg.mode === 'mesh') {
         this.geo = this.geo || (this.cfg.mesh === 'sphere' ? sphere(28) : cube());
         this.program = buildProgram(gl, withHeaderMesh(this.fullSource), MESH_VERTEX);
@@ -183,6 +186,7 @@ class ShaderPlayground extends HTMLElement {
           u_time: t,
           u_resolution: [this.canvas.width, this.canvas.height],
           controls: this.controlValues,
+          texture: this.texObj || null,
         };
         if (this.cfg.mode === 'mesh') {
           const vel = this.controlValues.u_vel ?? 0.6;

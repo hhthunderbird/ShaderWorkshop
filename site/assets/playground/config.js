@@ -24,5 +24,6 @@ export function normalizeConfig(raw) {
     tolerance: typeof raw.tolerance === 'number' ? clamp01(raw.tolerance) : 0.06,
     exportable: raw.exportable === true, // botões Baixar PNG / Copiar shader (Projeto-Vitória)
     light: Array.isArray(raw.light) && raw.light.length === 3 ? raw.light : [0.5, 0.7, 1.0], // direção da luz (modo mesh)
+    texture: typeof raw.texture === 'string' && raw.texture.length > 0 ? raw.texture : null, // URL da imagem -> sampler2D u_tex
   };
 }

@@ -50,3 +50,9 @@ test('light: default direcional; aceita override vec3', () => {
   assert.deepEqual(normalizeConfig({ fragment: 'x' }).light, [0.5, 0.7, 1.0]);
   assert.deepEqual(normalizeConfig({ fragment: 'x', light: [1, 0, 0] }).light, [1, 0, 0]);
 });
+
+test('texture: null por padrao; aceita url string', () => {
+  assert.equal(normalizeConfig({ fragment: 'x' }).texture, null);
+  assert.equal(normalizeConfig({ fragment: 'x', texture: '' }).texture, null);
+  assert.equal(normalizeConfig({ fragment: 'x', texture: '../assets/tex/exemplo.png' }).texture, '../assets/tex/exemplo.png');
+});
