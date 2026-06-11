@@ -70,3 +70,18 @@ test('withHeaderMesh nao duplica u_cameraPos se o aluno ja declarou', () => {
   const out = withHeaderMesh(src);
   assert.equal((out.match(/uniform vec3 u_cameraPos;/g) || []).length, 1);
 });
+
+test('withHeader: precision do aluno vem ANTES dos uniforms injetados (senao: No precision specified)', () => {
+  const src = `precision highp float;\nvoid main(){ gl_FragColor = vec4(v_uv, 0.0, 1.0); }`;
+  const out = withHeader(src);
+  assert.ok(out.indexOf('precision') < out.indexOf('uniform float u_time;'), 'precision deve vir antes dos uniforms');
+  assert.equal((out.match(/precision\s+\w+\s+float/g) || []).length, 1, 'nao duplica precision');
+  assert.ok(/^precision highp float;/.test(out), 'preserva a precision highp do aluno');
+});
+
+test('withHeaderMesh: precision do aluno vem antes dos uniforms (M12 specular)', () => {
+  const src = `precision highp float;\nuniform float u_dureza;\nvoid main(){ gl_FragColor = vec4(vec3(u_dureza), 1.0); }`;
+  const out = withHeaderMesh(src);
+  assert.ok(out.indexOf('precision') < out.indexOf('uniform float u_time;'), 'precision antes dos uniforms');
+  assert.equal((out.match(/precision\s+\w+\s+float/g) || []).length, 1, 'nao duplica precision');
+});
