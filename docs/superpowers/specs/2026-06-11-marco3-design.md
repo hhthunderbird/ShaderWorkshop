@@ -128,11 +128,12 @@ Imagens · Professor.** Dispositivos Head First implícitos em todos.
 - **Analogia (Gemini):** pelotão que marcha em sincronia (warp); se metade vira à esquerda e metade à
   direita num cruzamento, o pelotão inteiro faz as duas rotas e joga uma fora (divergência).
 - **Fonte:** Gemini (warps/wavefronts, branch divergence, half×float).
-- **Demos:** **visualização de divergência de branch** — uma grade onde um `if` baseado na posição
-  separa as células; o demo destaca as "turmas" (blocos) que ficaram divididas (custo) × as uniformes
-  (baratas). Ilustrativo/conceitual, sem pixel-diff. (Alternativa mais simples se a viz de turma ficar
-  confusa: dois padrões lado a lado — um com `if` divergente, outro com `mix`/`step` sem branch —
-  mostrando que dá pra evitar o `if`.)
+- **Demos:** **contraste `if` × sem-branch** (lado a lado, CSS `.duo`): um padrão feito com `if`
+  divergente baseado na posição, outro feito com `mix`/`step` (sem branch) gerando o MESMO resultado
+  visual — mostrando que o `if` dá pra evitar. ⚠️ **NÃO** fazer um demo que "mostra quais warps
+  divergiram": GLSL ES 1.00 não dá acesso ao agrupamento de invocações/warp (isso é Vulkan/GL4.x,
+  não WebGL1) — um shader que "vê warps" seria **fabricado** e fere a honestidade do marco. O conceito
+  de warp/divergência fica no **SVG** e no texto, não num shader que finge enxergá-lo. Sem pixel-diff.
 - **Math sidebar:** — (nota: `mix`/`step` muitas vezes substituem um `if`, evitando divergência).
 - **Imagens:** SVG do pelotão sincronizado e do cruzamento que diverge. [IMAGEM: diagrama de
   warp/wavefront].
@@ -141,9 +142,10 @@ Imagens · Professor.** Dispositivos Head First implícitos em todos.
   (M6/M13).
 
 ### 🏆 Projeto-Vitória 3 — Efeito Autoral
-- **Onde:** ao final do M12 (último módulo com técnica de shader nova) **ou** seção própria no M14
-  como fecho do curso inteiro. **Decisão:** colocar no **M12** (precisa do specular como ingrediente),
-  e o M14 só faz o **fechamento narrativo do curso** apontando de volta pra ele. (Confirmar no plano.)
+- **Onde:** ao final do **M12** (último módulo com técnica de shader nova — precisa do specular como
+  ingrediente). O **M14**, no fechamento do curso, **manda o aluno de volta ao próprio Efeito Autoral**:
+  "agora que você sabe o que é caro na GPU, olhe o seu shader — tem `if` que dá pra trocar por `mix`?".
+  Amarra otimização (M14) ao artefato que o aluno fez (M12) — recuperação ativa sobre algo dele.
 - **O quê:** playground **aberto e exportável** (reusa a flag `exportable` do Marco 1/2) onde o aluno
   combina os ingredientes do curso inteiro: forma (M7), textura (M9), luz difusa (M10), **specular
   (M12)**, cor/tempo autorais. Template rico, sem `reference` (sem pixel-diff).
@@ -163,8 +165,9 @@ Imagens · Professor.** Dispositivos Head First implícitos em todos.
    sliders + console limpo; checar banding do `pow`) antes de seguir. Teste node: config aceita o
    fragment do specular; header injeta `u_cameraPos`.
 2. **M13** (conceitual; demo enxame de partículas em fragment + caixa Cuidado! da metáfora).
-3. **M14** (conceitual; viz de divergência de branch; **fechamento do curso**).
-4. **Projeto-Vitória 3** dentro do M12 (exportável).
+3. **M14** (conceitual; demo `if`×`mix` lado a lado; warp/divergência só em SVG; **fechamento do
+   curso** com callback ao Efeito Autoral do M12). Passe de exatidão técnica §7 antes do commit.
+4. **Projeto-Vitória 3** dentro do M12 (exportável). Passe de exatidão §7 também no M13.
 Cada módulo: HTML Head First + guia do professor + SVGs + testes + verificação no Chrome + commit.
 
 ## 7. Gate de precisão técnica (NOVO — risco específico do Marco 3)
@@ -194,8 +197,8 @@ verdadeira). Por isso:
   do M13/M14, já que o Chrome só vê o demo animar).
 - **`pow` banding no specular:** verificar no Chrome; usar `highp` se aparecer faixa.
 - **Acoplamento `u_cameraPos` ↔ view:** comentar no playground.js (§3.1).
-- **M14 viz de divergência confusa:** alternativa de plano B (dois padrões lado a lado if×mix) já
-  prevista no demo do M14.
+- **M14 não pode "mostrar warps" (GLSL ES não tem introspecção de warp):** demo é o contraste honesto
+  `if`×`mix` lado a lado; warp/divergência só em SVG/texto (§4 M14). Pego no passe de exatidão §7.
 
 ## 10. Git
 Branch opcional `feat/marco3-poder-gpu` ou direto em `main` (como Marcos 1/2 acabaram indo). Um commit
