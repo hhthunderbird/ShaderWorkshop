@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 10 — Normais &amp; Luz Difusa</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · Marco 2 · Módulo 10 de 11</p>
+  <h1>Normais &amp; Luz Difusa</h1>
+  <p>Seu objeto já tem forma (M7) e pele (M9). Falta o que dá <strong>volume</strong> de verdade:
+  a <strong>luz</strong>. Faces viradas pro sol ficam claras; viradas pro outro lado, escuras. E o
+  jeito de calcular isso é o reencontro com um velho conhecido do M8: o <code>dot</code>.</p>
+
+  <div class="brain">
+    Lá no M8 você fez uma aposta: a face fica clara quando o <code>dot</code> (entre a direção dela e
+    a luz) é <em>alto</em> ou <em>baixo</em>? Hora de cobrar a aposta. Antes de rolar a página:
+    qual era sua resposta? Segura ela.
+  </div>
+
+  <h2>Normal: pra onde a superfície aponta</h2>
+  <p>Cada pedacinho de uma superfície "olha" pra alguma direção. Essa seta perpendicular à superfície
+  é a <strong>normal</strong> (no shader: <code>v_normal</code>, que o motor já te entrega). No topo de
+  uma esfera, a normal aponta pra cima; na lateral, pro lado. É a normal que diz se aquele ponto está
+  "de cara" pra luz.</p>
+
+  <figure>
+    <img src="../assets/img/normal-luz.svg" alt="Uma esfera com lado claro virado para a luz e lado escuro oposto; a normal N e o raio de luz L marcados num ponto da face iluminada" width="640">
+    <figcaption>brilho = <code>max(dot(N, L), 0.0)</code>. Normal pra luz → dot alto → claro. De costas → escuro.</figcaption>
+  </figure>
+
+  <h2>A conta da luz difusa</h2>
+  <p>"Difusa" é a luz que espalha igual por todo lado (o oposto de um brilho espelhado — isso fica
+  pro Marco 3). A receita é uma linha:</p>
+  <div class="bullets">
+    <ul>
+      <li>Pegue a <strong>normal</strong> <code>N</code> (pra onde a face aponta) e a
+      <strong>direção da luz</strong> <code>L</code>.</li>
+      <li>Faça <code>dot(N, L)</code>: alto quando a face encara a luz, baixo/negativo quando dá as
+      costas.</li>
+      <li>Corte o negativo com <code>max(dot(N, L), 0.0)</code> — luz não pode ser "menos que zero".</li>
+    </ul>
+  </div>
+  <p>Esse número (0 a 1) multiplica a cor: 1 = pleno sol, 0 = sombra. <strong>Resposta da aposta do
+  M8: clara quando o <code>dot</code> é ALTO.</strong> Acertou?</p>
+
+  <h2>Test Drive: acenda a luz</h2>
+  <p>Uma esfera de verdade, iluminada. Gire o slider <strong>direção da luz</strong> e veja a parte
+  clara passear pela superfície. Onde a normal encara a luz, fica claro; do outro lado, escuro.</p>
+
+  <shader-playground id="pg-luz"></shader-playground>
+
+  <div class="afie">
+    <p>Sem mexer — <strong>preveja</strong>: quando a luz aponta lá da direita, qual lado da esfera
+    fica claro? E o que acontece no ponto exato onde a normal aponta <em>direto</em> pra luz?</p>
+    <p>Resposta: ____________________</p>
+    <p>Agora gire o slider e confira.</p>
+  </div>
+
+  <details class="sidebar">
+    <summary>🧮 Matemática de bolso: por que <code>max(dot(N,L), 0.0)</code>?</summary>
+    <div>
+      <p>O <code>dot</code> de duas direções (M8) vai de −1 a 1. Pra luz, só interessa o lado positivo:
+      face encarando a luz (<code>dot</code> entre 0 e 1) recebe luz; face de costas
+      (<code>dot</code> negativo) não recebe <em>nada</em> — não existe "luz negativa". O
+      <code>max(..., 0.0)</code> joga todo negativo pra 0. Simples e é exatamente o que o olho espera.</p>
+    </div>
+  </details>
+
+  <div class="qa">
+    <dl>
+      <dt>De onde vem <code>v_normal</code>? Não calculei.</dt>
+      <dd>O motor calcula a normal de cada ponto da malha e te entrega pronta (como faz com o
+      <code>v_uv</code>). Você só usa.</dd>
+      <dt>Por que normalizar N e L antes do <code>dot</code>?</dt>
+      <dd>Mesma razão do M8: com tamanho 1, o <code>dot</code> vira puro "alinhamento" (0 a 1), sem o
+      tamanho das setas atrapalhar o brilho.</dd>
+      <dt>Isso é a luz "de verdade" dos jogos?</dt>
+      <dd>É a base dela (luz difusa de Lambert). Falta o brilho especular (aquele ponto brilhante) —
+      mas isso é o começo do Marco 3.</dd>
+    </dl>
+  </div>
+
+  <div class="cuidado">
+    Sem o <code>max(..., 0.0)</code>, as faces de costas ganhariam brilho <strong>negativo</strong> e
+    a conta estoura/escurece errado. Luz difusa sempre corta o negativo.
+  </div>
+
+  <div class="bullets">
+    <ul>
+      <li>Normal = direção pra onde a superfície aponta (<code>v_normal</code>, pronto no motor).</li>
+      <li>Luz difusa = <code>max(dot(N, L), 0.0)</code>: claro quando a face encara a luz.</li>
+      <li>Esse número (0 a 1) multiplica a cor/textura do objeto.</li>
+      <li>É o mesmo <code>dot</code> do M8 — agora virou iluminação.</li>
+    </ul>
+  </div>
+
+  <h2>🏆 Projeto-Vitória: Objeto Texturizado e Iluminado</h2>
+  <p>Hora de juntar o Marco 2 inteiro: forma (M7) + vetores/dot (M8) + textura (M9) + luz (M10). O
+  cubo abaixo já vem texturizado <strong>e</strong> iluminado. Ele é <strong>seu</strong>: mexa na
+  mistura de cor, na força da luz, troque a forma na sua cabeça. Quando gostar, clique
+  <strong>📷 Baixar imagem</strong> e <strong>📋 Copiar shader</strong> pra compartilhar.</p>
+
+  <shader-playground id="pg-projeto"></shader-playground>
+
+  <div class="afie">
+    <p>Ideias pra experimentar dentro do bloco editável:</p>
+    <ul>
+      <li>Mude a <strong>luz ambiente</strong> (o <code>0.25</code>): com 0.0, a sombra fica preta total.</li>
+      <li>Pinte por cima da textura: <code>vec3 cor = texture2D(u_tex, v_uv).rgb * vec3(1.0, 0.6, 0.6);</code></li>
+      <li>Ladrilhe a textura (M9): <code>texture2D(u_tex, fract(v_uv * 2.0))</code>.</li>
+    </ul>
+    <p><strong>Meta:</strong> usar pelo menos 2 dos 3 ingredientes do marco (forma já vem de graça): textura, luz, e cor autoral.</p>
+  </div>
+
+  <div class="recordacao">
+    <h2>Recordação: caça ao par</h2>
+    <p>Ligue cada termo ao seu significado (escreva a letra):</p>
+    <ul>
+      <li>( ) normal &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; A. corta o brilho negativo (luz não fica abaixo de 0)</li>
+      <li>( ) <code>dot(N,L)</code> &nbsp; B. direção pra onde a superfície aponta</li>
+      <li>( ) <code>max(...,0)</code> &nbsp; C. cor que espalha igual, sem ponto brilhante</li>
+      <li>( ) luz difusa &nbsp; D. mede se a face encara a luz</li>
+    </ul>
+  </div>
+
+  <p style="margin-top:28px"><a href="09-texturas-e-uv.html">← Anterior: Texturas &amp; UV</a>
+  &nbsp;·&nbsp;
+  <span class="proximo-soon">Próximo: Por Baixo do Capô II — Hardware Fixo →
+  <span style="color:#999">(em construção no próximo plano)</span></span></p>
+
+  <script type="module">
+    document.getElementById('pg-luz').config = {
+      mode: 'mesh', mesh: 'sphere',
+      fragment: `uniform float u_lang;
+void main() {
+  vec3 N = normalize(v_normal);
+  vec3 L = normalize(vec3(cos(u_lang), 0.4, sin(u_lang)));
+  float dif = max(dot(N, L), 0.0);
+  vec3 base = vec3(0.55, 0.7, 1.0);
+  gl_FragColor = vec4(base * dif, 1.0);
+}`,
+      uniforms: [
+        { name: 'u_lang', label: 'direção da luz', min: 0.0, max: 6.2831, value: 0.8 },
+        { name: 'u_vel', label: 'rotação', min: 0.0, max: 1.5, value: 0.0 },
+      ],
+    };
+    document.getElementById('pg-projeto').config = {
+      mode: 'mesh', mesh: 'cube',
+      texture: '../assets/tex/exemplo.png',
+      fragment: `void main() {
+  vec3 N = normalize(v_normal);
+  vec3 L = normalize(u_lightDir);
+// >>> EDIT: arte
+  vec3 cor = texture2D(u_tex, v_uv).rgb;
+  float dif = max(dot(N, L), 0.0);
+  vec3 final = cor * (0.25 + 0.75 * dif);
+// <<< EDIT
+  gl_FragColor = vec4(final, 1.0);
+}`,
+      uniforms: [{ name: 'u_vel', label: 'rotação', min: 0.0, max: 2.0, value: 0.5 }],
+      editableRegions: ['arte'],
+      exportable: true,
+    };
+  </script>
+</body>
+</html>

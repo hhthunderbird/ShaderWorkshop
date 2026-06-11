@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 280" width="640" height="280" font-family="system-ui, sans-serif">
+  <rect width="640" height="280" fill="#fff"/>
+  <text x="320" y="26" text-anchor="middle" font-size="15" font-weight="bold" fill="#333">A face vira clara quando aponta pra luz (dot da normal com a luz)</text>
+  <defs>
+    <marker id="aL" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#e8a000"/></marker>
+    <marker id="aN" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1971c2"/></marker>
+  </defs>
+
+  <!-- sol -->
+  <g transform="translate(70,70)">
+    <circle cx="0" cy="0" r="26" fill="#ffe066" stroke="#e8a000" stroke-width="2"/>
+    <text x="0" y="56" text-anchor="middle" font-size="12" fill="#b35900">luz</text>
+  </g>
+
+  <!-- esfera com lado claro (esquerda, virada pra luz) e escuro (direita) -->
+  <g transform="translate(360,150)">
+    <defs>
+      <radialGradient id="lit" cx="30%" cy="35%" r="75%">
+        <stop offset="0%" stop-color="#dbe9ff"/>
+        <stop offset="55%" stop-color="#5a86c8"/>
+        <stop offset="100%" stop-color="#0b1d3a"/>
+      </radialGradient>
+    </defs>
+    <circle cx="0" cy="0" r="90" fill="url(#lit)" stroke="#333" stroke-width="1"/>
+    <!-- normal num ponto da face iluminada -->
+    <circle cx="-50" cy="-40" r="3" fill="#1971c2"/>
+    <line x1="-50" y1="-40" x2="-95" y2="-78" stroke="#1971c2" stroke-width="3" marker-end="url(#aN)"/>
+    <text x="-120" y="-86" font-size="12" fill="#1971c2">normal N</text>
+    <!-- raio de luz chegando -->
+    <line x1="-150" y1="-120" x2="-70" y2="-58" stroke="#e8a000" stroke-width="3" marker-end="url(#aL)"/>
+    <text x="-150" y="-100" font-size="12" fill="#b35900">luz L</text>
+    <text x="-40" y="20" text-anchor="middle" font-size="12" fill="#dbe9ff" font-weight="bold">claro</text>
+    <text x="55" y="20" text-anchor="middle" font-size="12" fill="#9bb" font-weight="bold">escuro</text>
+  </g>
+
+  <text x="320" y="266" text-anchor="middle" font-size="12" fill="#888">brilho = max(dot(N, L), 0). N pra luz → dot alto → claro. N de costas → dot ≤ 0 → escuro.</text>
+</svg>
