@@ -134,6 +134,21 @@
     </ul>
   </div>
 
+  <h2>Sua vez: adicione o brilho</h2>
+  <p>A esfera abaixo já tem a luz <strong>difusa</strong> (do M10), mas está <strong>fosca</strong> —
+  o brilho ainda é <code>0.0</code>. Sua missão: troque o <code>0.0</code> pela receita do brilho
+  especular, usando o <code>pow</code> do <code>dot</code> entre a normal <code>N</code> e o
+  half-vector <code>H</code>.</p>
+  <div class="afie">
+    <p><strong>Preveja:</strong> quando você somar <code>pow(max(dot(N, H), 0.0), u_dureza)</code>,
+    onde vai aparecer o brilho? E o que acontece com ele quando você aumenta a <em>dureza</em>?</p>
+    <p>Escreva, clique ▶ Test Drive e confira: <strong>se aparecer um ponto branco que anda com a
+    direção da luz e encolhe quando você aumenta a dureza, você acertou.</strong> Travou?
+    💡 Mostrar solução.</p>
+  </div>
+
+  <shader-playground id="pg-ex-brilho"></shader-playground>
+
   <h2>🏆 Projeto-Vitória 3: Efeito Autoral</h2>
   <p>Você chegou ao terceiro projeto-vitória do curso. Desta vez, o desafio é criar um
   <strong>efeito de material autoral</strong>: uma superfície com personalidade própria, usando tudo
@@ -217,6 +232,32 @@ void main() {
       uniforms: [{ name: 'u_vel', label: 'rotação', min: 0.0, max: 2.0, value: 0.5 }],
       editableRegions: ['arte'],
       exportable: true,
+    };
+    document.getElementById('pg-ex-brilho').config = {
+      mode: 'mesh', mesh: 'sphere',
+      fragment: `precision highp float;
+uniform float u_lang;
+uniform float u_dureza;
+void main() {
+  vec3 N = normalize(v_normal);
+  vec3 L = normalize(vec3(cos(u_lang), 0.4, sin(u_lang)));
+  vec3 V = normalize(u_cameraPos - v_worldPos);
+  vec3 H = normalize(L + V);
+  float dif = max(dot(N, L), 0.0);
+// >>> EDIT: brilho
+  float esp = 0.0;
+// <<< EDIT
+  vec3 base = vec3(0.40, 0.55, 0.90);
+  vec3 cor = base * (0.15 + 0.85 * dif) + vec3(esp);
+  gl_FragColor = vec4(cor, 1.0);
+}`,
+      solution: '  float esp = pow(max(dot(N, H), 0.0), u_dureza);',
+      editableRegions: ['brilho'],
+      uniforms: [
+        { name: 'u_lang', label: 'direção da luz', min: 0.0, max: 6.2831, value: 0.8 },
+        { name: 'u_dureza', label: 'dureza do brilho', min: 2.0, max: 128.0, value: 32.0 },
+        { name: 'u_vel', label: 'rotação', min: 0.0, max: 1.5, value: 0.0 },
+      ],
     };
   </script>
 </body>

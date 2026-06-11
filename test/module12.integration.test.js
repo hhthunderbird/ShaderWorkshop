@@ -62,3 +62,11 @@ test('M12 tem checkpoint de consolidacao (dot(N,H)) e nao data o Blinn-Phong com
     'falta o checkpoint sobre o que dot(N,H) alto causa no brilho');
   assert.ok(!/anos 80/i.test(html), 'Blinn-Phong nao deve ser datado como "anos 80" (e de 1977)');
 });
+
+test('M12 tem exercicio predict-observe de specular (editavel brilho + solution), SEM pixel-diff', () => {
+  const html = readFileSync('site/modulos/12-luz-especular.html', 'utf8');
+  assert.ok(html.includes('id="pg-ex-brilho"'), 'falta o exercicio de specular');
+  assert.ok(html.includes("editableRegions: ['brilho']"), 'falta a regiao editavel brilho');
+  assert.ok(html.includes('pow(max(dot(N, H)'), 'falta a solucao do specular');
+  assert.ok(!html.includes('reference:'), 'M12 e cena 3D: nenhum playground pode ter reference');
+});
