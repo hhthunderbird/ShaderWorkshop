@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 2 — O Pixel e a Cor</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · Marco 1 · Módulo 2 de 6</p>
+  <h1>O Pixel e a Cor</h1>
+  <p>No módulo passado você pintou a tela <em>inteira</em> de uma cor só. Bonito, mas meio sem
+  graça — todo pixel recebeu exatamente a mesma cor. Agora vem o pulo do gato: e se <strong>cada
+  pixel decidisse a própria cor a partir de ONDE ele está</strong> na tela? É assim que nasce um
+  <strong>gradiente</strong> — e, mais pra frente, qualquer imagem.</p>
+
+  <h2>Todo pixel tem um endereço</h2>
+  <p>Lembra que o shader roda uma vez por pixel? Pois é: em cada uma dessas execuções, o pixel sabe
+  <em>onde</em> ele está. Esse endereço chega pra gente numa variável chamada <code>v_uv</code> —
+  são dois números:</p>
+  <div class="bullets">
+    <ul>
+      <li><code>v_uv.x</code> → posição na <strong>horizontal</strong>: <code>0.0</code> na borda
+      esquerda, <code>1.0</code> na borda direita.</li>
+      <li><code>v_uv.y</code> → posição na <strong>vertical</strong>: <code>0.0</code> embaixo,
+      <code>1.0</code> em cima.</li>
+    </ul>
+  </div>
+  <p>Repare: <strong>não</strong> é "pixel 0, pixel 1, pixel 845". É sempre um número de
+  <strong>0 a 1</strong>, não importa se a tela é grande ou pequena. A isso chamamos
+  <em>coordenada normalizada</em>.</p>
+
+  <figure>
+    <img src="../assets/img/uv-grid.svg" alt="Grade de pixels com os eixos v_uv.x (horizontal, 0 a 1) e v_uv.y (vertical, 0 a 1) anotados; um pixel destacado em ~(0.3, 0.3)" width="420">
+    <figcaption>Cada pixel tem um endereço <code>(v_uv.x, v_uv.y)</code>, sempre entre 0 e 1.</figcaption>
+  </figure>
+
+  <div class="brain">
+    Pensa no <strong>mapa de assentos do cinema</strong>: cada poltrona tem um endereço (fila, número).
+    Se eu disser "pinte de vermelho quem está na metade direita da sala", você consegue, sem saber o
+    nome de ninguém — só pelo <em>lugar</em>. O shader faz igualzinho com os pixels.
+  </div>
+
+  <h2>Test Drive: a cor vira posição</h2>
+  <p>O playground abaixo pinta cada pixel com a cor <code>vec3(v_uv.x, v_uv.y, 0.0)</code>. Ou seja:
+  quanto mais à direita, mais <strong>vermelho</strong> (R = <code>v_uv.x</code>); quanto mais pra
+  cima, mais <strong>verde</strong> (G = <code>v_uv.y</code>). Azul fica zerado. Dá <em>Test Drive</em>
+  e veja o gradiente aparecer. Depois, <strong>mexa na expressão</strong> e clique Test Drive de novo.</p>
+
+  <shader-playground id="pg-grad"></shader-playground>
+
+  <div class="afie">
+    <p>Sem rodar — <strong>preveja</strong>: o que aparece se você trocar a cor por
+    <code>vec3(v_uv.x, 0.0, 0.0)</code>? E por <code>vec3(v_uv.y, v_uv.y, v_uv.y)</code>?</p>
+    <p>1ª: ________________________________</p>
+    <p>2ª: ________________________________</p>
+    <p>Agora teste as duas no playground. Bateu com sua previsão?</p>
+  </div>
+
+  <details class="sidebar">
+    <summary>🧮 Matemática de bolso: o plano cartesiano e o intervalo [0, 1]</summary>
+    <div>
+      <p>Aquilo que você viu na escola como "par ordenado" <code>(x, y)</code> é exatamente isto:
+      um jeito de dizer um ponto por dois números. A diferença é que aqui a gente não usa
+      centímetros nem pixels — a gente <strong>normaliza</strong>: estica/encolhe tudo pra caber no
+      intervalo de <code>0.0</code> a <code>1.0</code>.</p>
+      <p>Por quê? Porque assim o mesmo shader funciona igual numa telinha de celular e num telão.
+      <code>0.5</code> é sempre o <em>meio</em>, seja lá qual for o tamanho real em pixels.</p>
+      <p>👉 Pra transformar um valor qualquer num intervalo [0,1], você divide pelo total:
+      <code>posição_em_pixels ÷ largura_total</code>. Isso é normalizar.</p>
+    </div>
+  </details>
+
+  <details class="sidebar">
+    <summary>🗣️ Dois sotaques, mesma língua: GLSL e HLSL</summary>
+    <div>
+      <p>Como no módulo passado: a gente escreve em <strong>GLSL</strong> (no navegador) e o
+      <strong>Unity</strong> usa <strong>HLSL</strong>. As coordenadas existem nos dois — só mudam de
+      nome conforme o contexto. Clique em <strong>🔁 Ver em HLSL</strong> em qualquer playground pra
+      ver o mesmo shader do jeito do Unity.</p>
+    </div>
+  </details>
+
+  <div class="qa">
+    <dl>
+      <dt>"Pixel" e "coordenada" são a mesma coisa?</dt>
+      <dd>Quase, mas cuidado: <strong>pixel</strong> é o pontinho físico da tela (e tem um número
+      inteiro, tipo "coluna 845"). A <strong>coordenada</strong> <code>v_uv</code> é esse lugar
+      <em>normalizado</em> de 0 a 1. O mesmo pixel pode ser "coluna 845" numa tela e "coluna 1690"
+      noutra — mas o <code>v_uv.x</code> dele é o mesmo nas duas.</dd>
+      <dt>De onde sai esse <code>v_uv</code>? Eu não declarei.</dt>
+      <dd>O motor do curso já entrega ele pronto pra você (é um <code>varying</code>, declarado nos
+      bastidores). Por enquanto: é de graça, use à vontade.</dd>
+      <dt>Por que o canto de baixo-esquerda fica preto?</dt>
+      <dd>Porque lá <code>v_uv</code> ≈ <code>(0, 0)</code>, então R=0, G=0, B=0 = preto. Cada canto
+      conta uma historinha sobre as coordenadas. 😉</dd>
+    </dl>
+  </div>
+
+  <div class="cuidado">
+    Não confunda <strong>pixel</strong> (o pontinho da tela, contado em inteiros) com a
+    <strong>coordenada normalizada</strong> <code>v_uv</code> (sempre de 0 a 1). Quase todo bug de
+    iniciante neste módulo é misturar os dois. Se a conta dá 320 ou 845, você está pensando em pixel;
+    se dá 0.5, está pensando em coordenada — e é coordenada que a gente quer.
+  </div>
+
+  <div class="bullets">
+    <ul>
+      <li>Cada pixel sabe sua posição na variável <code>v_uv</code> (dois números de 0 a 1).</li>
+      <li><code>v_uv.x</code> = horizontal (0 esq → 1 dir); <code>v_uv.y</code> = vertical (0 baixo → 1 cima).</li>
+      <li>Cor a partir da posição = <strong>gradiente</strong>.</li>
+      <li>Normalizar = espremer qualquer medida pro intervalo [0, 1], dividindo pelo total.</li>
+    </ul>
+  </div>
+
+  <h2>Afie o lápis: gradiente vermelho → azul</h2>
+  <p>Seu desafio: faça um gradiente <strong>horizontal</strong> que vai de <strong>vermelho</strong>
+  (na esquerda) até <strong>azul</strong> (na direita). Dica forte: a função
+  <code>mix(a, b, t)</code> mistura a cor <code>a</code> com a cor <code>b</code> conforme <code>t</code>
+  vai de 0 a 1. E você já tem um número que vai de 0 (esq) a 1 (dir)... qual é mesmo? 😉
+  Edite a expressão da cor, dê <em>Test Drive</em> e clique <em>Conferir</em>.</p>
+  <shader-playground id="pg-ex"></shader-playground>
+
+  <div class="recordacao">
+    <h2>Recordação: caça ao par</h2>
+    <p>Ligue cada termo ao seu significado (escreva a letra):</p>
+    <ul>
+      <li>( ) <code>v_uv.x</code> &nbsp;&nbsp; A. mistura duas cores conforme um número de 0 a 1</li>
+      <li>( ) normalizar &nbsp;&nbsp; B. posição horizontal do pixel, de 0 a 1</li>
+      <li>( ) <code>mix</code> &nbsp;&nbsp;&nbsp;&nbsp; C. espremer uma medida pro intervalo [0, 1]</li>
+      <li>( ) gradiente &nbsp;&nbsp; D. cor que muda conforme a posição</li>
+    </ul>
+  </div>
+
+  <p style="margin-top:28px"><a href="01-shaders-e-gpu.html">← Anterior: Shaders &amp; a GPU</a>
+  &nbsp;·&nbsp;
+  <span class="proximo-soon">Próximo: Matemática que Vira Imagem →
+  <span style="color:#999">(em construção no próximo plano)</span></span></p>
+
+  <script type="module">
+    document.getElementById('pg-grad').config = {
+      mode: 'fragment',
+      fragment: `void main() {
+// >>> EDIT: cor
+  vec3 c = vec3(v_uv.x, v_uv.y, 0.0);
+// <<< EDIT
+  gl_FragColor = vec4(c, 1.0);
+}`,
+      editableRegions: ['cor'],
+    };
+    document.getElementById('pg-ex').config = {
+      mode: 'fragment',
+      fragment: `void main() {
+// >>> EDIT: cor
+  vec3 c = vec3(v_uv.x, v_uv.y, 0.0);
+// <<< EDIT
+  gl_FragColor = vec4(c, 1.0);
+}`,
+      editableRegions: ['cor'],
+      solution: '  vec3 c = mix(vec3(1.0, 0.0, 0.0), vec3(0.0, 0.0, 1.0), v_uv.x);',
+      reference: '../assets/ref/m2-gradiente-rb.png',
+      tolerance: 0.06,
+    };
+  </script>
+</body>
+</html>
