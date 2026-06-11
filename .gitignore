@@ -20,3 +20,7 @@ __pycache__/
 # Cache de modelo / temporários
 .cache/
 *.log
+
+# Temporarios de download
+*.ytdl
+*.part
