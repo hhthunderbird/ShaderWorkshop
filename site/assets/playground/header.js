@@ -33,6 +33,7 @@ export function withHeaderMesh(src) {
     (hasPrecision ? '' : 'precision mediump float;\n') +
     addIfMissing('uniform float u_time;', 'u_time') +
     addIfMissing('uniform vec3 u_lightDir;', 'u_lightDir') +
+    addIfMissing('uniform vec3 u_cameraPos;', 'u_cameraPos') +
     addIfMissing('uniform sampler2D u_tex;', 'u_tex') +
     addIfMissing('varying vec2 v_uv;', 'v_uv') +
     addIfMissing('varying vec3 v_normal;', 'v_normal') +

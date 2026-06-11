@@ -57,3 +57,16 @@ test('withHeaderMesh nao duplica o que o aluno ja declarou', () => {
   const out = withHeaderMesh(src);
   assert.equal((out.match(/varying vec3 v_normal;/g) || []).length, 1);
 });
+
+test('withHeaderMesh injeta uniform u_cameraPos quando ausente (specular do M12)', () => {
+  const src = `void main(){ vec3 V = normalize(u_cameraPos - v_worldPos); gl_FragColor = vec4(V, 1.0); }`;
+  const out = withHeaderMesh(src);
+  assert.match(out, /uniform vec3 u_cameraPos;/);
+  assert.ok(out.indexOf('uniform vec3 u_cameraPos;') < out.indexOf('void main'));
+});
+
+test('withHeaderMesh nao duplica u_cameraPos se o aluno ja declarou', () => {
+  const src = `uniform vec3 u_cameraPos;\nvoid main(){ gl_FragColor = vec4(u_cameraPos, 1.0); }`;
+  const out = withHeaderMesh(src);
+  assert.equal((out.match(/uniform vec3 u_cameraPos;/g) || []).length, 1);
+});

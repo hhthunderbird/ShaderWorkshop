@@ -129,6 +129,7 @@ export function renderFrame(gl, program, indexCount, uniforms) {
   if (uniforms.u_model) set('u_model', (l) => gl.uniformMatrix4fv(l, false, new Float32Array(uniforms.u_model)));
   if (uniforms.u_normalMatrix) set('u_normalMatrix', (l) => gl.uniformMatrix3fv(l, false, new Float32Array(uniforms.u_normalMatrix)));
   if (uniforms.u_lightDir) set('u_lightDir', (l) => gl.uniform3f(l, uniforms.u_lightDir[0], uniforms.u_lightDir[1], uniforms.u_lightDir[2]));
+  if (uniforms.u_cameraPos) set('u_cameraPos', (l) => gl.uniform3f(l, uniforms.u_cameraPos[0], uniforms.u_cameraPos[1], uniforms.u_cameraPos[2]));
   if (uniforms.texture) {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, uniforms.texture);

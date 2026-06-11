@@ -197,6 +197,9 @@ class ShaderPlayground extends HTMLElement {
           base.u_model = model;
           base.u_normalMatrix = mat3FromMat4(model);
           base.u_lightDir = this.cfg.light;
+          // Câmera fixa em mundo (0,0,3): é o NEGATIVO da translação da view
+          // (translation(0,0,-3)). Se a view mudar, atualizar os dois juntos.
+          base.u_cameraPos = [0, 0, 3];
         }
         renderFrame(this.gl, this.program, this.indexCount, base);
       }
