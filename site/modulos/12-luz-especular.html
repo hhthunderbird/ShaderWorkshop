@@ -170,6 +170,8 @@
     document.getElementById('pg-brilho').config = {
       mode: 'mesh', mesh: 'sphere',
       fragment: `precision highp float;
+uniform float u_lang;
+uniform float u_dureza;
 void main() {
   vec3 N = normalize(v_normal);
   vec3 L = normalize(vec3(cos(u_lang), 0.4, sin(u_lang)));

@@ -10,8 +10,8 @@
   <text x="150" y="86" fill="#e8590c" font-size="16">L (luz)</text>
   <line x1="320" y1="178" x2="450" y2="90" stroke="#1c7ed6" stroke-width="3" marker-end="url(#a)"/>
   <text x="455" y="86" fill="#1c7ed6" font-size="16">V (olho)</text>
-  <line x1="320" y1="178" x2="320" y2="78" stroke="#9c36b5" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
-  <text x="232" y="130" fill="#9c36b5" font-size="16">H = meio de L e V</text>
+  <line x1="320" y1="178" x2="338" y2="80" stroke="#9c36b5" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+  <text x="232" y="135" fill="#9c36b5" font-size="16">H = meio de L e V</text>
   <text x="110" y="40" font-size="15" fill="#333">O brilho estoura quando N aponta pra H.</text>
   <defs>
     <marker id="a" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">
