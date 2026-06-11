@@ -14,3 +14,7 @@
 .pg-hlsl { margin: 8px 0; border: 1px solid #7048e8; border-radius: 6px; background: #f3f0ff; }
 .pg-hlsl-nota { font: 13px system-ui; margin: 0; padding: 6px 10px; color: #5f3dc4; }
 .pg-hlsl-code { margin: 0; padding: 10px; font: 13px ui-monospace, monospace; white-space: pre-wrap; overflow-x: auto; border-top: 1px solid #d0bfff; }
+
+.pg-erro-tec { margin-top: 6px; font-size: 0.85em; }
+.pg-erro-tec summary { cursor: pointer; color: #888; }
+.pg-erro-tec pre { white-space: pre-wrap; background: #f3f0f0; padding: 6px; border-radius: 4px; overflow-x: auto; margin: 4px 0 0; }

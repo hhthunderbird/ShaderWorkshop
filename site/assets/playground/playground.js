@@ -5,6 +5,7 @@ import { extractRegion, reassemble } from './editable.js';
 import { translateToHLSL } from './translate.js';
 import { createContext, buildProgram, setupQuad, setupMesh, MESH_VERTEX, renderFrame, readPixels, loadTexture } from './gl.js';
 import { withHeader, withHeaderMesh } from './header.js';
+import { friendlyError } from './glslerrors.js';
 import { cube, sphere } from './geometry.js';
 import { multiply, perspective, translation, rotateX, rotateY, mat3FromMat4 } from './mat4.js';
 
@@ -172,7 +173,11 @@ class ShaderPlayground extends HTMLElement {
       this.statusEl.textContent = '';
       this.statusEl.className = 'pg-status';
     } catch (e) {
-      this.statusEl.textContent = '⚠ ' + e.message;
+      const dica = friendlyError(e.message);
+      const extra = this.cfg.solution ? ' (↺ Reset desfaz · 💡 Mostrar solução mostra a resposta)' : '';
+      this.statusEl.innerHTML = '⚠ ' + escapeHtml(dica + extra) +
+        ' <details class="pg-erro-tec"><summary>🔧 erro técnico (avançado)</summary><pre>' +
+        escapeHtml(e.message) + '</pre></details>';
       this.statusEl.className = 'pg-status pg-erro';
       this.program = null;
     }
@@ -259,6 +264,9 @@ function rgbToHex([r, g, b]) {
 function hexToRgb(hex) {
   const n = parseInt(hex.slice(1), 16);
   return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255];
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 async function loadReferencePixels(url, w, h) {
