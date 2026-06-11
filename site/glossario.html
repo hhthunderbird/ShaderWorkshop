@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Glossário — Curso de Shaders</title>
+  <link rel="stylesheet" href="assets/css/headfirst.css">
+</head>
+<body class="hf">
+  <p><a href="index.html">← Mapa do curso</a> · 📖 Glossário</p>
+  <h1>Glossário</h1>
+  <p>Bateu dúvida num termo? Procure aqui — e clique no link pra voltar ao módulo que ensina.</p>
+
+  <dl>
+    <dt>banda (de memória)</dt>
+    <dd>A velocidade da memória da placa (GB/s); se for lenta, os núcleos ficam esperando. <a href="modulos/15-placa-de-video.html">📚 Módulo 15</a></dd>
+
+    <dt>compute</dt>
+    <dd>Usar a GPU pra qualquer conta em paralelo, não só desenhar pixels. <a href="modulos/13-alem-de-pixels.html">📚 Módulo 13</a></dd>
+
+    <dt>CPU</dt>
+    <dd>O "cérebro" do computador: poucos núcleos grandes e versáteis. <a href="modulos/01-shaders-e-gpu.html">📚 Módulo 1</a></dd>
+
+    <dt>dot (produto escalar)</dt>
+    <dd>Mede o quanto dois vetores apontam pro mesmo lado (1 = juntos, 0 = perpendiculares, −1 = opostos). <a href="modulos/08-vetores-e-coordenadas.html">📚 Módulo 8</a></dd>
+
+    <dt>especular (brilho)</dt>
+    <dd>O ponto de luz que depende de onde você olha: <code>pow(max(dot(N, H), 0.0), dureza)</code>. <a href="modulos/12-luz-especular.html">📚 Módulo 12</a></dd>
+
+    <dt>float</dt>
+    <dd>Um número (com vírgula, tipo 0.5). <a href="modulos/01-shaders-e-gpu.html">📚 Módulo 1</a></dd>
+
+    <dt>FPS</dt>
+    <dd>Quadros por segundo; o que o jogador sente como fluidez. <a href="modulos/15-placa-de-video.html">📚 Módulo 15</a></dd>
+
+    <dt>fract</dt>
+    <dd>A parte depois da vírgula de um número; serve pra repetir padrões. <a href="modulos/03-matematica-vira-imagem.html">📚 Módulo 3</a></dd>
+
+    <dt>fragment shader</dt>
+    <dd>O shader que roda por pixel e decide a cor final. <a href="modulos/01-shaders-e-gpu.html">📚 Módulo 1</a></dd>
+
+    <dt>framebuffer</dt>
+    <dd>O quadro que está sendo desenhado, guardado na memória da placa. <a href="modulos/15-placa-de-video.html">📚 Módulo 15</a></dd>
+
+    <dt>função</dt>
+    <dd>Uma máquina: entra número, sai outro (ex.: <code>sin</code>, <code>step</code>). <a href="modulos/03-matematica-vira-imagem.html">📚 Módulo 3</a></dd>
+
+    <dt>GLSL / HLSL</dt>
+    <dd>Linguagens de shader (navegador / Unity); "dois sotaques" da mesma ideia. <a href="modulos/01-shaders-e-gpu.html">📚 Módulo 1</a></dd>
+
+    <dt>GPU</dt>
+    <dd>Chip com milhares de núcleos pequenos, feito pra muita conta ao mesmo tempo. <a href="modulos/01-shaders-e-gpu.html">📚 Módulo 1</a></dd>
+
+    <dt>half-vector (H)</dt>
+    <dd>A direção no meio do caminho entre a luz e o olho; o brilho estoura quando a normal aponta pra ela. <a href="modulos/12-luz-especular.html">📚 Módulo 12</a></dd>
+
+    <dt>length</dt>
+    <dd>O tamanho de um vetor (e a distância entre dois pontos). <a href="modulos/04-formas-e-padroes.html">📚 Módulo 4</a></dd>
+
+    <dt>luz difusa</dt>
+    <dd>Luz que espalha igual em todas as direções: <code>max(dot(N, L), 0.0)</code>. <a href="modulos/10-normais-e-luz.html">📚 Módulo 10</a></dd>
+
+    <dt>malha (mesh)</dt>
+    <dd>Objeto 3D feito de vértices ligados em triângulos. <a href="modulos/07-vertices-e-pipeline.html">📚 Módulo 7</a></dd>
+
+    <dt>mix</dt>
+    <dd>Mistura entre dois valores (0 = o primeiro, 1 = o segundo). <a href="modulos/03-matematica-vira-imagem.html">📚 Módulo 3</a></dd>
+
+    <dt>MVP</dt>
+    <dd>A matriz (caixa-preta) que leva um ponto 3D pro lugar certo na tela 2D. <a href="modulos/07-vertices-e-pipeline.html">📚 Módulo 7</a></dd>
+
+    <dt>normal</dt>
+    <dd>A direção pra onde a superfície aponta num ponto. <a href="modulos/10-normais-e-luz.html">📚 Módulo 10</a></dd>
+
+    <dt>normalizar</dt>
+    <dd>Encolher um vetor pra tamanho 1 (sobra só a direção). <a href="modulos/08-vetores-e-coordenadas.html">📚 Módulo 8</a></dd>
+
+    <dt>paralelismo</dt>
+    <dd>Fazer muita coisa ao mesmo tempo: a GPU roda o shader em milhares de pixels juntos. <a href="modulos/06-paralelismo.html">📚 Módulo 6</a></dd>
+
+    <dt>pipeline</dt>
+    <dd>O caminho que um vértice percorre até virar pixel. <a href="modulos/07-vertices-e-pipeline.html">📚 Módulo 7</a></dd>
+
+    <dt>pixel</dt>
+    <dd>Cada pontinho da tela. <a href="modulos/01-shaders-e-gpu.html">📚 Módulo 1</a></dd>
+
+    <dt>ray tracing</dt>
+    <dd>Simular o caminho da luz pra reflexos e sombras realistas (hardware: RT cores). <a href="modulos/15-placa-de-video.html">📚 Módulo 15</a></dd>
+
+    <dt>rasterização</dt>
+    <dd>Transformar triângulos em fragmentos (os pixels que eles cobrem). <a href="modulos/11-hardware-fixo.html">📚 Módulo 11</a></dd>
+
+    <dt>RGB</dt>
+    <dd>Uma cor = 3 números (Vermelho, Verde, Azul), de 0 a 1. <a href="modulos/01-shaders-e-gpu.html">📚 Módulo 1</a></dd>
+
+    <dt>ROP</dt>
+    <dd>Circuito que escreve o pixel final (teste de profundidade + mistura). <a href="modulos/11-hardware-fixo.html">📚 Módulo 11</a></dd>
+
+    <dt>shader</dt>
+    <dd>Programinha que roda na GPU e decide a cor de cada pixel. <a href="modulos/01-shaders-e-gpu.html">📚 Módulo 1</a></dd>
+
+    <dt>sin / cos</dt>
+    <dd>Ondas que sobem e descem; base de animação e de círculos (<code>cos(0)=1</code>, <code>sin(0)=0</code>). <a href="modulos/03-matematica-vira-imagem.html">📚 Módulo 3</a></dd>
+
+    <dt>smoothstep</dt>
+    <dd>Um degrau suave (transição macia entre 0 e 1). <a href="modulos/03-matematica-vira-imagem.html">📚 Módulo 3</a></dd>
+
+    <dt>step</dt>
+    <dd>Função degrau: 0 antes do limiar, 1 depois. <a href="modulos/03-matematica-vira-imagem.html">📚 Módulo 3</a></dd>
+
+    <dt>textura</dt>
+    <dd>Uma imagem amostrada dentro do shader pra "vestir" a superfície. <a href="modulos/09-texturas-e-uv.html">📚 Módulo 9</a></dd>
+
+    <dt>texture2D</dt>
+    <dd>Busca a cor da textura numa coordenada UV. <a href="modulos/09-texturas-e-uv.html">📚 Módulo 9</a></dd>
+
+    <dt>TMU</dt>
+    <dd>Circuito dedicado a buscar (e filtrar) o texel da textura. <a href="modulos/11-hardware-fixo.html">📚 Módulo 11</a></dd>
+
+    <dt>u_time</dt>
+    <dd>O tempo em segundos; é o que faz a animação acontecer. <a href="modulos/05-dando-vida-animacao.html">📚 Módulo 5</a></dd>
+
+    <dt>uniform</dt>
+    <dd>Um valor que vem de fora do shader (ex.: um slider). <a href="modulos/05-dando-vida-animacao.html">📚 Módulo 5</a></dd>
+
+    <dt>UV / coordenada</dt>
+    <dd>Endereço de 0 a 1 de cada ponto (na tela no M2; na superfície da imagem no M9). <a href="modulos/02-pixel-e-cor.html">📚 Módulo 2</a></dd>
+
+    <dt>vec2 / vec3 / vec4</dt>
+    <dd>Par / trio / quarteto de números (ex.: uma cor RGB é um <code>vec3</code>). <a href="modulos/02-pixel-e-cor.html">📚 Módulo 2</a></dd>
+
+    <dt>vértice</dt>
+    <dd>Um dos pontinhos que formam uma malha 3D. <a href="modulos/07-vertices-e-pipeline.html">📚 Módulo 7</a></dd>
+
+    <dt>vertex shader</dt>
+    <dd>O shader que decide a posição de cada vértice. <a href="modulos/07-vertices-e-pipeline.html">📚 Módulo 7</a></dd>
+
+    <dt>vetor</dt>
+    <dd>Uma direção com tamanho. <a href="modulos/08-vetores-e-coordenadas.html">📚 Módulo 8</a></dd>
+
+    <dt>VRAM</dt>
+    <dd>A memória da placa, onde texturas e o framebuffer moram. <a href="modulos/15-placa-de-video.html">📚 Módulo 15</a></dd>
+
+    <dt>warp</dt>
+    <dd>Uma "turma" de threads que anda em sincronia na GPU. <a href="modulos/14-otimizacao.html">📚 Módulo 14</a></dd>
+
+    <dt>Z-buffer</dt>
+    <dd>Decide quem está na frente quando dois pontos caem no mesmo pixel. <a href="modulos/11-hardware-fixo.html">📚 Módulo 11</a></dd>
+  </dl>
+
+  <p style="margin-top:28px"><a href="index.html">🗺️ Mapa do curso</a></p>
+</body>
+</html>
