@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo 7 — Saindo do Quad: Vértices &amp; Pipeline</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · Marco 2 · Módulo 7 de 11</p>
+  <h1>Saindo do Quad: Vértices &amp; Pipeline</h1>
+  <p>Até aqui sua tela era um retângulo plano (um <em>quad</em>). Hora de sair dele: vamos desenhar um
+  objeto 3D de verdade — um cubo — que gira na sua frente. E você vai ver que, por baixo, continua
+  sendo o mesmo jogo de pintar pixels.</p>
+
+  <h2>1. Um objeto é feito de pontinhos</h2>
+  <p>Todo objeto 3D é uma <strong>malha</strong>: um monte de pontos no espaço (os <strong>vértices</strong>)
+  ligados em triângulos. Um cubo tem 8 cantos; a GPU liga esses cantos em triângulos e preenche as
+  faces. Olhe o cubo abaixo girando — cada quina é um vértice.</p>
+
+  <shader-playground id="pg-cubo"></shader-playground>
+
+  <div class="brain">
+    A tela é plana, mas o cubo parece 3D. Como? Alguém precisa decidir ONDE, na telinha 2D, cada
+    cantinho do cubo aparece — levando em conta a profundidade e a rotação. Quem faz essa conta?
+  </div>
+
+  <h2>2. Dois trabalhadores: quem posiciona e quem pinta</h2>
+  <p>Aqui entra a novidade. No Marco 1 você só escrevia <strong>uma</strong> coisa: a cor do pixel (o
+  <em>fragment shader</em>). Agora aparece um segundo trabalhador: o <strong>vertex shader</strong>.</p>
+  <div class="bullets">
+    <ul>
+      <li>O <strong>vertex shader</strong> roda uma vez <em>por vértice</em> e decide a
+      <strong>POSIÇÃO</strong> de cada ponto na tela.</li>
+      <li>O <strong>fragment shader</strong> (seu velho conhecido) roda por pixel e decide a
+      <strong>COR</strong>.</li>
+    </ul>
+  </div>
+  <p>Neste curso, o vertex shader já vem pronto pra você (ele faz a conta da posição). Você continua
+  escrevendo só a cor — como sempre. Quer espiar o vertex pronto? Está na caixa abaixo.</p>
+
+  <details class="sidebar">
+    <summary>👀 Espiando o vertex shader pronto (você não precisa editar)</summary>
+    <div>
+      <p>Ele recebe a posição de cada vértice e a multiplica por uma matriz mágica (a
+      <code>u_mvp</code>) que cuida da rotação, da perspectiva e de projetar o ponto 3D na tela 2D:</p>
+      <pre>gl_Position = u_mvp * vec4(a_position, 1.0);</pre>
+      <p>Você <strong>não</strong> precisa montar essa matriz — o motor monta pra você. Por enquanto,
+      basta saber: ela leva o ponto 3D pro lugar certo da tela.</p>
+    </div>
+  </details>
+
+  <h2>3. A matriz MVP e a linha de montagem</h2>
+  <p>Aquela matriz <code>u_mvp</code> faz três coisas de uma vez: <strong>move, gira e projeta</strong>
+  o objeto na tela. É uma caixa-preta por agora (no próximo módulo a gente entende as ferramentas por
+  dentro). O caminho completo, do ponto à imagem, é a <strong>linha de montagem</strong> (o pipeline):</p>
+
+  <figure>
+    <img src="../assets/img/pipeline.svg" alt="Três estágios: vértices posicionados pelo vertex shader, rasterização virando fragmentos, e fragmentos pintados pelo fragment shader" width="720">
+    <figcaption>Vértices → rasterização (vira pixels) → fragmentos pintados. Você programa as pontas; o meio é automático.</figcaption>
+  </figure>
+
+  <h2>Test Drive: pinte o cubo do seu jeito</h2>
+  <p>O cubo abaixo deixa você editar só a COR (o fragment). Tente colorir pela posição
+  (<code>v_worldPos</code>) ou pela coordenada da face (<code>v_uv</code>). Dê <em>Test Drive</em> e
+  veja girar.</p>
+  <shader-playground id="pg-cor"></shader-playground>
+
+  <details class="sidebar">
+    <summary>🗣️ Dois sotaques: e no Unity (HLSL)?</summary>
+    <div>
+      <p>A ideia é idêntica: existe um vertex e um fragment; a matriz vira <code>float4x4</code> e a
+      multiplicação se escreve quase igual. Clique <strong>🔁 Ver em HLSL</strong> pra comparar (é
+      ilustrativo — o 3D de verdade do Unity tem mais detalhes que veremos adiante).</p>
+    </div>
+  </details>
+
+  <div class="qa">
+    <dl>
+      <dt>O vertex shader pinta alguma coisa?</dt>
+      <dd>Não! Ele só POSICIONA os vértices. Quem pinta é o fragment. Confundir os dois é o tropeço
+      nº1 deste módulo.</dd>
+      <dt>Preciso entender a matriz MVP agora?</dt>
+      <dd>Não. Ela é caixa-preta por enquanto: leva o ponto 3D pra tela. No Módulo 8 a gente abre as
+      ferramentas (vetores) que explicam a intuição.</dd>
+      <dt>Por que o cubo tem "cantos" de cor?</dt>
+      <dd>Porque você está colorindo pela posição/face de cada ponto. Cada face do cubo tem suas
+      coordenadas — e elas viram cor.</dd>
+    </dl>
+  </div>
+
+  <div class="cuidado">
+    <strong>Vertex posiciona, fragment pinta.</strong> Não tente "pintar" no vertex nem "mover
+    vértice" no fragment — cada trabalhador tem seu papel na linha de montagem.
+  </div>
+
+  <div class="bullets">
+    <ul>
+      <li>Objeto 3D = malha de vértices ligados em triângulos.</li>
+      <li>Vertex shader decide a POSIÇÃO (1×/vértice); fragment decide a COR (1×/pixel).</li>
+      <li>A matriz <code>u_mvp</code> (caixa-preta) move, gira e projeta o ponto 3D na tela.</li>
+      <li>Pipeline: vértices → rasterização → fragmentos. Você programa as pontas.</li>
+    </ul>
+  </div>
+
+  <div class="recordacao">
+    <h2>Recordação: caça ao par</h2>
+    <p>Ligue cada termo ao seu significado (escreva a letra):</p>
+    <ul>
+      <li>( ) vértice &nbsp;&nbsp;&nbsp;&nbsp; A. decide a posição de cada ponto na tela</li>
+      <li>( ) vertex shader &nbsp; B. um ponto da malha 3D</li>
+      <li>( ) fragment shader &nbsp; C. transforma triângulos em pixels</li>
+      <li>( ) rasterização &nbsp; D. decide a cor de cada pixel</li>
+    </ul>
+  </div>
+
+  <p style="margin-top:28px"><a href="06-paralelismo.html">← Anterior: Paralelismo</a>
+  &nbsp;·&nbsp;
+  <span class="proximo-soon">Próximo: Vetores &amp; Coordenadas →
+  <span style="color:#999">(em construção no próximo plano)</span></span></p>
+
+  <script type="module">
+    document.getElementById('pg-cubo').config = {
+      mode: 'mesh', mesh: 'cube',
+      fragment: `void main() {
+  // cor pela posicao na face (coordenada local via v_uv)
+  vec3 c = vec3(v_uv, 1.0 - v_uv.x * v_uv.y);
+  gl_FragColor = vec4(c, 1.0);
+}`,
+      uniforms: [{ name: 'u_vel', label: 'velocidade', min: 0.0, max: 2.0, value: 0.6 }],
+    };
+    document.getElementById('pg-cor').config = {
+      mode: 'mesh', mesh: 'cube',
+      fragment: `void main() {
+// >>> EDIT: cor
+  vec3 c = vec3(v_uv.x, v_uv.y, 0.5);
+// <<< EDIT
+  gl_FragColor = vec4(c, 1.0);
+}`,
+      editableRegions: ['cor'],
+      solution: '  vec3 c = v_worldPos + 0.5;',
+      uniforms: [{ name: 'u_vel', label: 'velocidade', min: 0.0, max: 2.0, value: 0.6 }],
+    };
+  </script>
+</body>
+</html>
