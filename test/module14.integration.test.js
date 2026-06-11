@@ -45,3 +45,11 @@ test('o index linka o M14 e marca Marco 3 + curso completos', () => {
   assert.ok(idx.includes('Marco 3 completo'), 'index nao marca Marco 3 completo');
   assert.ok(/14\s*\/\s*14|curso completo/i.test(idx), 'index nao marca o curso completo (14/14)');
 });
+
+test('M14 tem secao de proximos passos com caminhos reais', () => {
+  const html = readFileSync('site/modulos/14-otimizacao.html', 'utf8');
+  assert.ok(/E agora|Próximos passos|Proximos passos/i.test(html), 'falta a secao de proximos passos');
+  assert.ok(/Shadertoy/i.test(html), 'falta apontar o Shadertoy');
+  assert.ok(/WebGPU/i.test(html), 'falta apontar o WebGPU');
+  assert.ok(/Unity/i.test(html), 'falta apontar o Unity');
+});
