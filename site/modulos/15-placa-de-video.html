@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Módulo Bônus — Decifrando a Placa de Vídeo</title>
   <link rel="stylesheet" href="../assets/css/headfirst.css">
-  <link rel="stylesheet" href="../assets/css/playground.css">
-  <script type="module" src="../assets/playground/playground.js"></script>
 </head>
 <body class="hf">
   <p><a href="../index.html">← Mapa do curso</a> · 🎁 Bônus · Módulo Extra</p>
@@ -61,7 +59,7 @@
   <details class="spec"><summary>Clock: 2.5 GHz (boost)</summary>
     <div>A velocidade de cada núcleo: quantas continhas por segundo ele faz. Núcleos rápidos × muitos núcleos = força bruta. <a href="06-paralelismo.html">📚 Módulo 6</a>.</div></details>
   <details class="spec"><summary>96 TMUs (Texture Mapping Units)</summary>
-    <div>Circuitos dedicados a buscar o pedacinho certo da imagem — exatamente o <code>texture2D</code> que você usou. <a href="09-texturas-e-uv.html">📚 Módulo 9</a> / <a href="11-hardware-fixo.html">Módulo 11</a>.</div></details>
+    <div>Circuitos dedicados a buscar <strong>e filtrar</strong> o pedacinho certo da imagem — exatamente o <code>texture2D</code> que você usou. <a href="09-texturas-e-uv.html">📚 Módulo 9</a> / <a href="11-hardware-fixo.html">Módulo 11</a>.</div></details>
   <details class="spec"><summary>48 ROPs (Render Output Units)</summary>
     <div>Escrevem o pixel final na tela: testam profundidade (Z-buffer) e misturam cores. Hardware fixo. <a href="11-hardware-fixo.html">📚 Módulo 11</a>.</div></details>
   <details class="spec"><summary>8 GB GDDR6 (VRAM)</summary>
@@ -73,7 +71,7 @@
   <details class="spec"><summary>96 Tensor cores</summary>
     <div>Hardware pra contas de IA (multiplicar matrizes em massa). Em jogos, usado pra <em>upscaling</em> (ex.: DLSS) — a GPU como calculadora paralela. <a href="13-alem-de-pixels.html">📚 Módulo 13</a>.</div></details>
   <details class="spec"><summary>TDP: 200 W</summary>
-    <div>Quanta energia a placa consome e vira calor — por isso ela tem cooler e ventoinhas. Mais força costuma custar mais watts.</div></details>
+    <div>O calor máximo que a placa gera em uso intenso — indica quanto de energia ela pode consumir, e por isso ela tem cooler e ventoinhas. Mais força costuma custar mais watts.</div></details>
   </div>
 
   <h2>Onde tudo se junta: FPS</h2>
@@ -106,6 +104,15 @@
     lenta do que uma com menos VRAM e mais núcleos rápidos.
   </div>
 
+  <div class="bullets">
+    <ul>
+      <li>Um jogo = shaders rodando na GPU toda frame; a ficha técnica diz quanto músculo a GPU tem pra isso.</li>
+      <li><strong>Núcleos</strong> (CUDA/Stream) rodam teus shaders em paralelo (M6); <strong>TMU</strong> busca textura (M9), <strong>ROP</strong> escreve o pixel (M11).</li>
+      <li><strong>VRAM</strong> = espaço (armazém); <strong>banda</strong> = velocidade (esteira). São coisas diferentes.</li>
+      <li><strong>RT cores</strong> = ray tracing (luz realista); <strong>Tensor cores</strong> = IA/upscaling (M13).</li>
+    </ul>
+  </div>
+
   <div class="recordacao">
     <h2>Recordação: caça ao par</h2>
     <p>Ligue cada componente ao seu papel (escreva a letra):</p>
@@ -115,7 +122,7 @@
       <li>( ) ROP &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; C. escreve o pixel final (M11)</li>
       <li>( ) VRAM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; D. armazém de texturas</li>
       <li>( ) RT core &nbsp;&nbsp;&nbsp; E. ray tracing (luz realista)</li>
-      <li>( ) Tensor core F. contas de IA/upscaling (M13)</li>
+      <li>( ) Tensor core &nbsp;&nbsp; F. contas de IA/upscaling (M13)</li>
     </ul>
   </div>
 
