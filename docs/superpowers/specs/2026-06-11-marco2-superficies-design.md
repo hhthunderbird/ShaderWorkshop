@@ -88,20 +88,29 @@ Formato (igual Marco 1): **Objetivo · Conceitos · Analogia · Fonte · Demos �
 Professor.** Dispositivos Head First implícitos em todos.
 
 ### Módulo 7 — Saindo do Quad: Vértices & Pipeline
+> ⚠️ **MÓDULO MAIS PESADO DO MARCO** (revisão didática): concentra muitos conceitos novos no salto
+> 2D→3D. Carga intrínseca alta → **fatiar em sub-blocos sequenciados** (não despejar tudo de uma vez)
+> e dar tempo. Um conceito por vez, com âncora concreta antes.
 - **Objetivo:** Aluno vê um objeto 3D (cubo) girando que ELE controla, e entende que a tela 3D é uma
   malha de vértices projetada na tela.
-- **Conceitos:** vértice; malha (vertices + faces); o vertex shader roda 1×/vértice e decide a
-  POSIÇÃO; o fragment continua decidindo a COR; a matriz MVP (caixa-preta) leva o ponto 3D pra tela;
-  pipeline = vértices → rasterização → fragmentos.
+- **Conceitos (nesta ordem, em sub-blocos — não tudo junto):**
+  1. **Malha & vértice** (concreto primeiro): o cubo é feito de pontinhos (vértices) ligados em
+     triângulos; o aluno gira e vê. Âncora antes de qualquer abstração.
+  2. **O trabalho se divide:** o *vertex shader* decide a POSIÇÃO (1×/vértice); o *fragment* (que ele
+     já conhece) continua decidindo a COR. Só depois do bloco 1.
+  3. **MVP & pipeline** (por último): a matriz MVP (caixa-preta) leva o ponto 3D pra tela; pipeline =
+     vértices → rasterização → fragmentos.
 - **Analogia (Gemini):** linha de montagem detalhada — primeiro monta o esqueleto (vértices), depois
   pinta a superfície (fragmentos).
 - **Fonte:** #007 (MVP), #023/#024 (pipeline).
-- **Demos:** modo `mesh`, cubo girando. Fragment simples (cor por normal ou por face). Slider de
-  velocidade de rotação. Leitura do vertex shader padrão (caixa "como funciona", não editável por
-  padrão). Sem pixel-diff (cena 3D).
+- **Demos:** modo `mesh`, cubo girando. Fragment simples **cor por face ou por posição (coordenada
+  local)** — NÃO usar normal aqui (normal só nasce em M10; evita referência adiante num módulo já
+  saturado). Slider de velocidade de rotação. Leitura do vertex shader padrão (caixa "como funciona",
+  não editável por padrão). Sem pixel-diff (cena 3D).
 - **Math sidebar:** "o que a matriz MVP faz" em uma frase (move/gira/projeta), sem álgebra.
 - **Imagens:** SVG do pipeline (vértices → triângulos → pixels). [IMAGEM: wireframe de uma malha].
-- **Professor:** tropeço — achar que "vertex shader pinta". Ele posiciona; quem pinta é o fragment.
+- **Professor:** **reservar tempo — módulo de maior carga do marco**; seguir os sub-blocos sem
+  atropelar. Tropeço — achar que "vertex shader pinta". Ele posiciona; quem pinta é o fragment.
 
 ### Módulo 8 — 🧮 Vetores & Coordenadas (ponte de matemática visual)
 - **Objetivo:** Aluno ganha a intuição de vetor e produto escalar — as ferramentas que a luz vai usar.
@@ -125,9 +134,13 @@ Professor.** Dispositivos Head First implícitos em todos.
 - **Demos:** (a) `fragment` 2D mostrando uma textura amostrada por UV — exercício pixel-diff de UV
   (ex.: repetir a textura com `fract(uv*N)`), determinístico/robusto. (b) `mesh` cubo/esfera vestido
   com a textura (cena 3D, sem pixel-diff).
-- **Math sidebar:** UV de 0 a 1 (reusa M2); por que `fract` repete o padrão (reusa M3).
+- **Math sidebar:** UV de 0 a 1 — **recuperação ativa, não re-exposição**: "antes de ver, lembra o
+  que era v_uv no M2?". E **nomear o falso-amigo**: no M2, UV = posição na *tela*; aqui, UV = endereço
+  na *superfície/imagem*. Mesma faixa [0,1], sentido novo. `fract` repete o padrão — pedir previsão
+  antes (reativa M3 por recuperação, não releitura).
 - **Imagens:** SVG do molde UV (imagem 2D → superfície).
-- **Professor:** tropeço — UV invertido/espelhado; orientação da textura.
+- **Professor:** tropeço nº1 — **UV mudou de sentido** (tela → superfície), não só inverteu/espelhou.
+  Explicitar isso; depois orientação/flip da textura.
 
 ### Módulo 10 — Normais & Luz Difusa
 - **Objetivo:** Aluno acende uma luz no objeto: faces viradas pra luz ficam claras; de costas, escuras.
@@ -137,7 +150,9 @@ Professor.** Dispositivos Head First implícitos em todos.
 - **Fonte:** #021, #040–#042.
 - **Demos:** `mesh` (esfera) com luz difusa; slider da direção da luz; objeto girando. Cena 3D, sem
   pixel-diff — predizer-observar (onde fica claro/escuro). Começa aqui o Projeto-Vitória 2.
-- **Math sidebar:** `dot(N,L)` (reusa M8); por que `max(...,0)` (luz não fica negativa).
+- **Math sidebar:** `dot(N,L)` — **recuperação ativa** (predizer-antes-de-revelar: "o `dot` de uma
+  face virada de costas pra luz dá quanto?") reativando M8, não re-explicando; por que `max(...,0)`
+  (luz não fica negativa).
 - **Imagens:** SVG da normal e do vetor-luz numa superfície curva; lado claro × lado escuro.
 - **Projeto-Vitória 2:** *Objeto Texturizado e Iluminado* — aluno combina malha + textura + luz numa
   cena autoral; exporta imagem / copia shader.
@@ -146,9 +161,11 @@ Professor.** Dispositivos Head First implícitos em todos.
 ### Módulo 11 — 🏗️ Por Baixo do Capô II: Hardware Fixo
 - **Objetivo:** Aluno entende que parte do pipeline NÃO é shader — é hardware dedicado, e por que isso
   importa pra velocidade.
-- **Conceitos:** rasterização (transformar triângulos em fragmentos) é hardware fixo; **TMU** (unidade
-  de textura — buscar texel é tão comum que tem circuito próprio); **Z-buffer/ROP** (decidir o que
-  está na frente e escrever o pixel). Shaders são a parte programável; o resto é "fábrica fixa".
+- **Conceitos (ancorar cada termo no que o aluno JÁ fez — minimizar termos novos):** rasterização
+  (transformar triângulos em fragmentos) é hardware fixo — **ligar ao pipeline do M7**; **TMU**
+  (buscar texel tem circuito próprio) — **ligar ao `texture2D` do M9**; **Z-buffer/ROP** (decidir o
+  que está na frente e escrever o pixel) — ancorar em "quem está na frente ganha". Shaders = parte
+  programável; o resto = "fábrica fixa". Nada de termo novo solto.
 - **Analogia (Gemini):** a linha de montagem tem estações programáveis (shaders) e estações fixas
   (rasterizador, TMU, ROP) — tão otimizadas que viraram circuito.
 - **Fonte:** Gemini (TMU/ROP, hardware fixo).
@@ -187,7 +204,9 @@ Cada módulo: HTML Head First + guia do professor + SVGs + testes + verificaçã
 - Pixel-diff de cena 3D iluminada.
 
 ## 9. Riscos e mitigações
-- **Matriz assusta:** caixa-preta + M8 de intuição. Aluno só multiplica `u_mvp * pos`.
+- **Matriz assusta:** caixa-preta + M8 de intuição. Aluno só multiplica `u_mvp * pos`. **Dívida
+  registrada:** o buraco NÃO se abre dentro do Marco 2 (matriz não reaparece aqui); SE o Marco 3
+  exigir manipular matriz, o andaime terá de ser retirado lá — anotar no risco do Marco 3.
 - **WebGL1 NPOT/textura:** usar CLAMP_TO_EDGE + LINEAR sem mipmap; texturas de exemplo potência-de-2.
 - **Pixel-diff 3D frágil:** política §4 — só onde é determinístico/2D; resto é predizer-observar + projeto.
 - **mat4/geometry com bug silencioso (não pego por teste node):** verificar a fatia vertical no
