@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 320" width="720" font-family="sans-serif">
   <rect width="720" height="320" fill="#fbfbf7"/>
-  <text x="20" y="34" font-size="16" font-weight="bold" fill="#333">Warp: a turma marcha junto</text>
+  <text x="20" y="34" font-size="16" font-weight="bold" fill="#333">Warp: a turma marcha junta</text>
   <g fill="#1c7ed6">
     <circle cx="60" cy="120" r="12"/><circle cx="95" cy="120" r="12"/>
     <circle cx="130" cy="120" r="12"/><circle cx="165" cy="120" r="12"/>
@@ -13,7 +13,7 @@
   <text x="300" y="160" font-size="14" fill="#9c36b5">else ↘</text>
   <line x1="300" y1="120" x2="430" y2="180" stroke="#9c36b5" stroke-width="2" marker-end="url(#a)"/>
   <text x="440" y="185" font-size="13" fill="#9c36b5">metade vai pro else</text>
-  <text x="60" y="250" font-size="15" fill="#333">A turma faz OS DOIS caminhos e joga um fora -> custa o dobro.</text>
+  <text x="60" y="250" font-size="15" fill="#333">A turma faz OS DOIS caminhos e joga um fora → custa o dobro.</text>
   <text x="60" y="278" font-size="14" fill="#2b8a3e">Trocar o if por mix/step evita isso.</text>
   <defs>
     <marker id="a" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto">

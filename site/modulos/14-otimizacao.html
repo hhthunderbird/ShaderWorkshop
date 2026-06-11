@@ -47,7 +47,7 @@
   <p>O visual é idêntico. Mas no caso do <code>if</code>, os pixels das bordas entre as listras provavelmente caem em pelotões mistos (alguns pixels numa listra, outros na outra) — e a turma executa os dois blocos. Com <code>mix</code>, não há escolha: a conta acontece para todo mundo ao mesmo tempo, sem ninguém ficar esperando.</p>
 
   <div class="cuidado">
-    <strong>Honestidade importante:</strong> você <em>não consegue ver</em> os warps dentro do shader — o WebGL não expõe isso (a introspação de warps existe só em Vulkan/GLSL 4.x com extensões de subgrupo). O diagrama da turma que anda junta é uma <strong>metáfora</strong> do que o hardware faz. O que você <em>pode</em> tomar como prática real: um <code>if</code> que divide pixels vizinhos em caminhos diferentes <strong>pode ser caro</strong>, e <code>mix</code>/<code>step</code> frequentemente faz o mesmo trabalho sem criar um branch.
+    <strong>Honestidade importante:</strong> você <em>não consegue ver</em> os warps dentro do shader — o WebGL não expõe isso (a introspecção de warps existe só em Vulkan/GLSL 4.x com extensões de subgrupo). O diagrama da turma que anda junta é uma <strong>metáfora</strong> do que o hardware faz. O que você <em>pode</em> tomar como prática real: um <code>if</code> que divide pixels vizinhos em caminhos diferentes <strong>pode ser caro</strong>, e <code>mix</code>/<code>step</code> frequentemente faz o mesmo trabalho sem criar um branch.
   </div>
 
   <h2>half × float: precisão tem preço</h2>
@@ -58,7 +58,7 @@
       <li>Use <code>highp</code> apenas onde a precisão importa: posições, cálculos de profundidade, distâncias grandes.</li>
       <li>Para cores, UVs e fatores de mistura, <code>mediump</code> costuma ser suficiente — e mais barato.</li>
       <li>Em WebGL1 você já conhece isso: a diretiva <code>precision mediump float;</code> que o motor injeta desde o M1 é exatamente esse trade-off.</li>
-      <li>Em GLSL ES 3.0 e HLSL existem tipos explícitos <code>half</code> para forçar 16 bits.</li>
+      <li>Em HLSL (e Metal) existe o tipo explícito <code>half</code> pra forçar 16 bits. Em GLSL ES, a mesma economia vem dos qualificadores: <code>mediump</code> na prática usa ~16 bits — é o que o motor já injeta desde o M1.</li>
     </ul>
   </div>
 
@@ -67,7 +67,7 @@
       <dt>Todo <code>if</code> é ruim?</dt>
       <dd>Não — só o <code>if</code> que divide pixels vizinhos do mesmo pelotão. Se todos os pixels de um pelotão tomam o mesmo caminho (condição uniforme, como um parâmetro global), o custo é zero. O problema é quando a condição depende da posição do pixel e divide a turma ao meio.</dd>
       <dt><code>mix</code>/<code>step</code> sempre substitui <code>if</code>?</dt>
-      <dd>Com frequência sim, quando a lógica é "escolher entre dois valores com base numa condição contínua". <code>mix(a, b, step(limiar, x))</code> faz o que <code>if (x > limiar) a; else b;</code> faz — sem branch.</dd>
+      <dd>Com frequência sim, quando a lógica é "escolher entre dois valores com base numa condição contínua". <code>mix(b, a, step(limiar, x))</code> faz o que <code>if (x > limiar) a; else b;</code> faz — repare que a ordem inverte: o <strong>primeiro</strong> argumento do <code>mix</code> é o valor do <code>else</code> (quando x &lt; limiar), e o segundo é o do <code>if</code>.</dd>
       <dt>Preciso decorar o tamanho do warp?</dt>
       <dd>Não. A ideia que importa é: <em>a turma anda junta</em>. O tamanho exato (32, 64...) varia por hardware. O que você carrega daqui é o princípio: branches que dividem vizinhos são caros; math que não diverge é grátis.</dd>
     </dl>
