@@ -67,11 +67,31 @@ Cortados: **Cordova** (legado — use Capacitor); **Electron/Tauri** (desktop, f
 
 **Veredito Camada B:** viável e empolgante, mas é **um projeto à parte**, com **backend, hospedagem paga-conforme-escala, e questões de privacidade**. Não fazer junto com o empacotamento. Merece seu **próprio brainstorming** quando a Camada A estiver de pé.
 
+## 4.5 Direção escolhida p/ Camada B: sala LOCAL sem nuvem (mini-servidor do professor)
+
+Decidido com o usuário (06/12): a sala conectada será **local, sem nuvem** — servidor no aparelho do professor, alunos web, sobre o **hotspot do professor**. Resolve a tensão offline e zera custo/LGPD-de-nuvem.
+
+**Topologia:** estrela. Professor = hub (servidor HTTP + WebSocket). Alunos = navegador/PWA conectando em `http://<ip-prof>:porta`. Realtime via WebSocket. QR (opcional) só transporta o `ip:porta` (descoberta, não auth).
+
+**Rede:** **hotspot do professor** (alunos entram na rede do aparelho dele). Garante LAN + offline, contorna o *client isolation* do Wi-Fi de escola. Toggle do hotspot é manual no Android (apps não ligam hotspot sem privilégio) — instruir o professor. Limite prático: bateria + ~10–30 alunos/aparelho.
+
+**Dois sabores de servidor (suportar os dois — decisão do usuário):**
+- **Notebook/PC (fácil):** servidor **Node** local (HTTP + `ws`). Serve o `site/` + a sala. Quase zero trabalho nativo. **É o MVP de desrisco.**
+- **Celular/tablet Android (mais trabalho):** app **Capacitor** com servidor embutido (NanoHTTPD/Ktor ou plugin WS). Mesma lógica de sala; muda só o host.
+
+**Caminho de desrisco (YAGNI):** **prototipar no Node/notebook primeiro** (prova o "modo turma": professor empurra um `ShaderPlayground` config pra turma, alunos devolvem miniatura via `toDataURL`, galeria/desafio). Validado o valor, **portar o mesmo servidor de sala pro app Android** (Capacitor). O protocolo WebSocket é idêntico nos dois.
+
+**O que a sala reusa do que já existe:** motor `ShaderPlayground` (empurrar `config`), `toDataURL` (miniatura do aluno), `localstore` (trabalho salvo). O "modo turma" é uma camada por cima, não um motor novo.
+
+**Partes difíceis a vigiar:** client isolation (→ hotspot resolve); descoberta de IP (→ QR/`teacher.local` mDNS); limite de alunos/banda no hotspot; servidor embutido no Android é o item mais custoso (por isso Node-primeiro).
+
+**Privacidade:** salas anônimas e efêmeras, dado fica no aparelho do professor, nada na nuvem. Mínimo de LGPD.
+
 ## 5. Caminho recomendado (fases)
 
 - **Fase 0 — PWA + hospedagem (Camada A):** manifest + service worker + deploy no GitHub Pages. Entrega **offline + instalável + cara de app**, grátis, baixo risco. **É o próximo build natural.** Pré-requisito de tudo.
 - **Fase 1 — Play Store via TWA (Camada A):** se quiser presença na loja Android. Reusa a Fase 0.
-- **Fase 2 — Sala conectada (Camada B), projeto próprio:** escolher backend (Firebase como aposta de MVP), desenhar salas/QR/sync anônimo, modo-turma online sobre o curso offline. Brainstorming dedicado.
+- **Fase 2 — Sala conectada LOCAL (Camada B), projeto próprio:** servidor local do professor (NÃO nuvem). **Fase 2a:** MVP no **Node/notebook** (WebSocket de sala + "modo turma" reusando o motor). **Fase 2b:** portar o servidor pro **app Android (Capacitor)** + QR de descoberta + hotspot. Brainstorming dedicado.
 - **Fase 3 — iOS / Capacitor:** só se iOS ou scanner nativo virarem requisito. Reusa tudo.
 - **(Paralelo) Redesign moderno mobile:** o restyle visual que você pediu é **ortogonal** e pode rodar a qualquer momento — como é um `headfirst.css` central, casa bem com a Fase 0 (app novo + visual novo juntos). Vira seu próprio brainstorming.
 
@@ -83,6 +103,6 @@ Cortados: **Cordova** (legado — use Capacitor); **Electron/Tauri** (desktop, f
 ## 7. Recomendação final (resumo)
 1. **Comece pela Fase 0 (PWA + GitHub Pages).** Barata, resolve offline + app-feel, destrava o resto. Forte candidata ao próximo brainstorming→build.
 2. **Play Store = TWA** (Android-first), depois da Fase 0.
-3. **Sala conectada = projeto separado** (Fase 2), com backend + privacidade anônima — não acoplar ao empacotamento.
+3. **Sala conectada = projeto separado** (Fase 2), **LOCAL sem nuvem** (servidor no aparelho do professor + hotspot). Começar pelo **MVP em Node/notebook** (desrisco barato), depois portar pro app Android. Não acoplar ao empacotamento.
 4. **iOS/Capacitor** só sob demanda real.
 5. **Redesign** roda em paralelo, ancorado no `headfirst.css` central.
