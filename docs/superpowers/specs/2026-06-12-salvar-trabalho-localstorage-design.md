@@ -10,7 +10,7 @@ Permitir que o aluno **salve o conteúdo do editor** de qualquer playground que 
 **Decisões travadas (via brainstorming):**
 - **Escopo: TODOS os editores** (não só os 3 Projetos-Vitória). Qualquer `<shader-playground>` com `editableRegions` ganha o recurso.
 - **Gatilho: botão explícito `💾 Salvar`** (não auto-save). Como salvar é uma escolha do aluno, restaurar ao abrir não surpreende.
-- Restaurar é automático ao carregar (se houver salvo). **Reset apaga o salvo** (Reset = volta ao original de verdade).
+- Restaurar é automático ao carregar (se houver salvo). **Reset é não-destrutivo:** volta o editor ao original mas NÃO apaga o salvo. **`Save` é o único que escreve** o slot. Para descartar um trabalho salvo, o aluno faz Reset (editor volta ao original) e Save de novo (sobrescreve o slot com o original). Decisão deliberada: evita perder o Efeito Autoral num clique acidental de Reset.
 
 **Escopo cortado (YAGNI):** sem nuvem/conta; sem múltiplos slots ou histórico de versões; sem export/import de arquivo (Baixar PNG + Copiar shader já cobrem compartilhar); **sem auto-save**.
 
@@ -40,17 +40,13 @@ export function save(storage, key, text) {
 export function load(storage, key) {
   try { const v = storage.getItem(key); return (v === undefined ? null : v); } catch { return null; }
 }
-
-// Apaga a entrada. Silencioso em erro.
-export function clear(storage, key) {
-  try { storage.removeItem(key); } catch { /* ignora */ }
-}
 ```
+(Sem `clear()`: o modelo é não-destrutivo — só `save` escreve. Não há chamador para apagar, então não se implementa o que não se usa.)
 
 (`getItem` de `localStorage` retorna `null` quando ausente; o mock de teste pode retornar `undefined` — daí o `=== undefined ? null`.)
 
 ### 3.2 `site/assets/playground/playground.js` (wiring fino)
-- **Import:** `import { keyFor, save, load, clear } from './localstore.js';`
+- **Import:** `import { keyFor, save, load } from './localstore.js';`
 - **Helper de chave:** método `_storeKey()` → `keyFor(location.pathname, this.id || ('pg' + this._idx))`. `this._idx` é um fallback posicional (índice do elemento entre os `shader-playground` da página) só usado quando não há `id`. Definir `this._idx` no `connectedCallback` via `[...document.querySelectorAll('shader-playground')].indexOf(this)`.
 - **Storage:** `this._store = (typeof window !== 'undefined' && window.localStorage) || null;` (guarda; se null, recurso desligado).
 - **Botão:** no `_render`, dentro de `.pg-buttons`, adicionar `💾 Salvar` **quando há editor** (`this.cfg.editableRegions.length`): `<button class="pg-save">💾 Salvar</button>`. Listener → `this._save()`.
@@ -58,7 +54,7 @@ export function clear(storage, key) {
   - Se `this._store` e há editor e `load(this._store, this._storeKey())` retorna texto não-nulo: setar `this.editor.value = textoSalvo`, `this.fullSource = reassemble(this.cfg.fragment, this.cfg.editableRegions[0], textoSalvo)`, e marcar uma flag `this._restored = true`.
   - **GOTCHA:** `_compile()` no sucesso faz `statusEl.textContent = ''` — então NÃO mostrar a mensagem dentro de `_restore`. Depois do `_compile()` no `connectedCallback`, se `this._restored`, setar `this.statusEl.textContent = '↻ Retomei seu trabalho salvo.'` e classe `pg-ok`. Assim a mensagem sobrevive ao clear do `_compile`.
 - **Salvar:** `_save()` → se há editor e store: `save(this._store, this._storeKey(), this.editor.value)`; status `💾 Salvo neste navegador.` (classe `pg-ok`) ou, se `save` retornou false, `⚠ Não consegui salvar (armazenamento cheio ou bloqueado).` (classe `pg-erro`).
-- **Reset limpa o salvo:** no `_reset()`, após restaurar os defaults, chamar `clear(this._store, this._storeKey())` (se store) — assim Reset volta ao original e esquece o salvo.
+- **Reset NÃO mexe no salvo:** `_reset()` segue como hoje (volta editor/controles ao `cfg` default, recompila). Não toca em `localStorage`. O slot salvo só muda quando o aluno clica Salvar de novo (sobrescreve). Modelo não-destrutivo.
 
 **Ordem no `connectedCallback` (importa):** `_render()` → `_restore()` → `_compile()` → (se `_restored`, setar status "↻…") → `_loop()`. O `_restore` precisa do editor já montado (`_render`) e precisa rodar antes do `_compile` pra compilar com o texto salvo; a mensagem vai depois do `_compile` (que limpa o status no sucesso).
 
@@ -70,10 +66,10 @@ export function clear(storage, key) {
 ## 5. Testes e verificação
 - **`test/localstore.test.js`** (node, mock storage = wrapper sobre um `Map`):
   - `keyFor` determinístico e com prefixo (`keyFor('/a.html','pg-x')` estável; ids diferentes → chaves diferentes).
-  - roundtrip: `save` então `load` devolve o texto; `clear` depois → `load` devolve null.
+  - roundtrip: `save` então `load` devolve o texto; sobrescrever com novo `save` → `load` devolve o novo.
   - `load` de chave ausente → null.
-  - storage que lança em `setItem`/`getItem`/`removeItem` (mock que joga) → `save` retorna false, `load`/`clear` não propagam e `load` retorna null.
-- **Wiring (Web Component) → prova por Playwright** (mesmo método do #6, extensão Chrome costuma não conectar no build): abrir um módulo com editor, escrever no editor, clicar 💾 Salvar, **reload da página**, confirmar que o editor reabre com o texto salvo; depois Reset → reload → editor volta ao original (salvo apagado). Throwaway, deletado ao fim.
+  - storage que lança em `setItem`/`getItem` (mock que joga) → `save` retorna false, `load` não propaga e retorna null.
+- **Wiring (Web Component) → prova por Playwright** (mesmo método do #6, extensão Chrome costuma não conectar no build): abrir um módulo com editor, escrever um marcador no editor, clicar 💾 Salvar, **reload da página**, confirmar que o editor reabre com o texto salvo (e o status "↻ Retomei…"). Confirmar também que um playground SEM editor (demo) não tem o botão Salvar. Throwaway, deletado ao fim.
 - **`npm run smoke`** deve seguir **17 verde** (sem mudança de shader).
 - **Regressão:** playgrounds SEM editor (demos, ex. M2 gradiente) não mostram o botão Salvar e seguem iguais.
 - Baseline de testes node: **141** → +1 arquivo (`localstore.test.js`, alguns `test(...)`).
@@ -83,7 +79,7 @@ export function clear(storage, key) {
 **Modificar:** `site/assets/playground/playground.js` (import + `_storeKey`/`_restore`/`_save`, botão, ordem do `connectedCallback`, `clear` no `_reset`).
 
 ## 7. Riscos / pontos de atenção
-- **Chave estável:** depende de `location.pathname` + `id`. Os 3 Projetos-Vitória usam `id="pg-projeto"` em páginas distintas → o pathname distingue. Exercícios têm ids próprios (`pg-ex`, etc.). Sem id, o fallback posicional pode colidir se a página mudar a ordem dos playgrounds depois de um save — risco baixo e tolerável (pior caso: restaura no playground errado uma vez; Reset limpa).
+- **Chave estável:** depende de `location.pathname` + `id`. Os 3 Projetos-Vitória usam `id="pg-projeto"` em páginas distintas → o pathname distingue. Exercícios têm ids próprios (`pg-ex`, etc.). Sem id, o fallback posicional pode colidir se a página mudar a ordem dos playgrounds depois de um save — risco baixo e tolerável (pior caso: restaura no playground errado uma vez; Reset volta o editor ao original na hora, e um novo Save corrige o slot).
 - **`set config` re-inicializa:** o `.config` setter chama `connectedCallback` de novo (módulo ES roda após upgrade). `_restore` roda lá → ok, restaura na (re)inicialização real, que é quando a config existe. Conferir que não dá dupla-restauração visível (idempotente: ler o salvo e setar o editor é idempotente).
 - **`_idx` em re-render:** calcular `_idx` uma vez por conexão; `querySelectorAll` na hora do connect é estável.
 - **Privacidade:** salva só o texto do shader do aluno, em `localStorage` local. Sem dado pessoal, sem rede. OK.
