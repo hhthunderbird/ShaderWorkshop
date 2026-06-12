@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo Bônus — Transparência: o Alpha</title>
+  <link rel="stylesheet" href="../assets/css/headfirst.css">
+  <link rel="stylesheet" href="../assets/css/playground.css">
+  <script type="module" src="../assets/playground/playground.js"></script>
+</head>
+<body class="hf">
+  <p><a href="../index.html">← Mapa do curso</a> · 🎁 Bônus · Módulo Extra</p>
+  <h1>Transparência: o Alpha</h1>
+  <p>Vidro, água, fumaça, o menu de pausa que deixa ver o jogo congelado atrás — tudo isso é
+  <strong>transparência</strong>. Até agora, toda cor que você pintou terminava em <code>1.0</code>.
+  Esse 4º número tem nome: <strong>alpha</strong>. Bora deixar a luz passar.</p>
+
+  <h2>O 4º número do vec4</h2>
+  <p>Lá no M2 você viu que uma cor é <code>vec4(r, g, b, a)</code> — e a gente sempre botou
+  <code>a = 1.0</code> sem pensar. Esse último número é o <strong>alpha</strong>: <code>1.0</code> =
+  totalmente opaco (tampa tudo), <code>0.0</code> = totalmente transparente (some).</p>
+  <div class="brain">
+    Mas tem uma pegadinha: pra <strong>ver</strong> a transparência, precisa ter algo
+    <strong>atrás</strong>. Se o fundo for preto, baixar o alpha só deixa a cor mais escura — não
+    parece "ver através". Por isso os demos abaixo têm um xadrez no fundo.
+  </div>
+
+  <h2>Veja o alpha funcionando</h2>
+  <p>Abaixo, um círculo laranja por cima de um fundo xadrez. Arraste o <strong>alpha</strong> de
+  <code>1.0</code> até <code>0.0</code> e veja o xadrez aparecer através do círculo — não é só
+  escurecer, é <em>misturar</em> com o que está atrás.</p>
+  <shader-playground id="pg-alpha"></shader-playground>
+
+  <h2>A receita da mistura</h2>
+  <figure>
+    <img src="../assets/img/blend-formula.svg" alt="A cor da frente (laranja, alpha 0.5) sobre o fundo xadrez resulta numa mistura meio a meio: resultado = frente vezes alpha mais fundo vezes (1 menos alpha)" width="640">
+    <figcaption>O motor (gl.BLEND) faz essa conta sozinho, pixel a pixel, contra o que já está pintado.</figcaption>
+  </figure>
+  <p>A regra é simples: <code>resultado = frente.rgb * a + fundo.rgb * (1 - a)</code>. Com
+  <code>a = 1</code> sai só a frente; com <code>a = 0</code> sai só o fundo; com <code>a = 0.5</code>,
+  meio a meio. É o mesmo <code>mix</code> que você viu no M3 — só que feito pela GPU automaticamente.</p>
+
+  <h2>Ordem importa</h2>
+  <figure>
+    <img src="../assets/img/blend-ordem.svg" alt="Pintar na ordem certa (fundo, depois meio, depois frente) dá o resultado certo; pintar fora de ordem dá um resultado errado" width="640">
+    <figcaption>Como a mistura é sempre contra o que já está no framebuffer, a ordem de desenho muda o resultado.</figcaption>
+  </figure>
+  <div class="cuidado">
+    <strong>Cuidado com a ordem!</strong> A transparência mistura com o que <strong>já</strong> foi
+    pintado. Então a regra de ouro é: <strong>desenhe o fundo primeiro e as coisas transparentes por
+    último, de trás pra frente.</strong> Em 3D isso é mais chato — o Z-buffer (M11) sozinho não
+    resolve, porque um objeto transparente precisa deixar passar quem está atrás dele. Por isso jogos
+    <em>ordenam manualmente</em> os objetos transparentes antes de desenhar.
+  </div>
+
+  <h2>Sua vez: deixe ver através</h2>
+  <div class="afie">
+    <p><strong>Preveja antes de ver:</strong> o círculo abaixo começa com <code>a = 1.0</code> (opaco,
+    tampa o xadrez). Se você trocar por <code>a = 0.5</code>, o que vai acontecer com o xadrez embaixo?</p>
+    <p>Escreva, clique ▶ Test Drive e confira: <strong>se o xadrez começar a aparecer através do
+    círculo, você acertou.</strong> Travou? 💡 Mostrar solução.</p>
+  </div>
+  <shader-playground id="pg-ex"></shader-playground>
+
+  <div class="qa">
+    <dl>
+      <dt>Por que contra o preto só escurece, em vez de ficar transparente?</dt>
+      <dd>Porque misturar com preto <code>(0,0,0)</code> puxa toda cor pra baixo. "Ver através" só
+      aparece quando tem um fundo <em>com cor</em> atrás — por isso o xadrez.</dd>
+      <dt>Alpha é a mesma coisa que opacidade?</dt>
+      <dd>É o complemento: <code>a = 1</code> opaco, <code>a = 0</code> transparente. Quando um programa
+      mostra "opacidade 70%", é <code>a = 0.7</code>.</dd>
+    </dl>
+  </div>
+
+  <p><a href="../index.html">← Voltar pro mapa do curso</a></p>
+
+  <script type="module">
+    document.getElementById('pg-alpha').config = {
+      mode: 'fragment',
+      backdrop: 'xadrez',
+      fragment: `precision mediump float;
+uniform float u_alpha;
+void main() {
+  float d = length(v_uv - 0.5);
+  float dentro = 1.0 - step(0.3, d);
+  vec3 cor = vec3(1.0, 0.4, 0.1);
+  gl_FragColor = vec4(cor, u_alpha * dentro);
+}`,
+      uniforms: [{ name: 'u_alpha', label: 'alpha (transparência)', min: 0.0, max: 1.0, value: 0.6 }],
+    };
+    document.getElementById('pg-ex').config = {
+      mode: 'fragment',
+      backdrop: 'xadrez',
+      fragment: `precision mediump float;
+void main() {
+  float d = length(v_uv - 0.5);
+  float dentro = 1.0 - step(0.3, d);
+  vec3 cor = vec3(0.2, 0.6, 1.0);
+// >>> EDIT: alpha
+  float a = 1.0;
+// <<< EDIT
+  gl_FragColor = vec4(cor, a * dentro);
+}`,
+      editableRegions: ['alpha'],
+      solution: '  float a = 0.5;',
+    };
+  </script>
+</body>
+</html>
