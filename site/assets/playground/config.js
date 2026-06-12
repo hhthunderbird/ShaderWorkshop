@@ -25,5 +25,6 @@ export function normalizeConfig(raw) {
     exportable: raw.exportable === true, // botões Baixar PNG / Copiar shader (Projeto-Vitória)
     light: Array.isArray(raw.light) && raw.light.length === 3 ? raw.light : [0.5, 0.7, 1.0], // direção da luz (modo mesh)
     texture: typeof raw.texture === 'string' && raw.texture.length > 0 ? raw.texture : null, // URL da imagem -> sampler2D u_tex
+    backdrop: (typeof raw.backdrop === 'string' && ['xadrez'].includes(raw.backdrop)) ? raw.backdrop : null, // fundo opaco p/ ver alpha (modo fragment 2-pass)
   };
 }

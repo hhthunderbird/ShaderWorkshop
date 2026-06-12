@@ -13,6 +13,13 @@ test('preenche defaults', () => {
   assert.equal(c.exportable, false);
 });
 
+test('backdrop: string conhecida vira valor, desconhecida/ausente vira null', () => {
+  const base = { fragment: 'void main(){ gl_FragColor = vec4(1.0); }' };
+  assert.equal(normalizeConfig({ ...base, backdrop: 'xadrez' }).backdrop, 'xadrez');
+  assert.equal(normalizeConfig({ ...base, backdrop: 'inexistente' }).backdrop, null);
+  assert.equal(normalizeConfig(base).backdrop, null);
+});
+
 test('exportable: so true quando explicitamente true', () => {
   assert.equal(normalizeConfig({ fragment: 'x', exportable: true }).exportable, true);
   assert.equal(normalizeConfig({ fragment: 'x', exportable: 'sim' }).exportable, false);
