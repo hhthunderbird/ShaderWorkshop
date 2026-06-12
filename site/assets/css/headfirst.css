@@ -1,65 +1,107 @@
-:root { --hf-ink: #1c1c1c; --hf-accent: #d6336c; --hf-paper: #fffdf7; }
-body.hf { max-width: 820px; margin: 0 auto; padding: 24px; font: 17px/1.6 Georgia, serif; color: var(--hf-ink); background: var(--hf-paper); }
-.hf h1, .hf h2 { font-family: "Comic Sans MS", "Segoe Print", system-ui; }
-.hf .afie { border: 2px dashed #888; border-radius: 8px; padding: 12px 16px; margin: 18px 0; background: #fff; }
+/* Temas: claro (padrão) e escuro. Todas as cores via variáveis. */
+:root, [data-theme="claro"] {
+  --bg:#faf9f6; --card:#ffffff; --ink:#1f1c18; --muted:#6b655a; --line:#e7e1d6; --code:#f4efe6;
+  --accent:#d6336c; --accent-ink:#ffffff; --focus:#1c7ed6;
+  --brain-bg:#fff0f4; --brain-accent:#d6336c;
+  --cuidado-bg:#fff6e5; --cuidado-line:#e0a000; --cuidado-ink:#b35900;
+  --qa-bg:#eef6ff; --afie-line:#b9b09c;
+  --magnets-bg:#f1f3f5; --magnets-line:#495057;
+  --recordacao-bg:#f3f0ff; --recordacao-accent:#7048e8;
+  --sidebar-bg:#f3f3f3; --sidebar-line:#cfcabb; --th-bg:#efe7ff;
+  --spec-bg:#ffffff; --spec-open-bg:#f6f4ef; --img-todo:#c0392b;
+  --ok:#1a7f37; --quase:#b35900; --erro:#c0392b;
+  --shadow:0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.05);
+  --canvas-glow:rgba(28,126,214,.18);
+}
+[data-theme="escuro"] {
+  --bg:#0d0f14; --card:#151821; --ink:#e9edf5; --muted:#8b93a7; --line:#262b38; --code:#1a1e29;
+  --accent:#ff6b9d; --accent-ink:#0d0f14; --focus:#4dabf7;
+  --brain-bg:#241823; --brain-accent:#ff6b9d;
+  --cuidado-bg:#2a2210; --cuidado-line:#caa23a; --cuidado-ink:#f0c060;
+  --qa-bg:#0e1b24; --afie-line:#3a3f4d;
+  --magnets-bg:#1a1e29; --magnets-line:#3a4150;
+  --recordacao-bg:#1d1830; --recordacao-accent:#a78bfa;
+  --sidebar-bg:#1a1e29; --sidebar-line:#2c3240; --th-bg:#241d33;
+  --spec-bg:#151821; --spec-open-bg:#1b1f2a; --img-todo:#ff8a7a;
+  --ok:#51cf66; --quase:#f0a44d; --erro:#ff6b6b;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+  --canvas-glow:rgba(34,211,238,.20);
+}
+
+body.hf { max-width: 800px; margin: 0 auto; padding: 24px 20px 64px;
+  font: 16px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink); background: var(--bg);
+  transition: background .2s ease, color .2s ease; }
+.hf a { color: var(--accent); }
+.hf p { margin: .7em 0; }
+.hf code { background: var(--code); padding: .12em .4em; border-radius: 5px; font: .86em ui-monospace, monospace; }
+
+.hf h1, .hf h2, .hf h3 { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; letter-spacing: -.015em; }
+.hf h1 { font-size: 2rem; line-height: 1.12; font-weight: 800; margin: .15em 0 .5em; color: var(--ink); }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hf h1 { background: linear-gradient(90deg, #1c7ed6, #e8590c);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+}
+.hf h2 { font-size: 1.35rem; font-weight: 700; margin: 1.7em 0 .5em; }
+
+.hf .afie { border: 2px dashed var(--afie-line); border-radius: 12px; padding: 14px 18px; margin: 20px 0; background: var(--card); box-shadow: var(--shadow); }
 .hf .afie::before { content: "✏️ Afie o lápis"; display: block; font-weight: bold; margin-bottom: 6px; }
-.hf .brain { border-left: 5px solid var(--hf-accent); padding: 10px 16px; margin: 18px 0; background: #fff0f4; }
-.hf .brain::before { content: "🧠 Brain Power"; display: block; font-weight: bold; color: var(--hf-accent); margin-bottom: 4px; }
-.hf .qa { background: #eef6ff; border-radius: 8px; padding: 12px 16px; margin: 18px 0; }
+.hf .brain { border-left: 5px solid var(--brain-accent); border-radius: 12px; padding: 12px 18px; margin: 20px 0; background: var(--brain-bg); box-shadow: var(--shadow); }
+.hf .brain::before { content: "🧠 Brain Power"; display: block; font-weight: bold; color: var(--brain-accent); margin-bottom: 4px; }
+.hf .qa { background: var(--qa-bg); border-radius: 14px; padding: 14px 18px; margin: 20px 0; box-shadow: var(--shadow); }
 .hf .qa::before { content: "Não existe pergunta idiota"; display: block; font-weight: bold; margin-bottom: 6px; }
 .hf .qa dt { font-weight: bold; margin-top: 8px; }
-.hf .cuidado { background: #fff6e5; border: 1px solid #e0a000; border-radius: 8px; padding: 10px 16px; margin: 18px 0; }
-.hf .cuidado::before { content: "⚠️ Cuidado!"; display: block; font-weight: bold; color: #b35900; margin-bottom: 4px; }
-.hf .sidebar { border: 1px solid #bbb; border-radius: 8px; margin: 18px 0; background: #f3f3f3; }
-.hf .sidebar > summary { cursor: pointer; font-weight: bold; padding: 10px 16px; }
-.hf .sidebar[open] > summary { border-bottom: 1px solid #ddd; }
-.hf .sidebar > div { padding: 0 16px 12px; }
-.hf .bullets { border-top: 3px double #888; padding-top: 12px; margin-top: 24px; }
+.hf .cuidado { background: var(--cuidado-bg); border: 1px solid var(--cuidado-line); border-radius: 14px; padding: 12px 18px; margin: 20px 0; box-shadow: var(--shadow); }
+.hf .cuidado::before { content: "⚠️ Cuidado!"; display: block; font-weight: bold; color: var(--cuidado-ink); margin-bottom: 4px; }
+.hf .sidebar { border: 1px solid var(--sidebar-line); border-radius: 12px; margin: 20px 0; background: var(--sidebar-bg); }
+.hf .sidebar > summary { cursor: pointer; font-weight: bold; padding: 12px 18px; }
+.hf .sidebar[open] > summary { border-bottom: 1px solid var(--line); }
+.hf .sidebar > div { padding: 0 18px 12px; }
+.hf .bullets { border-top: 3px double var(--line); padding-top: 12px; margin-top: 24px; }
 .hf .bullets::before { content: "Pontos-chave"; display: block; font-weight: bold; margin-bottom: 6px; }
-.hf .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0; }
+.hf .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
 @media (max-width: 640px) { .hf .duo { grid-template-columns: 1fr; } }
-.hf .magnets { border: 2px dashed #495057; border-radius: 8px; padding: 8px 16px 12px; margin: 18px 0; background: #f1f3f5; }
+.hf .magnets { border: 2px dashed var(--magnets-line); border-radius: 12px; padding: 10px 18px 14px; margin: 20px 0; background: var(--magnets-bg); }
 .hf .magnets::before { content: "🧲 Ímãs de código"; display: block; font-weight: bold; margin: 4px 0 6px; }
-.hf .magnets pre { background: #fff; border: 1px solid #ced4da; border-radius: 6px; padding: 10px 12px; font-family: ui-monospace, monospace; font-size: 14px; overflow-x: auto; }
-.hf figure { margin: 18px 0; text-align: center; }
+.hf .magnets pre { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; font-family: ui-monospace, monospace; font-size: 14px; overflow-x: auto; }
+.hf figure { margin: 20px 0; text-align: center; }
 .hf figure img { max-width: 100%; height: auto; }
-.hf .img-todo { border: 2px dotted #c0392b; padding: 14px; color: #c0392b; font-family: ui-monospace, monospace; font-size: 14px; background: #fff; }
+[data-theme="escuro"] .hf figure img { background: #fff; border-radius: 10px; padding: 6px; }
+.hf .img-todo { border: 2px dotted var(--img-todo); padding: 14px; color: var(--img-todo); font-family: ui-monospace, monospace; font-size: 14px; background: var(--card); }
 .hf .mascote { float: right; width: 90px; margin: 0 0 8px 12px; }
-.hf .recordacao { border: 2px solid #7048e8; border-radius: 8px; padding: 8px 16px 14px; margin: 18px 0; background: #f3f0ff; }
+.hf .recordacao { border: 2px solid var(--recordacao-accent); border-radius: 12px; padding: 10px 18px 14px; margin: 20px 0; background: var(--recordacao-bg); }
 .hf .recordacao h2 { margin-top: 8px; }
-.hf .recordacao::before { content: "🎯 Hora de fixar"; display: block; font-weight: bold; color: #7048e8; margin: 8px 0 0; }
-.hf .proximo-soon { color: #6c6c6c; cursor: default; }
+.hf .recordacao::before { content: "🎯 Hora de fixar"; display: block; font-weight: bold; color: var(--recordacao-accent); margin: 8px 0 0; }
+.hf .proximo-soon { color: var(--muted); cursor: default; }
 .hf .sidebar table { border-collapse: collapse; margin: 8px 0; width: 100%; }
-.hf .sidebar th, .hf .sidebar td { border: 1px solid #bbb; padding: 5px 9px; text-align: left; font-size: 15px; }
-.hf .sidebar th { background: #e7e0ff; }
-.hf .cuidado-inline { color: #b35900; font-size: 14px; margin: 8px 0 0; }
+.hf .sidebar th, .hf .sidebar td { border: 1px solid var(--line); padding: 5px 9px; text-align: left; font-size: 15px; }
+.hf .sidebar th { background: var(--th-bg); }
+.hf .cuidado-inline { color: var(--cuidado-ink); font-size: 14px; margin: 8px 0 0; }
 
-/* Ficha técnica do Módulo 15 (bônus): cada spec é um details clicável */
-.hf .spec { border: 1px solid #d0d7de; border-radius: 6px; margin: 6px 0; padding: 6px 12px; background: #fff; }
+/* Ficha técnica do Módulo 15 (bônus) */
+.hf .spec { border: 1px solid var(--line); border-radius: 8px; margin: 6px 0; padding: 6px 12px; background: var(--spec-bg); }
 .hf .spec > summary { cursor: pointer; font-weight: bold; font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
-.hf .spec > div { margin-top: 8px; color: #333; }
-.hf .spec[open] { background: #f8f9fa; }
+.hf .spec > div { margin-top: 8px; color: var(--muted); }
+.hf .spec[open] { background: var(--spec-open-bg); }
 
-/* Acessibilidade: foco visível em links e seções colapsáveis */
-.hf a:focus-visible,
-.hf details > summary:focus-visible {
-  outline: 3px solid #1c7ed6;
-  outline-offset: 2px;
+/* Foco visível */
+.hf a:focus-visible, .hf details > summary:focus-visible, .theme-toggle:focus-visible {
+  outline: 3px solid var(--focus); outline-offset: 2px;
 }
 
-/* Respeita prefers-reduced-motion: corta transições/animações de CSS.
-   (A animação do canvas é controlada no motor, via botão Animar/Pausar.) */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
+/* Botão flutuante de tema (renderizado por theme.js) */
+.theme-toggle { position: fixed; top: 12px; right: 12px; z-index: 50;
+  font: 600 16px system-ui; line-height: 1; padding: 9px 12px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; box-shadow: var(--shadow); }
+.theme-toggle:hover { border-color: var(--accent); }
 
-/* Tabela de rubrica / índice do kit do professor (o estilo de .sidebar table é escopado lá). */
-/* Wrapper que rola na horizontal em telas estreitas, sem estourar a página. */
+/* Tabela de rubrica / kit do professor */
 .hf .tabela-scroll { overflow-x: auto; margin: 12px 0; }
 .hf .rubrica { border-collapse: collapse; margin: 12px 0; width: 100%; }
-.hf .rubrica th, .hf .rubrica td { border: 1px solid #bbb; padding: 6px 10px; text-align: left; font-size: 15px; vertical-align: top; }
-.hf .rubrica th { background: #e7e0ff; }
+.hf .rubrica th, .hf .rubrica td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; font-size: 15px; vertical-align: top; }
+.hf .rubrica th { background: var(--th-bg); }
+
+/* Respeita prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

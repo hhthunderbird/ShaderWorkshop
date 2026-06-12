@@ -1,29 +1,26 @@
-.pg { border: 2px solid #2b2b2b; border-radius: 10px; padding: 12px; background: #fafafa; max-width: 360px; }
-.pg-canvas { width: 320px; max-width: 100%; height: auto; aspect-ratio: 1 / 1; display: block; border-radius: 6px; background: #000; image-rendering: pixelated; }
-.pg-controls { margin: 8px 0; display: flex; flex-direction: column; gap: 6px; }
-.pg-control { display: flex; align-items: center; justify-content: space-between; font: 14px system-ui; gap: 8px; }
-.pg-control input[type="range"] { flex: 1; }
-.pg-editor { width: 100%; min-height: 90px; font: 13px ui-monospace, monospace; margin: 8px 0; border: 1px solid #bbb; border-radius: 6px; padding: 8px; box-sizing: border-box; }
-.pg-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
-.pg-buttons button { font: 14px system-ui; padding: 6px 10px; border: 1px solid #2b2b2b; border-radius: 6px; background: #fff; cursor: pointer; }
-.pg-buttons button:hover { background: #efefef; }
-.pg-status { font: 14px system-ui; min-height: 1.2em; margin: 6px 0 0; }
-.pg-ok { color: #1a7f37; font-weight: bold; }
-.pg-quase { color: #b35900; }
-.pg-erro { color: #c0392b; font-family: ui-monospace, monospace; font-size: 13px; }
-.pg-hlsl { margin: 8px 0; border: 1px solid #7048e8; border-radius: 6px; background: #f3f0ff; }
-.pg-hlsl-nota { font: 13px system-ui; margin: 0; padding: 6px 10px; color: #5f3dc4; }
-.pg-hlsl-code { margin: 0; padding: 10px; font: 13px ui-monospace, monospace; white-space: pre-wrap; overflow-x: auto; border-top: 1px solid #d0bfff; }
+.pg { border: 1px solid var(--line); border-radius: 16px; padding: 14px; background: var(--card); max-width: 360px; box-shadow: var(--shadow); }
+.pg-canvas { width: 320px; max-width: 100%; height: auto; aspect-ratio: 1 / 1; display: block; border-radius: 10px; background: #000; image-rendering: pixelated; box-shadow: 0 0 32px var(--canvas-glow); }
+.pg-controls { margin: 10px 0; display: flex; flex-direction: column; gap: 8px; }
+.pg-control { display: flex; align-items: center; justify-content: space-between; font: 14px system-ui; gap: 8px; color: var(--ink); }
+.pg-control input[type="range"] { flex: 1; accent-color: var(--accent); }
+.pg-editor { width: 100%; min-height: 92px; font: 13px ui-monospace, monospace; margin: 8px 0; border: 1px solid var(--line); border-radius: 10px; padding: 10px; box-sizing: border-box; background: var(--card); color: var(--ink); }
+.pg-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.pg-buttons button { font: 600 14px system-ui; padding: 10px 14px; min-height: 44px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); cursor: pointer; }
+.pg-buttons button:hover { border-color: var(--accent); }
+.pg-buttons .pg-run { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.pg-status { font: 14px system-ui; min-height: 1.2em; margin: 8px 0 0; color: var(--ink); }
+.pg-ok { color: var(--ok); font-weight: bold; }
+.pg-quase { color: var(--quase); }
+.pg-erro { color: var(--erro); font-family: ui-monospace, monospace; font-size: 13px; }
+.pg-hlsl { margin: 8px 0; border: 1px solid var(--recordacao-accent); border-radius: 10px; background: var(--recordacao-bg); }
+.pg-hlsl-nota { font: 13px system-ui; margin: 0; padding: 8px 12px; color: var(--recordacao-accent); }
+.pg-hlsl-code { margin: 0; padding: 10px; font: 13px ui-monospace, monospace; white-space: pre-wrap; overflow-x: auto; border-top: 1px solid var(--line); color: var(--ink); }
 
 .pg-erro-tec { margin-top: 6px; font-size: 0.85em; }
-.pg-erro-tec summary { cursor: pointer; color: #6c6c6c; }
-.pg-erro-tec pre { white-space: pre-wrap; background: #f3f0f0; padding: 6px; border-radius: 4px; overflow-x: auto; margin: 4px 0 0; }
+.pg-erro-tec summary { cursor: pointer; color: var(--muted); }
+.pg-erro-tec pre { white-space: pre-wrap; background: var(--code); padding: 8px; border-radius: 6px; overflow-x: auto; margin: 4px 0 0; color: var(--ink); }
 
-/* Acessibilidade: foco visível em todos os controles do playground */
-.pg button:focus-visible,
-.pg-editor:focus-visible,
-.pg input:focus-visible,
-.pg-erro-tec summary:focus-visible {
-  outline: 3px solid #1c7ed6;
-  outline-offset: 2px;
+/* Foco visível em todos os controles do playground */
+.pg button:focus-visible, .pg-editor:focus-visible, .pg input:focus-visible, .pg-erro-tec summary:focus-visible {
+  outline: 3px solid var(--focus); outline-offset: 2px;
 }

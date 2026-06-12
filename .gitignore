@@ -31,3 +31,6 @@ __pycache__/
 
 # Dependencias node (recriaveis via npm install)
 node_modules/
+
+# Rascunhos de design (mockups, screenshots)
+mockups/
