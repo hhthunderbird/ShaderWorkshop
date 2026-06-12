@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 240" width="640" font-family="sans-serif">
+  <rect width="640" height="240" fill="#fbfbf7"/>
+  <text x="20" y="28" font-size="15" font-weight="bold" fill="#333">A ordem de desenho muda o resultado</text>
+  <!-- ordem certa -->
+  <text x="30" y="58" font-size="13" fill="#2b8a3e">✓ fundo → meio → frente</text>
+  <rect x="30" y="70" width="150" height="120" fill="#c7d2fe"/>
+  <rect x="60" y="95" width="110" height="80" fill="#34d399" opacity="0.6"/>
+  <rect x="95" y="115" width="80" height="60" fill="#e8590c" opacity="0.6"/>
+  <text x="30" y="210" font-size="12" fill="#666">cada camada mistura com a de baixo, na ordem</text>
+  <!-- ordem errada -->
+  <text x="360" y="58" font-size="13" fill="#c92a2a">✗ frente desenhada antes do fundo</text>
+  <rect x="360" y="70" width="150" height="120" fill="#c7d2fe"/>
+  <rect x="395" y="115" width="80" height="60" fill="#e8590c" opacity="0.6"/>
+  <rect x="390" y="95" width="110" height="80" fill="#34d399" opacity="0.6"/>
+  <text x="360" y="210" font-size="12" fill="#666">o que veio antes some sob o que veio depois</text>
+</svg>

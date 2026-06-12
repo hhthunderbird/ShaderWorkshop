@@ -23,3 +23,11 @@ test('M16: e modulo bonus (breadcrumb Bonus, NAO conta nos 14) + Cuidado de orde
   assert.ok(!/de 14/.test(html), 'modulo bonus NAO deve se numerar "de 14"');
   assert.ok(html.includes('class="cuidado"'), 'falta o Cuidado de ordem de desenho');
 });
+
+test('M16: index e glossario linkam o modulo e os termos', () => {
+  const idx = readFileSync('site/index.html', 'utf8');
+  assert.ok(idx.includes('16-transparencia.html'), 'index nao linka o M16');
+  const glo = readFileSync('site/glossario.html', 'utf8');
+  assert.ok(/alpha/i.test(glo), 'glossario nao tem o termo alpha');
+  assert.ok(/blending/i.test(glo), 'glossario nao tem o termo blending');
+});

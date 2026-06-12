@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 220" width="640" font-family="sans-serif">
+  <rect width="640" height="220" fill="#fbfbf7"/>
+  <text x="20" y="28" font-size="15" font-weight="bold" fill="#333">A receita da mistura (alpha = 0.5)</text>
+  <!-- fundo xadrez -->
+  <g>
+    <rect x="30" y="60" width="120" height="120" fill="#d9d9d9"/>
+    <rect x="30" y="60" width="60" height="60" fill="#b0b0b0"/>
+    <rect x="90" y="120" width="60" height="60" fill="#b0b0b0"/>
+    <text x="60" y="200" font-size="13" fill="#666">fundo</text>
+  </g>
+  <text x="165" y="125" font-size="28" fill="#333">+</text>
+  <!-- frente laranja translucida -->
+  <g>
+    <rect x="210" y="60" width="120" height="120" fill="#e8590c" opacity="0.5"/>
+    <text x="220" y="200" font-size="13" fill="#666">frente · 0.5</text>
+  </g>
+  <text x="345" y="125" font-size="28" fill="#333">=</text>
+  <!-- resultado: xadrez visivel sob laranja -->
+  <g>
+    <rect x="390" y="60" width="120" height="120" fill="#d9d9d9"/>
+    <rect x="390" y="60" width="60" height="60" fill="#b0b0b0"/>
+    <rect x="450" y="120" width="60" height="60" fill="#b0b0b0"/>
+    <rect x="390" y="60" width="120" height="120" fill="#e8590c" opacity="0.5"/>
+    <text x="400" y="200" font-size="13" fill="#666">resultado</text>
+  </g>
+  <text x="20" y="215" font-size="13" fill="#2b8a3e">resultado = frente.rgb · a + fundo.rgb · (1 − a)</text>
+</svg>
