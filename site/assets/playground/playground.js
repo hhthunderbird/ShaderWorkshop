@@ -3,7 +3,7 @@ import { toControlSpecs } from './uniforms.js';
 import { compare } from './pixeldiff.js';
 import { extractRegion, reassemble } from './editable.js';
 import { translateToHLSL } from './translate.js';
-import { createContext, buildProgram, setupQuad, setupMesh, MESH_VERTEX, renderFrame, readPixels, loadTexture } from './gl.js';
+import { createContext, buildProgram, setupQuad, setupMesh, MESH_VERTEX, renderFrame, renderFragmentBackdrop, createQuadBuffers, BACKDROP_FRAGMENTS, readPixels, loadTexture } from './gl.js';
 import { withHeader, withHeaderMesh } from './header.js';
 import { friendlyError } from './glslerrors.js';
 import { advanceTime, defaultPlaying } from './anim.js';
@@ -181,7 +181,13 @@ class ShaderPlayground extends HTMLElement {
         this.indexCount = setupMesh(gl, this.program, this.geo);
       } else {
         this.program = buildProgram(gl, withHeader(this.fullSource));
-        this.indexCount = setupQuad(gl, this.program);
+        if (this.cfg.backdrop) {
+          this.backdropProgram = buildProgram(gl, withHeader(BACKDROP_FRAGMENTS[this.cfg.backdrop]));
+          this.quadBufs = this.quadBufs || createQuadBuffers(gl);
+          this.indexCount = 6;
+        } else {
+          this.indexCount = setupQuad(gl, this.program);
+        }
       }
       this.statusEl.textContent = '';
       this.statusEl.className = 'pg-status';
@@ -222,7 +228,11 @@ class ShaderPlayground extends HTMLElement {
           // (translation(0,0,-3)). Se a view mudar, atualizar os dois juntos.
           base.u_cameraPos = [0, 0, 3];
         }
-        renderFrame(this.gl, this.program, this.indexCount, base);
+        if (this.cfg.mode !== 'mesh' && this.cfg.backdrop) {
+          renderFragmentBackdrop(this.gl, this.backdropProgram, this.program, this.quadBufs, base);
+        } else {
+          renderFrame(this.gl, this.program, this.indexCount, base);
+        }
       }
       this._raf = requestAnimationFrame(frame);
     };
