@@ -7,6 +7,13 @@
   <link rel="stylesheet" href="../assets/css/headfirst.css">
   <link rel="stylesheet" href="../assets/css/playground.css">
   <script type="module" src="../assets/playground/playground.js"></script>
+<!-- pwa-head -->
+  <link rel="manifest" href="../manifest.webmanifest">
+  <meta name="theme-color" content="#d6336c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
+  <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('../sw.js'));}</script>
 </head>
 <body class="hf">
   <p><a href="../index.html">← Mapa do curso</a> · Marco 1 · Módulo 2 de 6</p>
