@@ -55,3 +55,8 @@ body.hf { max-width: 820px; margin: 0 auto; padding: 24px; font: 17px/1.6 Georgi
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Tabela de rubrica / índice do kit do professor (o estilo de .sidebar table é escopado lá). */
+.hf .rubrica { border-collapse: collapse; margin: 12px 0; width: 100%; }
+.hf .rubrica th, .hf .rubrica td { border: 1px solid #bbb; padding: 6px 10px; text-align: left; font-size: 15px; vertical-align: top; }
+.hf .rubrica th { background: #e7e0ff; }
