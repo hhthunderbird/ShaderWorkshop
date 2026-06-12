@@ -12,8 +12,9 @@ Curso/_cookies.txt
 # Segredos / sessão de login
 cookies.txt
 
-# Script de download do curso pago (não publicar)
+# Scripts do pipeline do curso pago (não publicar)
 baixar-curso.ps1
+transcrever.py
 
 # Ambiente Python (recriável)
 .venv-whisper/
