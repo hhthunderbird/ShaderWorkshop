@@ -12,6 +12,9 @@ Curso/_cookies.txt
 # Segredos / sessão de login
 cookies.txt
 
+# Script de download do curso pago (não publicar)
+baixar-curso.ps1
+
 # Ambiente Python (recriável)
 .venv-whisper/
 __pycache__/
