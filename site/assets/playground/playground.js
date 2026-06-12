@@ -7,6 +7,7 @@ import { createContext, buildProgram, setupQuad, setupMesh, MESH_VERTEX, renderF
 import { withHeader, withHeaderMesh } from './header.js';
 import { friendlyError } from './glslerrors.js';
 import { advanceTime, defaultPlaying } from './anim.js';
+import { keyFor, save, load } from './localstore.js';
 import { cube, sphere } from './geometry.js';
 import { multiply, perspective, translation, rotateX, rotateY, mat3FromMat4 } from './mat4.js';
 
@@ -25,11 +26,19 @@ class ShaderPlayground extends HTMLElement {
     this.controlValues = {};
     for (const s of this.controlSpecs) this.controlValues[s.name] = s.value;
     this.fullSource = this.cfg.fragment;
+    this._store = (typeof window !== 'undefined' && window.localStorage) ? window.localStorage : null;
+    this._idx = [...document.querySelectorAll('shader-playground')].indexOf(this);
+    this._restored = false;
     this._t = 0;
     this._last = performance.now();
     this.playing = defaultPlaying(this._prefersReduced());
     this._render();
+    this._restore();
     this._compile();
+    if (this._restored) {
+      this.statusEl.textContent = '↻ Retomei seu trabalho salvo.';
+      this.statusEl.className = 'pg-status pg-ok';
+    }
     this._loop();
   }
 
@@ -44,6 +53,10 @@ class ShaderPlayground extends HTMLElement {
     return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }
 
+  _storeKey() {
+    return keyFor(location.pathname, this.id || ('pg' + this._idx));
+  }
+
   _render() {
     const animated = this.cfg.mode === 'mesh' || this.fullSource.includes('u_time');
     this.innerHTML = `
@@ -54,6 +67,7 @@ class ShaderPlayground extends HTMLElement {
         <div class="pg-buttons">
           <button class="pg-run">▶ Test Drive</button>
           <button class="pg-reset">↺ Reset</button>
+          ${this.cfg.editableRegions.length ? '<button class="pg-save">💾 Salvar</button>' : ''}
           ${animated ? `<button class="pg-anim">${this.playing ? '⏸ Pausar' : '▶ Animar'}</button>` : ''}
           ${this.cfg.reference ? '<button class="pg-check">✓ Conferir</button>' : ''}
           ${this.cfg.solution ? '<button class="pg-solution">💡 Mostrar solução</button>' : ''}
@@ -98,6 +112,7 @@ class ShaderPlayground extends HTMLElement {
 
     this.querySelector('.pg-run')?.addEventListener('click', () => this._applyEditorAndCompile());
     this.querySelector('.pg-reset')?.addEventListener('click', () => this._reset());
+    this.querySelector('.pg-save')?.addEventListener('click', () => this._save());
     this.querySelector('.pg-anim')?.addEventListener('click', (e) => {
       this.playing = !this.playing;
       e.target.textContent = this.playing ? '⏸ Pausar' : '▶ Animar';
@@ -280,6 +295,27 @@ class ShaderPlayground extends HTMLElement {
       this.editor.value = this.cfg.solution;
       this._applyEditorAndCompile();
     }
+  }
+
+  _save() {
+    if (!this.editor || !this._store) return;
+    const ok = save(this._store, this._storeKey(), this.editor.value);
+    if (ok) {
+      this.statusEl.textContent = '💾 Salvo neste navegador.';
+      this.statusEl.className = 'pg-status pg-ok';
+    } else {
+      this.statusEl.textContent = '⚠ Não consegui salvar (armazenamento cheio ou bloqueado).';
+      this.statusEl.className = 'pg-status pg-erro';
+    }
+  }
+
+  _restore() {
+    if (!this.editor || !this._store) return;
+    const texto = load(this._store, this._storeKey());
+    if (texto === null) return;
+    this.editor.value = texto;
+    this.fullSource = reassemble(this.cfg.fragment, this.cfg.editableRegions[0], texto);
+    this._restored = true;
   }
 
   disconnectedCallback() {
