@@ -30,6 +30,18 @@ void main() {
 
 export { MESH_VERTEX };
 
+// Shaders de fundo opaco (backdrop) p/ o módulo de transparência. v_uv é
+// injetado por withHeader (declaração-aware). Opaco (alpha 1.0).
+export const BACKDROP_FRAGMENTS = {
+  xadrez: `precision mediump float;
+void main() {
+  vec2 g = floor(v_uv * 8.0);
+  float c = mod(g.x + g.y, 2.0);
+  vec3 cor = mix(vec3(0.85), vec3(0.55), c);
+  gl_FragColor = vec4(cor, 1.0);
+}`,
+};
+
 export function createContext(canvas) {
   const gl =
     canvas.getContext('webgl', { antialias: true, preserveDrawingBuffer: true }) ||
@@ -65,31 +77,40 @@ export function buildProgram(gl, fragmentSource, vertexSource = QUAD_VERTEX) {
   return prog;
 }
 
-export function setupQuad(gl, program) {
+// Cria os buffers do quad fullscreen UMA vez. Retorna as referências p/ rebind.
+export function createQuadBuffers(gl) {
   const positions = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
   const uvs = new Float32Array([0, 0, 1, 0, 0, 1, 1, 1]);
   const indices = new Uint16Array([0, 1, 2, 2, 1, 3]);
-
   const posBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
   gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-  const posLoc = gl.getAttribLocation(program, 'a_position');
-  gl.enableVertexAttribArray(posLoc);
-  gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
   const uvBuf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, uvBuf);
   gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW);
-  const uvLoc = gl.getAttribLocation(program, 'a_uv');
-  if (uvLoc !== -1) {
-    gl.enableVertexAttribArray(uvLoc);
-    gl.vertexAttribPointer(uvLoc, 2, gl.FLOAT, false, 0, 0);
-  }
-
   const idxBuf = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, idxBuf);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-  return 6; // index count
+  return { posBuf, uvBuf, idxBuf };
+}
+
+// Liga os atributos do quad para `program`. Chamar antes de cada draw — as
+// locations podem diferir entre programas (backdrop x aluno).
+export function bindQuad(gl, program, bufs) {
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufs.posBuf);
+  const posLoc = gl.getAttribLocation(program, 'a_position');
+  if (posLoc !== -1) { gl.enableVertexAttribArray(posLoc); gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0); }
+  gl.bindBuffer(gl.ARRAY_BUFFER, bufs.uvBuf);
+  const uvLoc = gl.getAttribLocation(program, 'a_uv');
+  if (uvLoc !== -1) { gl.enableVertexAttribArray(uvLoc); gl.vertexAttribPointer(uvLoc, 2, gl.FLOAT, false, 0, 0); }
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufs.idxBuf);
+}
+
+// Mantém a assinatura antiga: cria buffers, liga p/ `program`, retorna o nº de índices.
+export function setupQuad(gl, program) {
+  const bufs = createQuadBuffers(gl);
+  bindQuad(gl, program, bufs);
+  return 6;
 }
 
 // Cria buffers de uma malha {positions, normals, uvs, indices} e liga os atributos.
@@ -114,8 +135,8 @@ export function setupMesh(gl, program, geo) {
   return geo.indices.length;
 }
 
-// Aplica uniforms automáticos + de controle e desenha.
-export function renderFrame(gl, program, indexCount, uniforms) {
+// Aplica todos os uniforms automáticos + de controle no programa dado.
+function applyUniforms(gl, program, uniforms) {
   gl.useProgram(program);
   const set = (name, fn) => {
     const loc = gl.getUniformLocation(program, name);
@@ -138,11 +159,37 @@ export function renderFrame(gl, program, indexCount, uniforms) {
     if (Array.isArray(val)) set(name, (l) => gl.uniform3f(l, val[0], val[1], val[2]));
     else set(name, (l) => gl.uniform1f(l, val));
   }
+}
+
+// Caminho padrão (1 draw, opaco). Comportamento idêntico ao de antes.
+export function renderFrame(gl, program, indexCount, uniforms) {
+  applyUniforms(gl, program, uniforms);
   gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
   gl.enable(gl.DEPTH_TEST);
   gl.clearColor(0, 0, 0, 1);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.drawElements(gl.TRIANGLES, indexCount, gl.UNSIGNED_SHORT, 0);
+}
+
+// Caminho de transparência (2 draws): backdrop opaco -> objeto do aluno com
+// blend src-over contra o framebuffer. DEPTH off (fragment 2D; garante o aluno por cima).
+export function renderFragmentBackdrop(gl, backdropProgram, userProgram, bufs, userUniforms) {
+  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+  gl.disable(gl.DEPTH_TEST);
+  gl.disable(gl.BLEND);
+  gl.clearColor(0, 0, 0, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  // passe 1: backdrop opaco
+  gl.useProgram(backdropProgram);
+  bindQuad(gl, backdropProgram, bufs);
+  gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+  // passe 2: aluno com blend src-over (frente.rgb*a + fundo.rgb*(1-a))
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  applyUniforms(gl, userProgram, userUniforms);
+  bindQuad(gl, userProgram, bufs);
+  gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+  gl.disable(gl.BLEND); // deixa o estado limpo
 }
 
 // Carrega uma textura de uma URL. Placeholder 1px cinza enquanto carrega.
